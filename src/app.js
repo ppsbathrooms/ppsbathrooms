@@ -21,12 +21,12 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static('views')); // load the files that are in the views directory
 
-const test = [1,0,1,1,1,0,0,1,1,0,0,0,0,0];
+const testData = [1,0,1,1,1,0,0,1,1,0,0,0,0,0];
 app.get('/', (req, res) => {
   var dataToSendToClient = {
-    brData: test
+    brData: testData
   };
-  res.render('html/index.html', dataToSendToClient);
+  res.render('html/chs.html', dataToSendToClient);
 });
 
 app.get('*', (req, res) => {
