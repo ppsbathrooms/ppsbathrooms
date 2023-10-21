@@ -45,4 +45,5 @@ html::-webkit-scrollbar {
 
 #mapSvg {
     width: 45vw;
+    margin-bottom: 50px;
 }
