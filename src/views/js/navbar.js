@@ -5,6 +5,10 @@ $('#navbar').html(
       '<a href="chs.html"><img class="navbarImg" src="../style/images/logos/clevelandLogo.png"></img></a><br>' +
       '<a href="fhs.html"><img class="navbarImg" src="../style/images/logos/franklinLogo.png"></img></a><br>' + 
       '<a href="ihs.html"><img class="navbarImg" src="../style/images/logos/idaLogo.png"></img></a><br>' +
+    '</div>' +
+    '<div id="navButtonsBottom">' +
+        '<a href="privacy.html">privacy</a>' +
+        '<a href="terms.html">terms</a>' +
     '</div>'
 );
 

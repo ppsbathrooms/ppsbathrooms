@@ -28,7 +28,7 @@ html::-webkit-scrollbar {
     margin: 0;
     z-index: 2;
     user-select: none;
-    
+
     top:  15px;
     left: 15px;
 
@@ -82,4 +82,34 @@ html::-webkit-scrollbar {
 #schoolButtons img:hover {
     opacity: 1;
     transition: opacity 0.2s;
+}
+
+#navButtonsBottom {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+}
+
+#navButtonsBottom a {
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: 10px;
+    opacity: .75;
+    transition: opacity 0.2s;
+}
+
+#navButtonsBottom a:hover {
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+.termstext {
+    color: #ffffff;
+    margin: 25px;
+    text-decoration: none;
 }
