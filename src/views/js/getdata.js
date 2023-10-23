@@ -1,3 +1,5 @@
+//get data from ppsbathrooms.org/{}data
+
 var request = makeHttpObject();
 request.open("GET", "https://www.ppsbathrooms.org/" + $("#pageID").html() + "data.json", true);
 request.send(null);
@@ -17,9 +19,26 @@ request.onreadystatechange = function() {
             setStatus(i, newStatus[i]);
         }
 
-        $("#svgBathrooms").fadeIn(100);
+        $("#svgBathrooms").show(100);
     }
 };
+
+
+
+//get data from local file
+
+// brData = brData.toString().split(',');
+// if (navigator.onLine) {newStatus = brData}
+// else {
+//     newStatus = -1;
+// }
+
+// for (var i = 0; i < 14; i++) {
+//     setStatus(i, newStatus[i]);
+// }
+
+// $("#svgBathrooms").show(100);
+
 
 function makeHttpObject() {
   try {return new XMLHttpRequest();}
@@ -48,15 +67,4 @@ function getBrData(brNumber) {
         return brData[brNumber];
     else
         return brData;
-}
-
-function noWifi() {
-    $('#noInternet').show();
-    $('#noInternetGlow').show();
-    showError('no internet connection');
-}
-
-function showError(error) {
-    $('#errorMessage').show();
-    $('#errorMessage').html('ERROR: ' + error);
 }
