@@ -57,7 +57,7 @@ app.get('/schools', (req, res) => {
 
 //404 keep at end of redirects
 app.get('*', (req, res) => {
-  res.render('html/404.html', {});
+  res.status(404).render('html/404.html', {});
 });
 
 
@@ -78,7 +78,7 @@ app.get('/multiple/paths', (req, res) => {
   // exist
 });
 
-// set up listener on port 5500
-const listener = app.listen(5500, function() {
+// set up listener on port 42069
+const listener = app.listen(42069, function() {
   console.log('listening on port ' + listener.address().port);
 });
