@@ -1,3 +1,4 @@
+//navbar
 $('#navbar').html(
   '<button id="navbarButton"><img id="icon16" src="../style/icons/bars.svg"></button>' + 
   '<div id="navbarBackground">' +
@@ -12,9 +13,11 @@ $('#navbar').html(
     '</div>'
 );
 
+//footer
+$('#footer').html('<p id="footerText">© sid collective 2023</p>');
 
 
-
+//navbar functions
 $("#navbarButton").click(function(){
   $("#navbarBackground").animate({width: 'toggle'}, 100);
 });
