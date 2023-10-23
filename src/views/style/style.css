@@ -1,8 +1,9 @@
 body {
     margin: 0;
     scroll-behavior: smooth;
-    background: #0f0f0f;
+    background: #0f141a;
     font-family: monospace;
+    text-transform: lowercase;
 }
 
 html {

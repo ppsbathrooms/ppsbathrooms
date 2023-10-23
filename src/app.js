@@ -21,22 +21,42 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static('views')); // load the files that are in the views directory
 
-const testData = [1,0,1,1,1,0,0,1,1,0,0,0,0,0];
+var chsdata = fs.readFileSync('chsdata.txt', 'utf8');
 
 app.get('/', (req, res) => {
-  var dataToSendToClient = {
-    brData: testData
-  };
-  res.render('html/chs.html', dataToSendToClient);
+  res.render('html/schools.html');
 });
 
+//cleveland
 app.get('/cleveland', (req, res) => {
   var dataToSendToClient = {
-    brData: testData
+    brData: chsdata
   };
   res.render('html/chs.html', dataToSendToClient);
 });
 
+//franklin
+app.get('/franklin', (req, res) => {
+  var dataToSendToClient = {
+    brData: chsdata
+  };
+  res.render('html/fhs.html', dataToSendToClient);
+});
+
+//ida
+app.get('/ida', (req, res) => {
+  var dataToSendToClient = {
+    brData: chsdata
+  };
+  res.render('html/ihs.html', dataToSendToClient);
+});
+
+//schools
+app.get('/schools', (req, res) => {
+  res.render('html/schools.html');
+});
+
+//404 keep at end of redirects
 app.get('*', (req, res) => {
   res.render('html/404.html', {});
 });
@@ -59,7 +79,7 @@ app.get('/multiple/paths', (req, res) => {
   // exist
 });
 
-// Thing that no one knows how it works but is important
-const listener = app.listen(process.env.PORT, function() {
+// set up listener on port 5500
+const listener = app.listen(5500, function() {
   console.log('listening on port ' + listener.address().port);
 });
