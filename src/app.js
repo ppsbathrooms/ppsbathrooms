@@ -63,10 +63,6 @@ db.loadDatabase(function (error) {
 // });
 
 
-
-
-// var chsdata = fs.readFileSync('chsdata.txt', 'utf8');
-
 app.get('/', (req, res) => {
   res.render('html/schools.html');
 });
@@ -84,8 +80,6 @@ app.get('/cleveland', (req, res) => {
     }
   });
 });
-
-
 
 //franklin
 app.get('/franklin', (req, res) => {
@@ -124,6 +118,18 @@ app.get('/schools', (req, res) => {
 app.get('*', (req, res) => {
   res.status(404).render('html/404.html', {});
 });
+
+app.post('/bathroomReportCHS', function(req, res) {
+  if (req.body.confirmation.toLowerCase() == '123') {
+    var values = req.body.values;
+    setBrData('chs', values);
+    addTotalVotes(1);
+  }
+});
+
+function setBrData(school, value) {
+  console.log(chalk.blue(school, ' set to ', value));
+}
 
 
 app

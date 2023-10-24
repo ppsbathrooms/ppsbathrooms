@@ -1,42 +1,31 @@
+brData = $('#brData').html();
+brData = brData.toString().split(',');
+numDiff = 0;
+originalData = [...brData];
+
+
 function buttonPressed(brNumber) {
-    newData = getBrData();
-    console.log(newData)
-    newDataSingle = getBrData(brNumber);
-    console.log(newDataSingle)
-    switch(newDataSingle) {
-        case true:
-            newDataSingle = 1;
-            break;
-        case false:
-            newDataSingle = 0;
-            break;
+    brData[brNumber] = 1 - brData[brNumber];
+    originalData[brNumber] = Number(originalData[brNumber]);
+
+    setStatus(brNumber, brData[brNumber]);
+    
+    if (brData[brNumber] !== originalData[brNumber]) {
+        numDiff += 1;
+    } else {
+        numDiff -= 1;
     }
 
-    // console.log(newDataSingle)
+    if ((numDiff > 0) && !$('#submitButton').is(":visible")) {
+        $("#submitButton")
+            .css("display", "flex")
+            .fadeIn(100);
 
-    newData[brNumber] = (!newDataSingle);
-
-
-    // console.log(newDataSingle)
-
-
-    var numDiff = 0;
-    for (var i = 0; i < 14; i++) {
-        if ((newData[i] != newDataSingle)) {
-            numDiff++;
-        }
+        } else if (numDiff === 0) {
+        $("#submitButton").fadeOut(100);
     }
-    setStatus(brNumber, newDataSingle);
 
-    console.log(numDiff)
-
-    var fadeSpeed = 100;
-    if (numDiff > 0 && $("#submitButton").is(":hidden")) {
-        $("#submitButton").fadeIn(fadeSpeed);
-    } else if (numDiff == 0) {
-        $("#submitButton").fadeOut(fadeSpeed);
-    }
-    document.getElementById("submitButton").innerHTML = "submit (" + numDiff + ")";
+    document.getElementById("submitButton").innerHTML = '<img id="icon16" src="/style/icons/check.svg"></img> <p> ('+numDiff+')</p>';
 }
 
 function submitData() {
@@ -46,7 +35,7 @@ function submitData() {
 
     // Send data to server
     $(document).ready(function () {
-        $.post("/bathroomReportPostMultipleCHS",
+        $.post("/bathroomReportCHS",
             {
                 values: newData,
                 confirmation: pass
@@ -127,13 +116,13 @@ function promptRoomHighlight() {
         else {
             notHighlighted = false;
             removeHighlight = document.getElementById("highlightRoomButton");
-            removeHighlight.innerHTML = "<img src='/icons/x.svg'>";
+            removeHighlight.innerHTML = "<img id='icon16' src='style/icons/x.svg'>";
             toggleBathrooms(false);
         }
     }
     else {
         notHighlighted = true;
-        document.getElementById("highlightRoomButton").innerHTML = "<img src='/icons/find.svg'>";
+        document.getElementById("highlightRoomButton").innerHTML = "<img id='icon16' src='style/icons/find.svg'>";
         $("#cancelHighlightButton").fadeOut(100);
         $("#highlight").fadeOut(250);
         $("#triHighlight").fadeOut(250);
@@ -158,31 +147,21 @@ function submitFeedback() {
     alert("Thank you for helping us improve ppsbathrooms!")
 }
 
-
-// $("#button1, #square1").click(function() {buttonPressed(0);});
-// $("#button2, #square2").click(function() {buttonPressed(1);});
-// $("#button3, #square3").click(function() {buttonPressed(2);});
-// $("#button4, #square4").click(function() {buttonPressed(3);});
-// $("#button5, #square5").click(function() {buttonPressed(4);});
-// $("#button6, #square6").click(function() {buttonPressed(5);});
-// $("#button7, #square7").click(function() {buttonPressed(6);});
-// $("#button8, #square8").click(function() {buttonPressed(7);});
-// $("#button9, #square9").click(function() {buttonPressed(8);});
-// $("#button10, #square10").click(function() {buttonPressed(9);});
-// $("#button11, #square11").click(function() {buttonPressed(10);});
-// $("#button12, #square12").click(function() {buttonPressed(11);});
-// $("#button13, #square13").click(function() {buttonPressed(12);});
-// $("#button14, #square14").click(function() {buttonPressed(13);});
+//buttons
+for (let i = 0; i < 14; i++) {
+    $("#button" + i).click(function() {buttonPressed(i-1);});
+    $("#square" + i).click(function() {buttonPressed(i-1);});
+}
 
 
-// $("#feedbackButton").click(function() {
-//     submitFeedback();
-// });
+$("#feedbackButton").click(function() {
+    submitFeedback();
+});
 
-// $("#highlightRoomButton").click(function() {
-//     promptRoomHighlight();
-// });
+$("#highlightRoomButton").click(function() {
+    promptRoomHighlight();
+});
 
-// $("#submitButton").click(function() {
-//     submitData();
-// });
+$("#submitButton").click(function() {
+    submitData();
+});

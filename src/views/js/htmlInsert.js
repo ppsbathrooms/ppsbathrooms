@@ -1,6 +1,6 @@
 //navbar
 $('#navbar').html(
-  '<button id="navbarButton"><img id="icon16" src="../style/icons/bars.svg"></button>' + 
+  '<button id="navbarButton"><img id="icon24" src="../style/icons/bars.svg"></button>' + 
   '<div id="navbarBackground">' +
     '<div id="schoolButtons">' +
       '<a href="/cleveland"><img class="navbarImg" src="../style/images/logos/clevelandLogo.png"></img></a><br>' +
@@ -12,6 +12,21 @@ $('#navbar').html(
         '<a href="terms.html">terms</a>' +
     '</div>'
 );
+
+$('#buttons').html(
+  '<div>' +
+    '<div class="bottomButtonHolder">' +
+      '<button id="feedbackButton"><img id="icon16" src="/style/icons/feedback.svg"></img></button>' +
+      '<button id="highlightRoomButton"><img id="icon16" src="/style/icons/find.svg"></img></button>' +
+    '</div>' +
+    '<div class="bottomSubmit">' +
+      '<button id="submitButton"><img id="icon16" src="/style/icons/check.svg"></img>' +
+        '<p> (0)</p>' +
+      '</button>' +
+    '</div>' +
+  '</div>'
+);
+
 
 //footer
 $('#footer').html('<p id="footerText">© sid collective 2023</p>');
