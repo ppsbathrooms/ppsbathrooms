@@ -167,14 +167,15 @@ for (let i = 0; i < numBathrooms + 1; i++) {
 }
 
 
-$("#feedbackButton").click(function() {
+//jquery on click functions need to be different because the code is appended
+$(document).on('click','#feedbackButton',function(e) {
     submitFeedback();
 });
 
-$("#highlightRoomButton").click(function() {
+$(document).on('click','#highlightRoomButton',function(e) {
     promptRoomHighlight();
 });
 
-$("#submitButton").click(function() {
+$(document).on('click','#submitButton',function(e) {
     submitData();
 });
