@@ -92,16 +92,16 @@ app.get('*', (req, res) => {
 
 //recieve post request, send update
 app.post('/bathroomUpdate', function(req, res) {
-  if (req.body.confirmation.toLowerCase() == '123') {
     var values = req.body.values;
     var school = req.body.school;
+  if (req.body.confirmation.toLowerCase() == getPassword(school)) {
     values = values.toString();
     values = values.replace(/[\n\r]/g, '');
     values = values.replace(/\s/g, '');
     setBrData(school, values);
   }
   else {
-    console.log(chalk.red("WRONG PASS: '", req.body.confirmation, "'"))
+    console.log(chalk.red("WRONG PASS FOR " + school.toUpperCase() + ": '", req.body.confirmation, "'"))
   }
 });
 
@@ -128,6 +128,21 @@ function submitFeedback(feedback) {
     var text = String(buf);
     writetofile(text, 'feedback', dateTime() + " | " + feedback);
   });
+}
+
+function getPassword(school) {
+  switch(school) {
+    case 'chs':
+      password = 'pass';
+      break;
+    case 'fhs': 
+      password = 'franklinpass'
+      break;
+    case 'ihs':
+      password = 'idapass'
+      break;
+  }
+  return password;
 }
 
 //date time
