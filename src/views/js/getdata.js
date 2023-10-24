@@ -1,43 +1,44 @@
 //get data from ppsbathrooms.org/{}data
 
-var request = makeHttpObject();
-request.open("GET", "https://www.ppsbathrooms.org/" + $("#pageID").html() + "data.json", true);
-request.send(null);
-request.onreadystatechange = function() {
-    if (request.readyState == 4) {
-        brData = request.responseText;
-        brData.length = 1; 
-        brData = brData.toString().split(','); 
+// var request = makeHttpObject();
+// request.open("GET", "https://www.ppsbathrooms.org/" + $("#pageID").html() + "data.json", true);
+// request.send(null);
+// request.onreadystatechange = function() {
+//     if (request.readyState == 4) {
+//         brData = request.responseText;
+//         brData.length = 1; 
+//         brData = brData.toString().split(','); 
 
-        if (navigator.onLine) {newStatus = brData}
-        else {
-            newStatus = -1;
-            noWifi();
-        }
+//         if (navigator.onLine) {newStatus = brData}
+//         else {
+//             newStatus = -1;
+//             noWifi();
+//         }
 
-        for (var i = 0; i < 14; i++) {
-            setStatus(i, newStatus[i]);
-        }
+//         for (var i = 0; i < 14; i++) {
+//             setStatus(i, newStatus[i]);
+//         }
 
-        $("#svgBathrooms").show(100);
-    }
-};
+//         $("#svgBathrooms").show(100);
+//     }
+// };
 
 
 
-//get data from local file
+//get data from db file
 
-// brData = brData.toString().split(',');
-// if (navigator.onLine) {newStatus = brData}
-// else {
-//     newStatus = -1;
-// }
+brData = $('#brData').html();
+brData = brData.toString().split(',');
+if (navigator.onLine) {newStatus = brData}
+else {
+    newStatus = -1;
+}
 
-// for (var i = 0; i < 14; i++) {
-//     setStatus(i, newStatus[i]);
-// }
+for (var i = 0; i < 14; i++) {
+    setStatus(i, newStatus[i]);
+}
 
-// $("#svgBathrooms").show(100);
+$("#svgBathrooms").show(100);
 
 
 function makeHttpObject() {

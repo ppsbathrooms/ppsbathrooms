@@ -29,10 +29,8 @@ html::-webkit-scrollbar {
     margin: 0;
     z-index: 2;
     user-select: none;
-
     top:  15px;
     left: 15px;
-
     cursor: pointer;
 }
 
@@ -55,9 +53,9 @@ html::-webkit-scrollbar {
     position: fixed;
     height: 100%;
     width: 64px;
+    top: 0;
     left: 0;
     background-color: #24303d;
-
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     display: none;
@@ -119,7 +117,7 @@ html::-webkit-scrollbar {
     display: none;
 }
 
-#data {
+#brData {
     display: none;
 }
 
