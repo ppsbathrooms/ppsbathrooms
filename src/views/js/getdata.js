@@ -35,6 +35,7 @@ else {
 }
 
 for (var i = 0; i < 14; i++) {
+    // console.log('set status ', i, newStatus[i])
     setStatus(i, newStatus[i]);
 }
 

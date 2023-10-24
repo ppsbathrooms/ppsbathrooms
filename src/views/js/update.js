@@ -1,3 +1,4 @@
+pageId = $('#pageID').html();
 brData = $('#brData').html();
 brData = brData.toString().split(',');
 numDiff = 0;
@@ -147,8 +148,20 @@ function submitFeedback() {
     alert("Thank you for helping us improve ppsbathrooms!")
 }
 
+    switch(pageId) {
+        case 'chs':
+            numBathrooms = 14;
+            break;
+        case 'fhs':
+            numBathrooms = 35;
+            break;
+        case 'ihs':
+            numBathrooms = 5;
+            break;
+    }
+
 //buttons
-for (let i = 0; i < 14; i++) {
+for (let i = 0; i < numBathrooms + 1; i++) {
     $("#button" + i).click(function() {buttonPressed(i-1);});
     $("#square" + i).click(function() {buttonPressed(i-1);});
 }
