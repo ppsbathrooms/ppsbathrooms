@@ -105,6 +105,12 @@ app.post('/bathroomUpdate', function(req, res) {
   }
 });
 
+app.post('/sendFeedback', function(req, res) {
+  console.log(chalk.gray("Feedback Submitted: " + req.body.feedback));
+  submitFeedback(req.body.feedback);
+});
+
+
 //updates bathroom data
 function setBrData(school, value) {
   db.update(
@@ -117,6 +123,32 @@ function setBrData(school, value) {
   console.log(chalk.blue(school, 'set to', value));
 }
 
+function submitFeedback(feedback) {
+  fs.readFile('feedback.txt', function(err, buf) {
+    var text = String(buf);
+    writetofile(text, 'feedback', dateTime() + " | " + feedback);
+  });
+}
+
+//date time
+function dateTime() {
+var currentdate = new Date(); 
+return (new Date().getMonth()+1)  + "/" 
+                + currentdate.getDate() + "/"
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+}
+
+//writes to file
+async function writetofile(txtFileContents, file, read) {
+  var newText = txtFileContents + '\n' + read;
+
+  fs.writeFile(file + '.txt', newText, err => {
+    if (err) throw err;
+  });
+};
 
 app
   .route('/reqtypes')
