@@ -34,35 +34,6 @@ db.loadDatabase(function (error) {
     console.log(chalk.green('INFO: local database loaded successfully.'))
 });
 
-
-// use this stuff to set data inside of database
-// var schools = [];
-
-// var chs = {
-//   name: 'chs',
-//   value: '1,1,1,1,1,1,1,1,1,1,1,1,1,1'
-// };
-
-// var fhs = {
-//   name: 'fhs',
-//   value: '0,0,0,0,0'
-// };
-
-// var ihs = {
-//   name: 'ihs',
-//   value: '0,0,0,0,0,0,0,0,0,0,0,0,0,0'
-// };
-
-// schools.push(chs, fhs, ihs);
-
-// db.insert(schools, function(err, docs) {
-//     docs.forEach(function(d) {
-//         console.log('Saved school:', d.name);
-//         console.log('value:', d.value);
-//     });
-// });
-
-
 app.get('/', (req, res) => {
   res.render('html/schools.html');
 });
@@ -119,16 +90,31 @@ app.get('*', (req, res) => {
   res.status(404).render('html/404.html', {});
 });
 
-app.post('/bathroomReportCHS', function(req, res) {
+//recieve post request, send update
+app.post('/bathroomUpdate', function(req, res) {
   if (req.body.confirmation.toLowerCase() == '123') {
     var values = req.body.values;
-    setBrData('chs', values);
-    addTotalVotes(1);
+    var school = req.body.school;
+    values = values.toString();
+    values = values.replace(/[\n\r]/g, '');
+    values = values.replace(/\s/g, '');
+    setBrData(school, values);
+  }
+  else {
+    console.log(chalk.red("WRONG PASS: '", req.body.confirmation, "'"))
   }
 });
 
+//updates bathroom data
 function setBrData(school, value) {
-  console.log(chalk.blue(school, ' set to ', value));
+  db.update(
+    { _id: school + "Data"}, 
+    { $set: { value: value} },
+    {},
+    function (err, numReplaced) {db.loadDatabase();}
+  );
+  
+  console.log(chalk.blue(school, 'set to', value));
 }
 
 
@@ -149,6 +135,7 @@ app.get('/multiple/paths', (req, res) => {
   // exist
 });
 
+// thing that works but nobody knows how
 // set up listener on port 42069
 const listener = app.listen(42069, function() {
   console.log('listening on port ' + listener.address().port);

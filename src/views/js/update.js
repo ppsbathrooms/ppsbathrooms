@@ -36,9 +36,10 @@ function submitData() {
 
     // Send data to server
     $(document).ready(function () {
-        $.post("/bathroomReportCHS",
+        $.post("/bathroomUpdate",
             {
-                values: newData,
+                values: brData,
+                school: pageId,
                 confirmation: pass
             },
             function (data, status) {
