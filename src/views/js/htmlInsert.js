@@ -16,6 +16,7 @@ $('#navbar').html(
 $('#buttons').html(
   '<div>' +
     '<div class="bottomButtonHolder">' +
+      '<div id="bottomButtonNavbarShift"></div>' + 
       '<button id="feedbackButton"><img id="icon16" src="/style/icons/feedback.svg"></img></button>' +
       '<button id="highlightRoomButton"><img id="icon16" src="/style/icons/find.svg"></img></button>' +
     '</div>' +
@@ -35,4 +36,5 @@ $('#footer').html('<p id="footerText">© sid collective 2023</p>');
 //navbar functions
 $("#navbarButton").click(function(){
   $("#navbarBackground").animate({width: 'toggle'}, 100);
+  $("#bottomButtonNavbarShift").animate({width: 'toggle'}, 100);
 });

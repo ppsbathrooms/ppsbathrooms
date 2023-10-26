@@ -31,7 +31,7 @@ db.loadDatabase(function (error) {
       console.log(chalk.red('FATAL: local database could not be loaded. Caused by: ' + error));
       throw error;
     }
-    console.log(chalk.green('INFO: local database loaded successfully.'))
+    console.log(chalk.green('local database loaded successfully'))
 });
 
 app.get('/', (req, res) => {
@@ -101,12 +101,12 @@ app.post('/bathroomUpdate', function(req, res) {
     setBrData(school, values);
   }
   else {
-    console.log(chalk.red("WRONG PASS FOR " + school.toUpperCase() + ": '", req.body.confirmation, "'"))
+    console.log(chalk.red("wrong pass for " + school + ": '", req.body.confirmation, "'"))
   }
 });
 
 app.post('/sendFeedback', function(req, res) {
-  console.log(chalk.gray("Feedback Submitted: " + req.body.feedback));
+  console.log(chalk.gray("feedback submitted: " + req.body.feedback));
   submitFeedback(req.body.feedback);
 });
 
@@ -120,7 +120,7 @@ function setBrData(school, value) {
     function (err, numReplaced) {db.loadDatabase();}
   );
   
-  console.log(chalk.blue(school, 'set to', value));
+  console.log(chalk.gray(school, 'set to', value));
 }
 
 function submitFeedback(feedback) {
