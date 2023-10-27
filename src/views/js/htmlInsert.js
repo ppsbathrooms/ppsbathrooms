@@ -1,5 +1,6 @@
 //navbar
 $('#navbar').html(
+  '<img src="../style/icons/noWifi.svg" id="noWifi"></img>' +
   '<button id="navbarButton"><img id="icon24" src="../style/icons/bars.svg"></button>' + 
   '<div id="navbarBackground">' +
     '<div id="schoolButtons">' +
@@ -38,3 +39,7 @@ $("#navbarButton").click(function(){
   $("#navbarBackground").animate({width: 'toggle'}, 100);
   $("#bottomButtonNavbarShift").animate({width: 'toggle'}, 100);
 });
+
+if (!navigator.online) {
+  $('#noWifi').show();
+}

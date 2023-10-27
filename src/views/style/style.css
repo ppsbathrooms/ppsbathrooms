@@ -63,6 +63,7 @@ html::-webkit-scrollbar {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     display: none;
+    user-select: none;
 }
 
 #schoolButtons {
@@ -77,7 +78,6 @@ html::-webkit-scrollbar {
 #schoolButtons img {
     width:  40px;
     height: 40px;
-    user-select: none;
     opacity: .75;
     transition: opacity 0.2s;
 }
@@ -193,4 +193,15 @@ html::-webkit-scrollbar {
 #bottomButtonNavbarShift {
     width: 70px;
     display: none;
+}
+
+#noWifi, #noWifiBlur {
+    height: 24px;
+    width:  24px;
+
+    position: fixed;
+    top:   20px;
+    right: 20px;
+    display: none;
+    user-select: none;
 }
