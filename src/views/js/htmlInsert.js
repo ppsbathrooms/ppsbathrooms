@@ -40,6 +40,6 @@ $("#navbarButton").click(function(){
   $("#bottomButtonNavbarShift").animate({width: 'toggle'}, 100);
 });
 
-if (!navigator.online) {
+if (!navigator.onLine) {
   $('#noWifi').show();
 }
