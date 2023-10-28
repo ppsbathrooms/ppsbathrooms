@@ -13,11 +13,20 @@
 </head>
 
 <body>
-  <p id="pageID">chs</p>
 
-  <p id="brData">
-    <%= data.brData %>
-  </p>
+  <div class="schoolData">
+    <p id="chsData">
+      <%= data.brData[0] %>
+    </p>
+    <p id="fhsData">
+      <%= data.brData[1] %>
+    </p>
+    <p id="ihsData">
+      <%= data.brData[2] %>
+    </p>
+  </div>
+
+  <p id="pageID">chs</p>
 
   <div id="navbar"></div>
 

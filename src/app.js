@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 
 //cleveland
 app.get('/cleveland', (req, res) => {
-  db.findOne({ name: 'chs' }, function(err, doc) {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
     if (err) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
@@ -54,7 +54,7 @@ app.get('/cleveland', (req, res) => {
 
 //franklin
 app.get('/franklin', (req, res) => {
-  db.findOne({ name: 'fhs' }, function(err, doc) {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
     if (err) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
@@ -68,7 +68,7 @@ app.get('/franklin', (req, res) => {
 
 //ida
 app.get('/ida', (req, res) => {
-  db.findOne({ name: 'ihs' }, function(err, doc) {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
     if (err) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
@@ -94,11 +94,12 @@ app.get('*', (req, res) => {
 app.post('/bathroomUpdate', function(req, res) {
     var values = req.body.values;
     var school = req.body.school;
-  if (req.body.confirmation.toLowerCase() == getPassword(school)) {
-    values = values.toString();
-    values = values.replace(/[\n\r]/g, '');
-    values = values.replace(/\s/g, '');
-    setBrData(school, values);
+    if (req.body.confirmation.toLowerCase() == getPassword(school)) {
+      values = values.toString();
+      values = values.replace(/[\n\r]/g, '');
+      values = values.replace(/\s/g, '');
+
+      setBrData(school, values);
   }
   else {
     console.log(chalk.red("wrong pass for " + school + ": '", req.body.confirmation, "'"))
@@ -113,13 +114,34 @@ app.post('/sendFeedback', function(req, res) {
 
 //updates bathroom data
 function setBrData(school, value) {
-  db.update(
-    { _id: school + "Data"}, 
-    { $set: { value: value} },
-    {},
-    function (err, numReplaced) {db.loadDatabase();}
-  );
-  
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
+    v = doc.value;
+
+    chs = v[0];
+    fhs = v[1];
+    ihs = v[2];
+
+    switch(school) {
+      case 'chs':
+        chs = value;
+        break;
+      case 'fhs':
+        fhs = value;
+        break;
+      case 'ihs':
+        ihs = value;
+        break;
+    }
+
+    newValue = [chs, fhs, ihs]
+
+    db.update(
+      { _id: 'schoolData'}, 
+      { $set: { value: newValue} },
+      {},
+      db.loadDatabase()
+    );
+  });
   console.log(chalk.gray(school, 'set to', value));
 }
 

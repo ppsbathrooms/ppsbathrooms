@@ -1,5 +1,7 @@
+pageID = $('#pageID').html()
+
 //get data from db file
-brData = $('#brData').html();
+brData = $('#' + pageID + 'Data').html();
 brData = brData.toString().split(',');
 if (navigator.onLine) {newStatus = brData}
 else {

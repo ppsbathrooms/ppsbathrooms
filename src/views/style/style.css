@@ -127,8 +127,9 @@ html::-webkit-scrollbar {
     cursor: pointer;
 }
 
-#brData {
+.schoolData {
     display: none;
+    user-select: none;
 }
 
 #footer {

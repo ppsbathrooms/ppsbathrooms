@@ -1,5 +1,5 @@
 pageId = $('#pageID').html();
-brData = $('#brData').html();
+brData = $('#' + pageId + 'Data').html();
 brData = brData.toString().split(',');
 numDiff = 0;
 originalData = [...brData];
