@@ -89,11 +89,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// Schools
-app.get('/schools', (req, res) => {
-  res.render('html/schools.html');
-});
-
 //404 keep at end of redirects
 app.get('*', (req, res) => {
   res.status(404).render('html/404.html', {});

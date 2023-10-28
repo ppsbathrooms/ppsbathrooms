@@ -4,9 +4,9 @@ $('#navbar').html(
   '<button id="navbarButton"><img id="icon24" src="../style/icons/bars.svg"></button>' + 
   '<div id="navbarBackground">' +
     '<div id="schoolButtons">' +
-      '<img class="navbarImg" src="../style/images/logos/clevelandLogo.png"></img></a><br>' +
-      '<img class="navbarImg" src="../style/images/logos/franklinLogo.png"></img></a><br>' + 
-      '<img class="navbarImg" src="../style/images/logos/idaLogo.png"></img></a><br>' +
+      '<img class="navbarImg" src="../style/images/logos/clevelandLogo.png" onClick="selectSchool(\'chs\')"></img>' +
+      '<img class="navbarImg" src="../style/images/logos/franklinLogo.png" onClick="selectSchool(\'fhs\')"></img>' + 
+      '<img class="navbarImg" src="../style/images/logos/idaLogo.png" onClick="selectSchool(\'ihs\')"></img>' +
     '</div>' +
     '<div id="navButtonsBottom">' +
         '<a href="privacy.html">privacy</a>' +
