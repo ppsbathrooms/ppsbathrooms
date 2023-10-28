@@ -1,14 +1,14 @@
+// #region Imports & Setup
+
 const express = require('express');
 const path = require('path');
-
-
-//Imports the express library
 const bodyParser = require('body-parser');
 
 const fs = require('fs');
 
 const app = express(); // Creates an app for your servers client
-const chalk = require('chalk'); //easy console colors
+const chalk = require('chalk'); // Easy console colors
+
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
@@ -20,9 +20,9 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static('views')); // load the files that are in the views directory
 
+// #endregion
 
-//database stuff
-
+// #region Database Stuff
 var Datastore = require('nedb');
 var db = new Datastore({ filename: 'brData.db' });
 
@@ -33,6 +33,43 @@ db.loadDatabase(function (error) {
     }
     console.log(chalk.green('local database loaded successfully'))
 });
+
+//updates bathroom data
+function setBrData(school, value) {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
+    v = doc.value;
+
+    chs = v[0];
+    fhs = v[1];
+    ihs = v[2];
+
+    switch(school) {
+      case 'chs':
+        chs = value;
+        break;
+      case 'fhs':
+        fhs = value;
+        break;
+      case 'ihs':
+        ihs = value;
+        break;
+    }
+
+    newValue = [chs, fhs, ihs]
+
+    db.update(
+      { _id: 'schoolData'}, 
+      { $set: { value: newValue} },
+      {},
+      db.loadDatabase()
+    );
+  });
+  console.log(chalk.gray(school, 'set to', value));
+}
+
+// #endregion
+
+// #region Pages
 
 app.get('/', (req, res) => {
   res.render('html/schools.html');
@@ -90,60 +127,34 @@ app.get('*', (req, res) => {
   res.status(404).render('html/404.html', {});
 });
 
+// #endregion
+
+// #region Posts
+
 //recieve post request, send update
 app.post('/bathroomUpdate', function(req, res) {
-    var values = req.body.values;
-    var school = req.body.school;
-    if (req.body.confirmation.toLowerCase() == getPassword(school)) {
-      values = values.toString();
-      values = values.replace(/[\n\r]/g, '');
-      values = values.replace(/\s/g, '');
+  var values = req.body.values;
+  var school = req.body.school;
+  if (req.body.confirmation.toLowerCase() == getPassword(school)) {
+    values = values.toString();
+    values = values.replace(/[\n\r]/g, '');
+    values = values.replace(/\s/g, '');
 
-      setBrData(school, values);
-  }
-  else {
-    console.log(chalk.red("wrong pass for " + school + ": '", req.body.confirmation, "'"))
-  }
+    setBrData(school, values);
+}
+else {
+  console.log(chalk.red("wrong pass for " + school + ": '", req.body.confirmation, "'"))
+}
 });
 
 app.post('/sendFeedback', function(req, res) {
-  console.log(chalk.gray("feedback submitted: " + req.body.feedback));
-  submitFeedback(req.body.feedback);
+console.log(chalk.gray("feedback submitted: " + req.body.feedback));
+submitFeedback(req.body.feedback);
 });
 
+// #endregion
 
-//updates bathroom data
-function setBrData(school, value) {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    v = doc.value;
-
-    chs = v[0];
-    fhs = v[1];
-    ihs = v[2];
-
-    switch(school) {
-      case 'chs':
-        chs = value;
-        break;
-      case 'fhs':
-        fhs = value;
-        break;
-      case 'ihs':
-        ihs = value;
-        break;
-    }
-
-    newValue = [chs, fhs, ihs]
-
-    db.update(
-      { _id: 'schoolData'}, 
-      { $set: { value: newValue} },
-      {},
-      db.loadDatabase()
-    );
-  });
-  console.log(chalk.gray(school, 'set to', value));
-}
+// #region Other Nonsense
 
 function submitFeedback(feedback) {
   fs.readFile('feedback.txt', function(err, buf) {
@@ -152,6 +163,7 @@ function submitFeedback(feedback) {
   });
 }
 
+// Yoinks the password for a school (if you're viewing the public GitHub page plz dont steal)
 function getPassword(school) {
   switch(school) {
     case 'chs':
@@ -167,7 +179,7 @@ function getPassword(school) {
   return password;
 }
 
-//date time
+// Gets the current datetime
 function dateTime() {
 var currentdate = new Date(); 
 return (new Date().getMonth()+1)  + "/" 
@@ -178,7 +190,7 @@ return (new Date().getMonth()+1)  + "/"
                 + currentdate.getSeconds();
 }
 
-//writes to file
+// Writes text to a file
 async function writetofile(txtFileContents, file, read) {
   var newText = txtFileContents + '\n' + read;
 
@@ -187,8 +199,7 @@ async function writetofile(txtFileContents, file, read) {
   });
 };
 
-app
-  .route('/reqtypes')
+app.route('/reqtypes')
   .get(function(req, res) {
     res.send('Get');
   })
@@ -199,13 +210,14 @@ app
     res.send('Put');
   });
 
-// Very useful, used all the time
+// Very very useful, used all the time
 app.get('/multiple/paths', (req, res) => {
-  // exist
+  // exist good
 });
 
-// thing that works but nobody knows how
-// set up listener on port 42069
+// thing that works but nobody knows how PLZ DONT TOUCH PLZZZZ
 const listener = app.listen(42069, function() {
   console.log('listening on port ' + listener.address().port);
 });
+
+// #endregion
