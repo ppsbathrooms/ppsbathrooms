@@ -1,9 +1,12 @@
-pageId = $('#pageID').html();
-brData = $('#' + pageId + 'Data').html();
-brData = brData.toString().split(',');
-numDiff = 0;
-originalData = [...brData];
 
+function getDataForUpdate() {
+    pageID = $('#pageID').html();
+
+    brData = $('#' + pageID + 'Data').html();
+    brData = brData.toString().split(',');
+    numDiff = 0;
+    originalData = [...brData];
+}
 
 function buttonPressed(brNumber) {
     brData[brNumber] = 1 - brData[brNumber];
@@ -39,7 +42,7 @@ function submitData() {
         $.post("/bathroomUpdate",
             {
                 values: brData,
-                school: pageId,
+                school: pageID,
                 confirmation: pass
             },
             function (data, status) {
@@ -149,7 +152,10 @@ function submitFeedback() {
     alert("Thank you for helping us improve ppsbathrooms!")
 }
 
-    switch(pageId) {
+function setupButtons() {
+    pageID = $('#pageID').html();
+
+    switch(pageID) {
         case 'chs':
             numBathrooms = 14;
             break;
@@ -161,22 +167,23 @@ function submitFeedback() {
             break;
     }
 
-//buttons
-for (let i = 0; i < numBathrooms + 1; i++) {
-    $("#button" + i).click(function() {buttonPressed(i-1);});
-    $("#square" + i).click(function() {buttonPressed(i-1);});
+    // Buttons
+    for (let i = 0; i < numBathrooms + 1; i++) {
+        $("#button" + i).click(function() {buttonPressed(i-1);});
+        $("#square" + i).click(function() {buttonPressed(i-1);});
+    }
+
+
+    //jquery on click functions need to be different because the code is appended
+    $(document).on('click','#feedbackButton',function(e) {
+        submitFeedback();
+    });
+
+    $(document).on('click','#highlightRoomButton',function(e) {
+        promptRoomHighlight();
+    });
+
+    $(document).on('click','#submitButton',function(e) {
+        submitData();
+    });
 }
-
-
-//jquery on click functions need to be different because the code is appended
-$(document).on('click','#feedbackButton',function(e) {
-    submitFeedback();
-});
-
-$(document).on('click','#highlightRoomButton',function(e) {
-    promptRoomHighlight();
-});
-
-$(document).on('click','#submitButton',function(e) {
-    submitData();
-});

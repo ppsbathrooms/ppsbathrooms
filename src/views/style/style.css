@@ -206,3 +206,43 @@ html::-webkit-scrollbar {
     display: none;
     user-select: none;
 }
+
+.schoolButtons {
+    text-align: center;
+    font-size: 24px;
+    text-decoration: none;
+    padding-top: 100px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.schoolButtons a {
+    color: #1a0b0b;
+    text-decoration: none;
+}
+
+.schoolButtons img {
+    width: 200px;
+    height: 200px;
+    transition: transform .25s ease-out;
+    opacity: .9;
+}
+
+.schoolButtons img:hover {
+    transition: transform .5s;
+    opacity: 1;
+    transform: scale(1.025);
+}
+
+@media screen and (max-width: 600px) {
+    .schoolButtons img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .schoolButtons p {
+        font-size: 16px;
+    }
+}

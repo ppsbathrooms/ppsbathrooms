@@ -71,12 +71,12 @@ function setBrData(school, value) {
 
 // #region Pages
 
-app.get('/', (req, res) => {
+app.get('/schools', (req, res) => {
   res.render('html/schools.html');
 });
 
-//cleveland
-app.get('/cleveland', (req, res) => {
+// Bathrooms
+app.get('/', (req, res) => {
   db.findOne({ name: 'bathrooms' }, function(err, doc) {
     if (err) {
       res.status(500).json({ error: 'An error occurred' });
@@ -84,40 +84,12 @@ app.get('/cleveland', (req, res) => {
       var dataToSendToClient = {
         brData: doc.value
       }
-      res.render('html/chs', { data: dataToSendToClient });
+      res.render('html/home', { data: dataToSendToClient });
     }
   });
 });
 
-//franklin
-app.get('/franklin', (req, res) => {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    if (err) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      var dataToSendToClient = {
-        brData: doc.value
-      }
-      res.render('html/fhs', { data: dataToSendToClient });
-    }
-  });
-});
-
-//ida
-app.get('/ida', (req, res) => {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    if (err) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      var dataToSendToClient = {
-        brData: doc.value
-      }
-      res.render('html/ihs', { data: dataToSendToClient });
-    }
-  });
-});
-
-//schools
+// Schools
 app.get('/schools', (req, res) => {
   res.render('html/schools.html');
 });
@@ -155,6 +127,7 @@ submitFeedback(req.body.feedback);
 // #endregion
 
 // #region Other Nonsense
+
 
 function submitFeedback(feedback) {
   fs.readFile('feedback.txt', function(err, buf) {

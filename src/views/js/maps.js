@@ -1,16 +1,20 @@
-switch($('#pageID').html()) {
-    case 'chs':
-        chsMap();
-        break;
-    case 'fhs':
-        fhsMap();
-        break;
-    case 'ihs':
-        idaMap();
-        break;
+function loadMap() {
+    pageID = $('#pageID').html();
+
+    switch(pageID) {
+        case 'chs':
+            chsMap();
+            break;
+        case 'fhs':
+            fhsMap();
+            break;
+        case 'ihs':
+            idaMap();
+            break;
+    }
 }
 
-//cleveland
+// Cleveland
 
 function chsMap() {
     $('.map').html(
@@ -519,12 +523,12 @@ function chsMap() {
             '<tspan x="128.65384" y="2066.4739" fill="#e6e6e6" font-family="monospace" font-size="26.667px">209</tspan>' +
             '</text>' +
         '</g>' +
-        '<g fill="#fff">' +
-            '<rect x="113.32" y="2460.9" width="73.268" height="9.325" />' +
-            '<rect x="579.31" y="2547.5" width="73.268" height="9.325" />' +
-            '<rect x="269.52" y="3900.5" width="76.206" height="11.771" />' +
-            '<rect transform="rotate(90)" x="2312" y="-1218.9" width="118.62" height="9.325" />' +
-        '</g>' +
+        // '<g fill="#fff">' +
+        //     '<rect x="113.32" y="2460.9" width="73.268" height="9.325" />' +
+        //     '<rect x="579.31" y="2547.5" width="73.268" height="9.325" />' +
+        //     '<rect x="269.52" y="3900.5" width="76.206" height="11.771" />' +
+        //     '<rect transform="rotate(90)" x="2312" y="-1218.9" width="118.62" height="9.325" />' +
+        // '</g>' +
         '<g transform="translate(77.704 -21.066)" fill="#e6e6e6" font-family="sans-serif" font-size="66.667px">' +
             '<text x="38.800018" y="113.2">' +
             '<tspan x="38.800018" y="113.2" fill="#ffffff" font-family="monospace" font-size="66.667px">floor 1</tspan>' +
@@ -587,7 +591,7 @@ function chsMap() {
     );
 }
 
-//franklin
+// Franklin
 
 function fhsMap() {
     $('.map').html(
@@ -837,7 +841,7 @@ function fhsMap() {
     )
 }
 
-//ida b wells
+// Ida B Wells
 
 function idaMap() {
     $('.map').html(
