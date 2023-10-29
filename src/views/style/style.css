@@ -78,8 +78,10 @@ html::-webkit-scrollbar {
 #schoolButtons img {
     width:  40px;
     height: 40px;
+    cursor: pointer;
     opacity: .75;
     transition: opacity 0.2s;
+    padding-bottom: 10px;
 }
 
 #schoolButtons img:hover {
@@ -118,7 +120,7 @@ html::-webkit-scrollbar {
 }
 
 #svgBathrooms {
-    display: none;
+    /* display: none; */
     cursor: pointer;
 }
 
@@ -136,6 +138,7 @@ html::-webkit-scrollbar {
     width: 100%;
     height: 45px;
     display: flex;
+    bottom: 0;
     justify-content: center;
     align-items: center;
     font-size: 12px;
@@ -207,7 +210,7 @@ html::-webkit-scrollbar {
     user-select: none;
 }
 
-.schoolButtons {
+.schoolChoice {
     text-align: center;
     font-size: 24px;
     text-decoration: none;
@@ -216,21 +219,25 @@ html::-webkit-scrollbar {
     display: flex;
     justify-content: center;
     width: 100%;
+    user-select: none;
 }
 
-.schoolButtons a {
+.schoolChoice button {
+    background:  none;
     color: #1a0b0b;
     text-decoration: none;
+    border: none;
+    cursor: pointer;
 }
 
-.schoolButtons img {
+.schoolChoice img {
     width: 200px;
     height: 200px;
     transition: transform .25s ease-out;
     opacity: .9;
 }
 
-.schoolButtons img:hover {
+.schoolChoice img:hover {
     transition: transform .5s;
     opacity: 1;
     transform: scale(1.025);

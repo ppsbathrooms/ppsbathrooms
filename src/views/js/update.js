@@ -167,7 +167,7 @@ function setupButtons() {
             break;
     }
 
-    // Buttons
+// Buttons
     for (let i = 0; i < numBathrooms + 1; i++) {
         $("#button" + i).click(function() {buttonPressed(i-1);});
         $("#square" + i).click(function() {buttonPressed(i-1);});

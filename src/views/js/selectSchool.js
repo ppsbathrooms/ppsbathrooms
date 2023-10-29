@@ -1,12 +1,14 @@
 function selectSchool(school) {
-    console.log(school)
+    $(".schoolChoice").hide();
 
-    document.getElementsByClassName("schoolButtons")[0].style.display = "none";
+    $("#pageID").html(school);
 
-    document.getElementById("pageID").innerHTML = school;
+    loadMap();
+
+    $("#svgBathrooms").show(100);
+    getData();
 
     getDataForUpdate();
-    getData();
-    loadMap();
+    
     setupButtons();
 }
