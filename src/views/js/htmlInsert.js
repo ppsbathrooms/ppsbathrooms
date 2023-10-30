@@ -4,9 +4,9 @@ $('#navbar').html(
   '<button id="navbarButton"><img id="icon24" src="../style/icons/bars.svg"></button>' + 
   '<div id="navbarBackground">' +
     '<div id="schoolButtons">' +
-      '<img class="navbarImg" src="../style/images/logos/clevelandLogo.png" onClick="selectSchool(\'chs\')"></img>' +
-      '<img class="navbarImg" src="../style/images/logos/franklinLogo.png" onClick="selectSchool(\'fhs\')"></img>' + 
-      '<img class="navbarImg" src="../style/images/logos/idaLogo.png" onClick="selectSchool(\'ihs\')"></img>' +
+      '<img id="chsNavbar" src="../style/images/logos/clevelandLogo.png"></img>' +
+      '<img id="fhsNavbar" src="../style/images/logos/franklinLogo.png"></img>' + 
+      '<img id="ihsNavbar" src="../style/images/logos/idaLogo.png"></img>' +
     '</div>' +
     '<div id="navButtonsBottom">' +
         '<a href="/privacy">privacy</a>' +
@@ -42,4 +42,35 @@ $("#navbarButton").click(function(){
 
 if (!navigator.onLine) {
   $('#noWifi').show();
+}
+
+$("#chsNavbar").click(function(){
+  if($('#pageID').html() != '404') {
+    selectSchool('chs')
+  }
+  else {
+    fourNavbar('chs');
+  }
+});
+
+$("#fhsNavbar").click(function(){
+  if($('#pageID').html() != '404') {
+    selectSchool('fhs')
+  }
+  else {
+    fourNavbar('fhs');
+  }
+});
+
+$("#ihsNavbar").click(function(){
+  if($('#pageID').html() != '404') {
+    selectSchool('ihs')
+  }
+  else {
+    fourNavbar('ihs');
+  }
+});
+
+function fourNavbar(school) {
+  window.location.replace("/" + fullSchoolName(school));
 }

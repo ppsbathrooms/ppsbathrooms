@@ -1,10 +1,13 @@
 schoolRedirect = $('#school').html()
-console.log(schoolRedirect)
-if(schoolRedirect.replace(/\s/g, '').length) {
-    selectSchool(schoolRedirect.replace(/\s/g, ""))
-} else {
-    $('.schoolChoice').css('display', 'flex');
+
+if($('#pageID').html() != '404') {
+    if(schoolRedirect.replace(/\s/g, '').length) {
+        selectSchool(schoolRedirect.replace(/\s/g, ""))
+    } else {
+        $('.schoolChoice').css('display', 'flex');
+    }
 }
+
 
 function selectSchool(school) {
     $(".schoolChoice").hide();
