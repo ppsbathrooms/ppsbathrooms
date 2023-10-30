@@ -36,6 +36,7 @@ html::-webkit-scrollbar {
     top:  15px;
     left: 15px;
     cursor: pointer;
+    z-index: 4;
 }
 
 #pageID {
@@ -64,6 +65,7 @@ html::-webkit-scrollbar {
     border-bottom-right-radius: 10px;
     display: none;
     user-select: none;
+    z-index: 3;
 }
 
 #schoolButtons {
@@ -216,7 +218,7 @@ html::-webkit-scrollbar {
     text-decoration: none;
     padding-top: 100px;
     color: #fff;
-    display: flex;
+    display: none;
     justify-content: center;
     width: 100%;
     user-select: none;

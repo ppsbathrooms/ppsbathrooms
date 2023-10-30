@@ -71,10 +71,6 @@ function setBrData(school, value) {
 
 // #region Pages
 
-app.get('/schools', (req, res) => {
-  res.render('html/schools.html');
-});
-
 // Bathrooms
 app.get('/', (req, res) => {
   db.findOne({ name: 'bathrooms' }, function(err, doc) {
@@ -82,11 +78,66 @@ app.get('/', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       var dataToSendToClient = {
-        brData: doc.value
+        brData: doc.value,
+        school: null
       }
       res.render('html/home', { data: dataToSendToClient });
     }
   });
+});
+
+app.get('/cleveland', (req, res) => {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
+    if (err) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      var dataToSendToClient = {
+        brData: doc.value,
+        school: 'chs'
+      }
+      res.render('html/home', { data: dataToSendToClient });
+    }
+  });
+});
+
+app.get('/franklin', (req, res) => {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
+    if (err) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      var dataToSendToClient = {
+        brData: doc.value,
+        school: 'fhs'
+      }
+      res.render('html/home', { data: dataToSendToClient });
+    }
+  });
+});
+
+app.get('/ida', (req, res) => {
+  db.findOne({ name: 'bathrooms' }, function(err, doc) {
+    if (err) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      var dataToSendToClient = {
+        brData: doc.value,
+        school: 'ihs'
+      }
+      res.render('html/home', { data: dataToSendToClient });
+    }
+  });
+});
+
+app.get('/privacy', (req, res) => {
+  res.render('html/privacy.html');
+});
+
+app.get('/terms', (req, res) => {
+  res.render('html/terms.html');
+});
+
+app.get('/schools', (req, res) => {
+  res.render('html/schools.html');
 });
 
 //404 keep at end of redirects

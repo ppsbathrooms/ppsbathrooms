@@ -10,6 +10,9 @@ function getData() {
     for (var i = 0; i < 14; i++) {
         setStatus(i, newStatus[i]);
     }
+    
+    $("#svgBathrooms").show(100);
+
 }
 
 // Wizardry stuff

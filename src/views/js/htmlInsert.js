@@ -9,8 +9,8 @@ $('#navbar').html(
       '<img class="navbarImg" src="../style/images/logos/idaLogo.png" onClick="selectSchool(\'ihs\')"></img>' +
     '</div>' +
     '<div id="navButtonsBottom">' +
-        '<a href="privacy.html">privacy</a>' +
-        '<a href="terms.html">terms</a>' +
+        '<a href="/privacy">privacy</a>' +
+        '<a href="/terms">terms</a>' +
     '</div>'
 );
 
