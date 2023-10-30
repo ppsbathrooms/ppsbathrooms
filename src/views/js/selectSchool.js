@@ -1,18 +1,21 @@
 schoolRedirect = $('#school').html()
+pageId = $('#pageID').html()
 
-if($('#pageID').html() != '404') {
+if(pageId != '404') {
     if(schoolRedirect.replace(/\s/g, '').length) {
         selectSchool(schoolRedirect.replace(/\s/g, ""))
+        $('#buttons').show(100)
     } else {
         $('.schoolChoice').css('display', 'flex');
     }
 }
 
-
 function selectSchool(school) {
     $(".schoolChoice").hide();
 
     $("#pageID").html(school);
+
+    $('#buttons').show(100)
 
     loadMap();
 
@@ -25,6 +28,11 @@ function selectSchool(school) {
     window.history.pushState('page2', 'Title', '/' + fullSchoolName(school));
 }
 
+// if(pageId = 'schools') {
+//     console.log(pageId)
+//     $('#buttons').hide()
+// } else {
+// }
 
 function fullSchoolName(school) {
     var url;
