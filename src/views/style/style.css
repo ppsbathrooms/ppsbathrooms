@@ -91,6 +91,7 @@ html::-webkit-scrollbar {
     transition: opacity 0.2s;
 }
 
+
 #navButtonsBottom {
     position: absolute;
     display: flex;
@@ -154,6 +155,7 @@ html::-webkit-scrollbar {
     position: fixed;
     bottom: 15px;
     border-radius: 10px;
+    height: 32px;
 }
 
 .bottomSubmit {
@@ -177,6 +179,10 @@ html::-webkit-scrollbar {
     display: flex;
     align-items: center;
     user-select: none;
+}
+
+#highlightRoomButton {
+    display: none;
 }
 
 #submitButton {
@@ -235,6 +241,27 @@ html::-webkit-scrollbar {
 #buttons {
     display: none;
 }
+
+#helpMap {
+    width: 45vw;
+    height: 100%;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    margin-left: 25px;
+    user-select: none;
+}
+
+#help {
+    color: #fff;
+    margin: 30px;
+    margin-top: 75px;
+    margin-bottom: 75px;
+}
+
+#helpButton {
+    margin-top: 10px;
+}
+
 
 .schoolChoice img {
     width: 200px;

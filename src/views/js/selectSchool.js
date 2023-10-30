@@ -1,7 +1,9 @@
 schoolRedirect = $('#school').html()
 pageId = $('#pageID').html()
 
-if(pageId != '404') {
+isSchoolPage = (pageId != '404') && (pageId != 'help')
+
+if(isSchoolPage) {
     if(schoolRedirect.replace(/\s/g, '').length) {
         selectSchool(schoolRedirect.replace(/\s/g, ""))
         $('#buttons').show(100)
@@ -16,6 +18,13 @@ function selectSchool(school) {
     $("#pageID").html(school);
 
     $('#buttons').show(100)
+
+    if(school == 'chs') {
+        $('#highlightRoomButton').show();
+    }
+    else {
+        $('#highlightRoomButton').hide();
+    }
 
     loadMap();
 

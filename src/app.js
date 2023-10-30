@@ -128,6 +128,10 @@ app.get('/ida', (req, res) => {
   });
 });
 
+app.get('/help', (req, res) => {
+  res.render('html/help.html');
+});
+
 app.get('/privacy', (req, res) => {
   res.render('html/privacy.html');
 });
