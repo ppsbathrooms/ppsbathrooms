@@ -49,7 +49,8 @@ function submitData() {
             });
     });
 
-    // numDiff = 0;
+    numDiff = 0;
+    originalData = [...brData];
 }
 
 $("#highlight").fadeOut(0);

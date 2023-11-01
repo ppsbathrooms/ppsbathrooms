@@ -37,12 +37,6 @@ function selectSchool(school) {
     window.history.pushState('page2', 'Title', '/' + fullSchoolName(school));
 }
 
-// if(pageId = 'schools') {
-//     console.log(pageId)
-//     $('#buttons').hide()
-// } else {
-// }
-
 function fullSchoolName(school) {
     var url;
     switch(school) {

@@ -32,7 +32,10 @@ $('#buttons').html(
 
 
 //footer
-$('#footer').html('<p id="footerText">© sid collective 2023</p>');
+$('#footer').html(
+  '<p id="footerText">© sid collective 2023</p>' +
+  '<a id="footerHelp" href="/help">help</a>'
+  );
 
 
 //navbar functions
