@@ -1,4 +1,4 @@
-
+//get bathroom data
 function getDataForUpdate() {
     pageID = $('#pageID').html();
 
@@ -8,6 +8,7 @@ function getDataForUpdate() {
     originalData = [...brData];
 }
 
+//bathroom update button pressed
 function buttonPressed(brNumber) {
     brData[brNumber] = 1 - brData[brNumber];
     originalData[brNumber] = Number(originalData[brNumber]);
@@ -32,6 +33,7 @@ function buttonPressed(brNumber) {
     document.getElementById("submitButton").innerHTML = '<img id="icon16" src="/style/icons/check.svg"></img> <p> ('+numDiff+')</p>';
 }
 
+//send new br status to server & reset cached data
 function submitData() {
     // Get password
     $("#submitButton").fadeOut(100);
@@ -53,9 +55,10 @@ function submitData() {
     originalData = [...brData];
 }
 
-$("#highlight").fadeOut(0);
-$("#triHighlight").fadeOut(0);
-// Room highlighting
+$("#highlight").fadeOut();
+$("#triHighlight").fadeOut();
+
+// highlight specific room
 function highlightRoom(roomNum) {
     var roomData = roomNumToIndex(roomNum);
     if (roomData === -1)
@@ -86,9 +89,8 @@ function highlightRoom(roomNum) {
         { x: roomData.x, y: roomData.y, width: roomData.w, height: roomData.h }
     );
 
+    //if the room is a triangle
     if (roomData.hasOwnProperty("x1")) {
-        console.log("TRIGANGLE");
-
         document.getElementById("triHighlight")
             .setAttribute("points",
                 roomData.x1.toString() + "," + roomData.y1.toString() + "," + roomData.x2.toString() + "," + roomData.y2.toString() + "," + roomData.x3.toString() + "," + roomData.y3.toString());
@@ -103,11 +105,13 @@ function highlightRoom(roomNum) {
     return true;
 }
 
+//toggle visibility of bathrooms
 function toggleBathrooms(shown) {
     if (shown) { $('#svgBathrooms, #svgButtons').fadeIn(250); }
     else { $('#svgBathrooms, #svgButtons').fadeOut(250); }
 }
 
+//highlight rooms event
 var notHighlighted = true;
 function promptRoomHighlight() {
     if (notHighlighted) {
@@ -136,6 +140,7 @@ function promptRoomHighlight() {
     }
 }
 
+//submit feedback event
 function submitFeedback() {
     var feedback = prompt("enter feedback", "");
     if (feedback === "")
@@ -153,6 +158,7 @@ function submitFeedback() {
     alert("Thank you for helping us improve ppsbathrooms!")
 }
 
+//shows bathroom update buttons
 function setupButtons() {
     pageID = $('#pageID').html();
 
@@ -168,14 +174,14 @@ function setupButtons() {
             break;
     }
 
-// Buttons
+    //detect bathroom button click event
     for (let i = 0; i < numBathrooms + 1; i++) {
         $("#button" + i).click(function() {buttonPressed(i-1);});
         $("#square" + i).click(function() {buttonPressed(i-1);});
     }
 
 
-    //jquery on click functions need to be different because the code is appended
+    //detect bottom button click event, different detection for appended elements
     $(document).on('click','#feedbackButton',function(e) {
         submitFeedback();
     });

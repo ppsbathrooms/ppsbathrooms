@@ -1,4 +1,5 @@
-data = [
+//coordinates for each room in cleveland for highlighting
+clevelandCoords = [
   {"r": 106,"x": 118,"y": 197,"w": 28,"h": 31},
   {"r": 109,"x": 118,"y": 140,"w": 27,"h": 32},
   {"r": 110,"x": 125,"y": 225,"w": 21,"h": 31}, 
@@ -108,10 +109,11 @@ data = [
   {"r": 388,"x": 439,"y": 941,"w": 19,"h": 29}, 
 ];
 
+//find room coords with room number
 function roomNumToIndex(roomNum) {
-  for (var i = 0; i < data.length; i++) {
-    if (data[i].r == roomNum) {
-      return data[i]
+  for (var i = 0; i < clevelandCoords.length; i++) {
+    if (clevelandCoords[i].r == roomNum) {
+      return clevelandCoords[i]
     }
   }
   return -1;

@@ -15,17 +15,6 @@ function getData() {
 
 }
 
-// Wizardry stuff
-function makeHttpObject() {
-  try {return new XMLHttpRequest();}
-  catch (error) {}
-  try {return new ActiveXObject("Msxml2.XMLHTTP");}
-  catch (error) {}
-  try {return new ActiveXObject("Microsoft.XMLHTTP");}
-  catch (error) {}
-
-  throw new Error("Could not create HTTP request object.");
-}
 
 // It's in the name dummy
 function setStatus(brNumber, status) {
@@ -36,7 +25,6 @@ function setStatus(brNumber, status) {
     } else {
         $("#br" + brNumber.toString()).css({ fill: '#75B9FA'}); 
     }
-
 }
 
 // Also in the name (duh)

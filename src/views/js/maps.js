@@ -1,3 +1,4 @@
+//display school map
 function loadMap() {
     pageID = $('#pageID').html();
 
@@ -14,8 +15,7 @@ function loadMap() {
     }
 }
 
-// Cleveland
-
+// cleveland map
 function chsMap() {
     $('.map').html(
     '<div id="mapHolder">' +
@@ -591,8 +591,7 @@ function chsMap() {
     );
 }
 
-// Franklin
-
+//franklin map
 function fhsMap() {
     $('.map').html(
     '<div id="mapHolder">' +
@@ -841,8 +840,7 @@ function fhsMap() {
     )
 }
 
-// Ida B Wells
-
+//ida map
 function idaMap() {
     $('.map').html(
     '<div id="mapHolder">' +
