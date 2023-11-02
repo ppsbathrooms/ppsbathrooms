@@ -1,12 +1,17 @@
 schoolRedirect = $('#school').html()
 pageId = $('#pageID').html()
 
-isSchoolPage = (pageId != '404') && (pageId != 'help')
+schoolPages = ['chs', 'fhs', 'ihs', 'schools']
+
+isSchoolPage = $.inArray( pageId, schoolPages );
+isSchoolPage = isSchoolPage > 0 ? true : false;
+
+console.log(isSchoolPage);
 
 //redirect school pages
 if(isSchoolPage) {
     if(schoolRedirect.replace(/\s/g, '').length) {
-        selectSchool(schoolRedirect.replace(/\s/g, ""), true)
+        selectSchool(schoolRedirect.replace(/\s/g, ""), false)
         $('#buttons').show(100)
     } else {
         $('.schoolChoice').css('display', 'flex');
@@ -16,6 +21,7 @@ if(isSchoolPage) {
 //go to school page
 function selectSchool(school, redirect) {
     document.title = "ppsbathrooms | " + schoolNameConvert(school, false) 
+
     $(".schoolChoice").hide();
 
     $("#pageID").html(school);
@@ -43,28 +49,29 @@ function selectSchool(school, redirect) {
         window.history.pushState('page2', 'Title', '/' + schoolNameConvert(school, false));
     }
     
-    currentSchool = window.location.href.toString().split(window.location.host)[1]
+    newPage = window.location.href.toString().split(window.location.host)[1]
 }
 
 //current webpage
-var currentSchool = window.location.href.toString().split(window.location.host)[1]
+var currentPage = window.location.href.toString().split(window.location.host)[1]
 
 //on forward/backward button check if new webpage is different and if it is change displayed map / hide it
 window.onpopstate=function()
 {
-    newSchool = window.location.href.toString().split(window.location.host)[1];
-    isSchoolPickPage = (newSchool == '/') ? true: false;
+    newPage = window.location.href.toString().split(window.location.host)[1];
+    isSchoolPickPage = (newPage == '/') ? true: false;
     if(isSchoolPickPage) {
+        document.title = "ppsbathrooms | home";
         $("#pageID").html('school');
         $('.map').html('');
         $('.schoolChoice').css('display', 'flex');
         $('#footer').css('position', 'absolute');
         $('#buttons').hide(100)
-        currentSchool = '/';
+        currentPage = '/';
     }
-    else if(newSchool != currentSchool) {
-            justSchool = window.location.href.toString().split(window.location.host)[1].replace(/\//g,'')
-            selectSchool(schoolNameConvert(justSchool, true), false)
+    else if(newPage != currentPage) {
+            justPage = window.location.href.toString().split(window.location.host)[1].replace(/\//g,'')
+            selectSchool(schoolNameConvert(justPage, true), false)
     }
 }
 

@@ -269,9 +269,14 @@ html::-webkit-scrollbar {
     right: 20px;
 }
 
-#footerHelp:hover {
+#footerHelp:hover, #return:hover {
     color: #999;
     transition: color .25s;
+}
+
+#return {
+    color: #666;
+    text-decoration: none;
 }
 
 .schoolChoice img {
