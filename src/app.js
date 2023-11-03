@@ -241,7 +241,7 @@ app.get('/multiple/paths', (req, res) => {
 const PORT = process.env.PORT || 42069;
 // thing that works but nobody knows how PLZ DONT TOUCH PLZZZZ
 // i touched it... sorry :(
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`server started on port ${PORT}`);
 });
 
