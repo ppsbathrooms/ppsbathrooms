@@ -6,8 +6,6 @@ schoolPages = ['chs', 'fhs', 'ihs', 'schools']
 isSchoolPage = $.inArray( pageId, schoolPages );
 isSchoolPage = isSchoolPage > 0 ? true : false;
 
-console.log(isSchoolPage);
-
 //redirect school pages
 if(isSchoolPage) {
     if(schoolRedirect.replace(/\s/g, '').length) {
@@ -49,16 +47,17 @@ function selectSchool(school, redirect) {
         window.history.pushState('page2', 'Title', '/' + schoolNameConvert(school, false));
     }
     
-    newPage = window.location.href.toString().split(window.location.host)[1]
+    currentPage = window.location.href.toString().split(window.location.host)[1]
 }
 
 //current webpage
 var currentPage = window.location.href.toString().split(window.location.host)[1]
 
 //on forward/backward button check if new webpage is different and if it is change displayed map / hide it
-window.onpopstate=function()
+window.onpopstate = function()
 {
     newPage = window.location.href.toString().split(window.location.host)[1];
+
     isSchoolPickPage = (newPage == '/') ? true: false;
     if(isSchoolPickPage) {
         document.title = "ppsbathrooms | home";
@@ -72,6 +71,7 @@ window.onpopstate=function()
     else if(newPage != currentPage) {
             justPage = window.location.href.toString().split(window.location.host)[1].replace(/\//g,'')
             selectSchool(schoolNameConvert(justPage, true), false)
+        currentPage = newPage;
     }
 }
 

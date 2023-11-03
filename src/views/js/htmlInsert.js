@@ -95,10 +95,12 @@ $("#ihsNavbar").click(function(){
 
 //change navbar functionality for 404 page, redirect instead of replacing map
 function fourNavbar(school) {
-  window.location.replace("/" + fullSchoolName(school));
+  window.location.replace("/" + schoolNameConvert(school, false));
+  currentPage = window.location.href.toString().split(window.location.host)[1]
 }
 
 //footer help redirect
 $("#helpButton").click(function(){
-  window.location.replace("/help");
+  window.location.href = "/help";
+  currentPage = window.location.href.toString().split(window.location.host)[1]
 });

@@ -218,24 +218,45 @@ html::-webkit-scrollbar {
     user-select: none;
 }
 
+.schoolButtonHolder {
+    width: 40vw;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .schoolChoice {
+    position: absolute;
     text-align: center;
-    font-size: 24px;
     text-decoration: none;
     padding-top: 100px;
     color: #fff;
     display: none;
     justify-content: center;
-    width: 100%;
     user-select: none;
+    width: 100vw;
 }
 
 .schoolChoice button {
     background:  none;
-    color: #1a0b0b;
+    color: #fff;
+    font-size: 16px;
+    font-family: monospace;
     text-decoration: none;
     border: none;
     cursor: pointer;
+}
+
+.schoolChoice img {
+    width: 100%;
+    transition: transform .25s ease-out;
+    opacity: .9;
+}
+
+.schoolChoice img:hover {
+    transition: transform .5s;
+    opacity: 1;
+    transform: scale(1.025);
 }
 
 #buttons {
@@ -279,26 +300,25 @@ html::-webkit-scrollbar {
     text-decoration: none;
 }
 
-.schoolChoice img {
-    width: 200px;
-    height: 200px;
-    transition: transform .25s ease-out;
-    opacity: .9;
-}
+/* SCREEN SIZE STUFFS */
 
-.schoolChoice img:hover {
-    transition: transform .5s;
-    opacity: 1;
-    transform: scale(1.025);
-}
-
-@media screen and (max-width: 600px) {
-    .schoolButtons img {
-        width: 100px;
-        height: 100px;
+/* small screen stuffs */
+@media (max-width: 800px) {
+    #mapSvg {
+        width: 80vw;
+        margin-bottom: 25px;
     }
+    .schoolButtonHolder {
+        width: 90vw;
+    }
+    #helpMap {
+        width: 60vw;
+    }
+}
 
-    .schoolButtons p {
-        font-size: 16px;
+/* hide buggy school select text on small screens */
+@media (max-width: 330px) {
+    .schoolChoice button {
+        font-size: 0;
     }
 }
