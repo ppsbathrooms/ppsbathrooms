@@ -238,9 +238,11 @@ app.get('/multiple/paths', (req, res) => {
   // exist good
 });
 
+const PORT = process.env.PORT || 42069;
 // thing that works but nobody knows how PLZ DONT TOUCH PLZZZZ
-const listener = app.listen(42069, function() {
-  console.log('listening on port ' + listener.address().port);
+// i touched it... sorry :(
+app.listen(PORT, () => {
+  console.log(`server started on port ${PORT}`);
 });
 
 // #endregion
