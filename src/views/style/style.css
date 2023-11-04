@@ -218,39 +218,29 @@ html::-webkit-scrollbar {
     user-select: none;
 }
 
-.schoolButtonHolder {
-    width: 40vw;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-}
-
 .schoolChoice {
-    position: absolute;
     text-align: center;
+    font-size: 24px;
     text-decoration: none;
     padding-top: 100px;
     color: #fff;
-    display: none;
+    display: flex;
     justify-content: center;
-    user-select: none;
-    width: 100vw;
+    width: 100%;
 }
 
-.schoolChoice button {
-    background:  none;
-    color: #fff;
-    font-size: 16px;
-    font-family: monospace;
+.schoolChoice a {
+    color: #ffffff;
     text-decoration: none;
-    border: none;
     cursor: pointer;
 }
 
 .schoolChoice img {
-    width: 100%;
+    width: 200px;
+    height: 200px;
     transition: transform .25s ease-out;
     opacity: .9;
+    user-select: none;
 }
 
 .schoolChoice img:hover {
@@ -308,17 +298,15 @@ html::-webkit-scrollbar {
         width: 80vw;
         margin-bottom: 25px;
     }
-    .schoolButtonHolder {
-        width: 90vw;
-    }
     #helpMap {
         width: 60vw;
     }
-}
+    .schoolChoice img {
+        width:  110px;
+        height: 110px;
+    }
 
-/* hide buggy school select text on small screens */
-@media (max-width: 330px) {
-    .schoolChoice button {
-        font-size: 0;
+    .schoolChoice p {
+        font-size: 16px;
     }
 }
