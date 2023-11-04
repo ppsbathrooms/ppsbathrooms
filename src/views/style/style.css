@@ -161,6 +161,7 @@ html::-webkit-scrollbar {
 .bottomSubmit {
     right: 15px;
     height: 32px;
+    z-index: 2;
 }
 
 #submitButton,
@@ -207,7 +208,7 @@ html::-webkit-scrollbar {
     display: none;
 }
 
-#noWifi, #noWifiBlur {
+#noWifi {
     height: 24px;
     width:  24px;
 
@@ -218,13 +219,27 @@ html::-webkit-scrollbar {
     user-select: none;
 }
 
+#topLogo {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    cursor: pointer;
+}
+
+#topLogo img{
+    width:  36px;
+    height: 36px;
+}
+
 .schoolChoice {
     text-align: center;
     font-size: 24px;
     text-decoration: none;
     padding-top: 100px;
     color: #fff;
-    display: flex;
+    display: none;
     justify-content: center;
     width: 100%;
 }

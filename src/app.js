@@ -186,19 +186,43 @@ function submitFeedback(feedback) {
   });
 }
 
+useEnvironmentVariables = process.env.CHSPASS != undefined;
+console.log(chalk.gray('use environment variables', useEnvironmentVariables))
+
+chsPass = process.env.CHSPASS;
+fhsPass = process.env.FHSPASS;
+ihsPass = process.env.IHSPASS;
+
 // Yoinks the password for a school (if you're viewing the public GitHub page plz dont steal)
+// haha suckers you cant steal them any more
 function getPassword(school) {
-  switch(school) {
-    case 'chs':
-      password = 'pass';
-      break;
-    case 'fhs': 
-      password = 'franklinpass'
-      break;
-    case 'ihs':
-      password = 'idapass'
-      break;
+  if(useEnvironmentVariables) {
+    switch(school) {
+      case 'chs':
+        password = chsPass;
+        break;
+      case 'fhs': 
+        password = fhsPass;
+        break;
+      case 'ihs':
+        password = ihsPass;
+        break;
+    }
+  } 
+  else {
+    switch(school) {
+      case 'chs':
+        password = 'pass';
+        break;
+      case 'fhs': 
+        password = 'franklinpass'
+        break;
+      case 'ihs':
+        password = 'idapass'
+        break;
+    }
   }
+
   return password;
 }
 
