@@ -1,7 +1,7 @@
 body {
     margin: 0;
     scroll-behavior: smooth;
-    background: #0f141a;
+    background: #0a0c15;
     font-family: monospace;
     text-transform: lowercase;
 }
@@ -20,6 +20,7 @@ html::-webkit-scrollbar {
     width:  24px;
     height: 24px;
 }
+
 #icon16 {
     width:  12px;
     height: 12px;
@@ -144,7 +145,7 @@ html::-webkit-scrollbar {
     justify-content: center;
     align-items: center;
     font-size: 12px;
-    color: #666;
+    color: #505460;
     user-select: none;
     display: none;
 }
@@ -234,14 +235,15 @@ html::-webkit-scrollbar {
 }
 
 .schoolChoice {
+    position: absolute;
     text-align: center;
     font-size: 24px;
     text-decoration: none;
-    padding-top: 100px;
     color: #fff;
     display: none;
-    justify-content: center;
+    right: 0;
     width: 100%;
+    height: 100%;
 }
 
 .schoolChoice a {
@@ -262,6 +264,50 @@ html::-webkit-scrollbar {
     transition: transform .5s;
     opacity: 1;
     transform: scale(1.025);
+}
+
+#mainTitle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-transform: none;
+    bottom: -10%;
+    opacity: 0;
+}
+
+#titleUpper {
+    margin-top: 150px;
+    font-size: 72px;
+}
+
+#titleLower {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom: 40px;
+    margin: 0;
+    color: rgba(200, 211, 239, .8);
+    font-size: 16px;
+}
+
+#titleLower span {
+    font-size: 24px;
+}
+
+#menuBgImage {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translate(0, -50%);
+    height: auto;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#menuSchoolButtons {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 #buttons {
@@ -290,20 +336,22 @@ html::-webkit-scrollbar {
 
 #footerHelp {
     position: absolute;
-    color: #666;
+    color: #505460;
     text-decoration: none;
     right: 20px;
+    transition: color .25s;
 }
 
 #footerHelp:hover, #return:hover {
-    color: #999;
+    color: #81879B;
     transition: color .25s;
 }
 
 #return {
-    color: #666;
+    color: #505460;
     text-decoration: none;
 }
+
 
 /* SCREEN SIZE STUFFS */
 
@@ -323,5 +371,15 @@ html::-webkit-scrollbar {
 
     .schoolChoice p {
         font-size: 16px;
+    }
+    #titleUpper {
+        margin-top: 50px;
+        font-size: 32px;
+    }
+    #titleLower {
+        font-size: 12px;
+    }
+    #menuBgImage {
+        display: none;
     }
 }

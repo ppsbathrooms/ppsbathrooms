@@ -194,3 +194,12 @@ function setupButtons() {
         submitData();
     });
 }
+
+
+$(window).ready(function() {
+    $('#mainTitle').animate({bottom:'0px'}, {duration: 650, easing: 'swing', queue: false});
+
+    setTimeout(function() {
+        $('#mainTitle').animate({opacity:'1'}, {duration: 1000, easing: 'swing', queue: false});
+    }, 100);
+});

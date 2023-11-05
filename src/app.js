@@ -187,7 +187,6 @@ function submitFeedback(feedback) {
 }
 
 useEnvironmentVariables = process.env.CHSPASS != undefined;
-console.log(chalk.gray('use environment variables', useEnvironmentVariables))
 
 chsPass = process.env.CHSPASS;
 fhsPass = process.env.FHSPASS;

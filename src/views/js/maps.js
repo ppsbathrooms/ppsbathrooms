@@ -27,10 +27,10 @@ function chsMap() {
             '<polygon points="0,0 0,0 0,0" id="triHighlight" fill="#f68b27" />' +
         '</g>' +
         '<g> <!-- covers up highlights that stick out -->' +
-            '<rect x="330" y="550" width="100" height="100" fill="#0f141a"></rect>' +
-            '<rect x="320" y="915" width="100" height="100" fill="#0f141a"></rect>' +
-            '<rect x="500" y="4156" width="100" height="100" fill="#0f141a"></rect>' +
-            '<rect x="960" y="3250" width="100" height="100" fill="#0f141a"></rect>' +
+            '<rect x="330" y="550" width="100" height="100"  fill="#0a0c15"></rect>' +
+            '<rect x="320" y="915" width="100" height="100"  fill="#0a0c15"></rect>' +
+            '<rect x="500" y="4156" width="100" height="100" fill="#0a0c15"></rect>' +
+            '<rect x="960" y="3250" width="100" height="100" fill="#0a0c15"></rect>' +
 
         '</g>' +
         '<g id="svgButtons">' +
