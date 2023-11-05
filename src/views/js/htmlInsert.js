@@ -37,8 +37,11 @@ $('#buttons').html(
 //footer
 $('#footer').html(
   '<p id="footerText">© sid collective 2023</p>' +
-  '<a id="footerHelp" href="/help">help</a>'
-);
+  '<div id="footerRight">' +
+  '<a href="/contact">contact</a>' +
+  '<a href="/help">help</a>'+
+  '</div>'
+  );
 
 //different footer when not displaying map
 $(document).ready(function() {
@@ -47,7 +50,7 @@ $(document).ready(function() {
 
 function schoolDisplayFooter() {
   $('#footer').css('display', 'flex');
-  if($('#pageID').html() == 'schools') {
+  if($('#pageID').html() == 'schools' || $('#pageID').html() == 'contact') {
     $('#footer').css('position', 'absolute');
   }
 }

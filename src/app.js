@@ -132,6 +132,10 @@ app.get('/help', (req, res) => {
   res.render('html/help.html');
 });
 
+app.get('/contact', (req, res) => {
+  res.render('html/contact.html');
+});
+
 app.get('/privacy', (req, res) => {
   res.render('html/privacy.html');
 });
