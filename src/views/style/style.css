@@ -466,4 +466,8 @@ html::-webkit-scrollbar {
     #menuBgImage {
         display: none;
     }
+    #menuLabels p{
+        width: 110px;
+        margin-top: -50px;
+    }
 }
