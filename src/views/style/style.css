@@ -429,7 +429,7 @@ html::-webkit-scrollbar {
     #helpMap {
         width: 60vw;
     }
-    .schoolChoice img {
+    #mainTitle img {
         width:  110px;
         height: 110px;
     }
