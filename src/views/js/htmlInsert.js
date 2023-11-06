@@ -22,11 +22,11 @@ $('#buttons').html(
   '<div>' +
     '<div class="bottomButtonHolder">' +
       '<div id="bottomButtonNavbarShift"></div>' + 
-      '<button id="feedbackButton"><img id="icon16" src="/style/icons/feedback.svg"></img></button>' +
-      '<button id="highlightRoomButton"><img id="icon16" src="/style/icons/find.svg"></img></button>' +
+      '<button id="feedbackButton" title="give feedback"><img id="icon16" src="/style/icons/feedback.svg"></img></button>' +
+      '<button id="highlightRoomButton" title="highlight a room"><img id="icon16" src="/style/icons/find.svg"></img></button>' +
     '</div>' +
     '<div class="bottomSubmit">' +
-      '<button id="submitButton"><img id="icon16" src="/style/icons/check.svg"></img>' +
+      '<button id="submitButton" title="submit bathroom changes"><img id="icon16" src="/style/icons/check.svg"></img>' +
         '<p> (0)</p>' +
       '</button>' +
     '</div>' +

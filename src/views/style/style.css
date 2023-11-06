@@ -271,7 +271,7 @@ html::-webkit-scrollbar {
     width: 100%;
     height: 100%;
     text-transform: none;
-    bottom: -10%;
+    top: 10%;
     opacity: 0;
 }
 
@@ -300,12 +300,31 @@ html::-webkit-scrollbar {
     top: 50%;
     transform: translate(0, -50%);
     position: fixed;
+    user-select: none;
 }
 
 #menuSchoolButtons {
+    top: 35%;
+    position: absolute;
     width: 100%;
     display: flex;
     justify-content: center;
+    opacity: 0;
+}
+
+#menuLabels {
+    margin-top: 190px;
+    top: 40%;
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+}
+
+#menuLabels p {
+    width: 200px;
+    text-align: center;
 }
 
 #buttons {

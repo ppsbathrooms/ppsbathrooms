@@ -196,10 +196,25 @@ function setupButtons() {
 }
 
 
+//menu animation stuffs
+
 $(window).ready(function() {
-    $('#mainTitle').animate({bottom:'0px'}, {duration: 650, easing: 'swing', queue: false});
+    $('#mainTitle').animate({top:'0px'}, {duration: 500, easing: 'swing', queue: false});
 
     setTimeout(function() {
-        $('#mainTitle').animate({opacity:'1'}, {duration: 1000, easing: 'swing', queue: false});
-    }, 100);
+        $('#mainTitle').animate({opacity:'1'}, {duration: 750, easing: 'swing', queue: false});
+    }, 50);
+
+    setTimeout(function() {
+        $('#menuSchoolButtons').animate({top:'30%'}, {duration: 650, easing: 'swing', queue: false});
+    }, 150);
+
+    setTimeout(function() {
+        $('#menuSchoolButtons').animate({opacity:'1'}, {duration: 500, easing: 'swing', queue: false});
+        $('#menuLabels').animate({top:'30%'}, {duration: 650, easing: 'swing', queue: false});
+    }, 200);
+
+    setTimeout(function() {
+        $('#menuLabels').animate({opacity:'1'}, {duration: 750, easing: 'swing', queue: false});
+    }, 250);
 });
