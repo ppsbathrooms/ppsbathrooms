@@ -437,6 +437,114 @@ html::-webkit-scrollbar {
     margin-bottom: 100px;
 }
 
+#passwordPopup {
+    display: none;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#passwordHelp {
+    font-size: 10px;
+    color: #505460;
+    text-decoration: none;
+    position: absolute;
+    margin-top: 110px;
+    margin-left: 310px;
+    transition: color .25s;
+}
+
+#passwordHelp:hover {
+    color: #81879B;
+    transition: color .25s;
+}
+
+#ppBackdrop {
+    display: none;
+    background: rgba(0, 0, 0, .75);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+#ppBackground {
+    background: #202227;
+    box-shadow: 1px 2px 2px rgba(0, 0, 0, .2);
+    width:  350px;
+    height: 130px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#ppBackground p {
+    font-size: 16px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+}
+
+#ppInput {
+    all: unset;
+    padding: 3px;
+    margin-left: 3px;
+    width: 250px;
+    border-radius: 5px;
+    background: transparent ;
+    border: none;
+    color: #fff;
+    height: 15px;
+}
+
+#ppInputBg {
+    background: #373B43;
+    width: 270px;
+    height: 25px;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#passwordSubmit {
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    opacity: 0;
+}
+
+#ppx {
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 315px;
+    width: 24px;
+    aspect-ratio: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ppx img {
+    user-select: none;
+    width:  16px;
+    height: 16px;
+    aspect-ratio: 1;
+}
+
 /* SCREEN SIZE STUFFS */
 
 /* small screen stuffs */

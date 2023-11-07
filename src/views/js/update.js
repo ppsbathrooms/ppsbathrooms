@@ -33,26 +33,14 @@ function buttonPressed(brNumber) {
     document.getElementById("submitButton").innerHTML = '<img id="icon16" src="/style/icons/check.svg"></img> <p> ('+numDiff+')</p>';
 }
 
-//send new br status to server & reset cached data
+//displays password popup (pp heh)
 function submitData() {
-    // Get password
     $("#submitButton").fadeOut(100);
-    var pass = prompt("ENTER PASSWORD", "")
 
-    // Send data to server
-    $(document).ready(function () {
-        $.post("/bathroomUpdate",
-            {
-                values: brData,
-                school: pageID,
-                confirmation: pass
-            },
-            function (data, status) {
-            });
-    });
+    $("#passwordPopup").css("display", "flex")
+    $("#ppBackdrop").fadeIn(100);
 
-    numDiff = 0;
-    originalData = [...brData];
+    $('#ppInput').focus();
 }
 
 $("#highlight").fadeOut();
@@ -195,9 +183,62 @@ function setupButtons() {
     });
 }
 
+//x key for pp
+$('#ppx').click(function (e) {
+    $("#passwordPopup").fadeOut(100)
+    $("#ppBackdrop").fadeOut(100);
+});
+
+//sends data to server
+$('#passwordSubmit').click(function (e) {
+    pass = $('#ppInput').val();
+
+    if(pass != '') {
+        $(this).attr("disabled", "disabled");
+    
+        $(document).ready(function () {
+            $.post("/bathroomUpdate",
+                {
+                    values: brData,
+                    school: pageID,
+                    confirmation: pass
+                },
+                function (data, status) {
+                });
+        });
+
+        $('#ppInput').val('');
+
+        numDiff = 0;
+        originalData = [...brData];
+
+        $("#passwordPopup").fadeOut(100)
+        $("#ppBackdrop").fadeOut(100);
+        $(this).removeAttr("disabled");
+    }
+});
+
+//submits password on enter key
+$('#ppInput').on('keypress', function (e) {
+    if(e.which === 13){
+        $('#passwordSubmit').click();
+    }
+});
+
+//displays submit button
+$("#ppInput").on("input", function() {
+    if($(this).val() != '') {
+        $('#passwordSubmit').animate({opacity:1},25);
+        $('#passwordSubmit').css('cursor', 'pointer')
+    }
+    else {
+        $('#passwordSubmit').animate({opacity:0},50);
+        $('#passwordSubmit').css('cursor', 'default');
+    }
+});
+
 
 //menu animation stuffs
-
 $(window).ready(function() {
     $('#mainTitle').animate({top:'0px'}, {duration: 500, easing: 'swing', queue: false});
 
