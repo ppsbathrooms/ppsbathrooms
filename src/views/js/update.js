@@ -187,33 +187,49 @@ function setupButtons() {
 $('#ppx').click(function (e) {
     $("#passwordPopup").fadeOut(100)
     $("#ppBackdrop").fadeOut(100);
+    $("#submitButton").fadeIn(100);
 });
 
-//sends data to server
-$('#passwordSubmit').click(function (e) {
-    pass = $('#ppInput').val();
 
-    if(pass != '') {
+numWrong = 0;
+
+//sends data to server and determines if password is correct or not
+$('#passwordSubmit').click(function (e) {
+    const pass = $('#ppInput').val();
+
+    if (pass !== '') {
         $(this).attr("disabled", "disabled");
-    
-        $(document).ready(function () {
-            $.post("/bathroomUpdate",
-                {
-                    values: brData,
-                    school: pageID,
-                    confirmation: pass
-                },
-                function (data, status) {
-                });
+
+        $.post("/bathroomUpdate", {
+            values: brData,
+            school: pageID,
+            confirmation: pass
+        }, function (data, status) { // server response
+            if (data.isCorrect) {
+                $('#ppInput').val('');
+
+                numDiff = 0;
+                originalData = [...brData];
+
+                numWrong = 0;
+
+                $("#passwordPopup").fadeOut(100);
+                $("#ppBackdrop").fadeOut(100);
+                $("#wrongPass").fadeIn(100);
+            } else {
+                if(!(numWrong > 4)) {
+                    $('#ppInput').val('');
+                    $("#wrongPass").fadeIn(100);
+                    numWrong ++
+                }
+                else {
+                    $("#ppInputBg").hide();
+                    numWrong = 0;
+                }
+            }
         });
 
-        $('#ppInput').val('');
 
-        numDiff = 0;
-        originalData = [...brData];
-
-        $("#passwordPopup").fadeOut(100)
-        $("#ppBackdrop").fadeOut(100);
         $(this).removeAttr("disabled");
     }
 });

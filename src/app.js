@@ -161,16 +161,23 @@ app.get('*', (req, res) => {
 app.post('/bathroomUpdate', function(req, res) {
   var values = req.body.values;
   var school = req.body.school;
-  if (req.body.confirmation.toLowerCase() == getPassword(school)) {
+  var providedPassword = req.body.confirmation;
+  console.log(providedPassword)
+  neededPassword = getPassword(school);
+  console.log(neededPassword)
+
+  if (providedPassword.toLowerCase() === neededPassword) {
     values = values.toString();
     values = values.replace(/[\n\r]/g, '');
     values = values.replace(/\s/g, '');
 
+    res.json({ isCorrect: true});
     setBrData(school, values);
-}
-else {
-  console.log(chalk.red("wrong pass for " + school + ": '", req.body.confirmation, "'"))
-}
+
+  } else {
+    console.log(chalk.red("Wrong pass for " + school + ": '", providedPassword, "'"));
+    res.json({ isCorrect: false});
+  }
 });
 
 app.post('/sendFeedback', function(req, res) {
