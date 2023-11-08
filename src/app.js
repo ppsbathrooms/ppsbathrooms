@@ -162,9 +162,7 @@ app.post('/bathroomUpdate', function(req, res) {
   var values = req.body.values;
   var school = req.body.school;
   var providedPassword = req.body.confirmation;
-  console.log(providedPassword)
   neededPassword = getPassword(school);
-  console.log(neededPassword)
 
   if (providedPassword.toLowerCase() === neededPassword) {
     values = values.toString();
