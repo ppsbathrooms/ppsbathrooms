@@ -38,7 +38,7 @@ $('#buttons').html(
 $('#footer').html(
   '<p id="footerText">© sid collective 2023</p>' +
   '<div id="footerRight">' +
-  '<a href="/contact">contact</a>' +
+  '<a id="footerContact" href="/contact">contact</a>' +
   '<a href="/help">help</a>'+
   '</div>'
   );

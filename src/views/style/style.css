@@ -306,13 +306,17 @@ html::-webkit-scrollbar {
     font-size: 24px;
 }
 
-#menuBgImage {
+#menuBgImage, #menuBgImageMobile {
     position: absolute;
     width: 100%;
     top: 50%;
     transform: translate(0, -50%);
     position: fixed;
     user-select: none;
+}
+
+#menuBgImageMobile {
+    display: none;
 }
 
 #menuSchoolButtons {
@@ -531,7 +535,14 @@ html::-webkit-scrollbar {
 /* SCREEN SIZE STUFFS */
 
 /* small screen stuffs */
-@media (max-width: 800px) {
+@media (max-width: 360px) {
+    #footerContact {
+        display: none;
+    }
+}
+
+
+    @media (max-width: 800px) {
     #mapSvg {
         width: 80vw;
         margin-bottom: 25px;
@@ -556,6 +567,9 @@ html::-webkit-scrollbar {
     }
     #menuBgImage {
         display: none;
+    }
+    #menuBgImageMobile {
+        display: block;
     }
     #menuLabels p{
         width: 110px;
