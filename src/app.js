@@ -1,13 +1,15 @@
 // #region Imports & Setup
 
 const express = require('express');
-const path = require('path');
+const session = require('express-session');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const fs = require('fs');
 
 const app = express(); // Creates an app for your servers client
 const chalk = require('chalk'); // Easy console colors
+const bcrypt = require('bcrypt');
 
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -18,13 +20,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 })); // Express modules / packages
 
+app.use(session({ secret: 'DHPVOGY1rSZ3r43lNtOwZ7trSMvURlPtpN0T6jm1RCsxxSfBtJPSa0kGZXB3dlvO', resave: true, saveUninitialized: true }));
 app.use(express.static('views')); // load the files that are in the views directory
 
 // #endregion
 
 // #region Database Stuff
 var Datastore = require('nedb');
-var db = new Datastore({ filename: 'brData.db' });
+var db = new Datastore({ filename: 'db.db' });
 
 db.loadDatabase(function (error) {   
   if (error) {
@@ -146,6 +149,49 @@ app.get('/terms', (req, res) => {
 
 app.get('/schools', (req, res) => {
   res.render('html/schools.html');
+});
+
+
+app.get('/admin', (req, res) => {
+  if(!req.session.authenticated) {
+    res.sendFile(__dirname + '/views/html/admin/login.html');
+  }
+  else {
+    res.sendFile(__dirname + '/dashboard.html');
+  }
+});
+
+
+app.post('/admin', async (req, res) => {
+  const { username, password } = req.body;
+
+  db.findOne({ username: username }, (err, user) => {
+    if (err) {
+      console.log('err');
+      throw err;
+    }
+
+    if (user && bcrypt.compareSync(password, user.password)) {
+      req.session.authenticated = true;
+      res.redirect('/admin');
+    } else {
+      console.log(chalk.red('wrong login'))
+      res.redirect('/admin');
+    }
+  });
+});
+
+app.get('/admin/dashboard', (req, res) => {
+  if (req.session.authenticated) {
+    res.sendFile(__dirname + '/dashboard.html');
+  } else {
+    res.redirect('/admin');
+  }
+});
+
+app.get('/admin/logout', (req, res) => {
+  req.session.authenticated = false;
+  res.redirect('/admin');
 });
 
 //404 keep at end of redirects

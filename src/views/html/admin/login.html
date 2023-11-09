@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+
+    <script src="../thirdParty/jquery.min.js"></script>
+    <title>ppsbathrooms | admin</title>
+</head>
+
+<style>
+    body {
+        font-family: monospace;
+        background-color: #0a0c15;
+        color: #fff;
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+        justify-content: center;
+    }
+
+    #loginWindow {
+        margin-top: 20vh;
+        width: 300px;
+        height: 250px;
+        background: #202227;
+        padding: 5px 15px 5px 15px;
+        border-radius: 10px;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    input {
+        all: unset;
+        padding: 3px;
+        margin-left: 3px;
+        width: calc(100% - 15px/2);
+        border-radius: 5px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        height: 15px;
+    }
+
+    #submitButton {
+        color: #fff;
+        border: none;
+        background: #505460;
+        padding: 5px 10px 5px 10px;
+        border-radius: 5px;
+        transition: background-color .25s;
+        cursor: pointer;
+    }
+
+    #submitButton:hover {
+        background: #666C7D;
+        transition: background-color .25s;
+    }
+
+    #submitButton {
+        color: #fff;
+        border: none;
+        background: #505460;
+        padding: 5px 10px 5px 10px;
+        border-radius: 5px;
+
+    }
+
+    #inputBg {
+        background: #373B43;
+        width: calc(100% - 15px/2);
+        height: 25px;
+        border-radius: 5px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<body>
+    <div id="loginWindow">
+        <h2>login</h2>
+        <form action="/admin" method="post">
+            <p>username</p>
+            <div id="inputBg">
+                <input type="text" id="username" name="username" autocomplete="off" required>
+            </div>
+            <p>password</p>
+            <div id="inputBg">
+                <input type="password" id="password" name="password" autocomplete="off" required>
+            </div><br><br>
+            <button id="submitButton" type="submit">login</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

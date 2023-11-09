@@ -35,6 +35,9 @@ function buttonPressed(brNumber) {
 
 //displays password popup (pp heh)
 function submitData() {
+    $("#navbarBackground").animate({width: 'hide'}, 100);
+    $("#bottomButtonNavbarShift").animate({width: 'hide'}, 100);
+    
     $("#submitButton").fadeOut(100);
 
     $("#passwordPopup").css("display", "flex")
