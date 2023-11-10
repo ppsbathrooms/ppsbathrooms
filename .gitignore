@@ -1,3 +1,7 @@
+# Exclude feedback.txt
+feedback.txt
+db.db
+
 # Logs
 logs
 *.log

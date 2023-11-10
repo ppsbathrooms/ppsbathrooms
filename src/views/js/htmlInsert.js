@@ -40,6 +40,9 @@ $('#footer').html(
   '<div id="footerRight">' +
   '<a id="footerContact" href="/contact">contact</a>' +
   '<a href="/help">help</a>'+
+  '</div>' +
+  '<div id="footerLeft">' +
+  '<a href="/admin">login</a>' +
   '</div>'
   );
 

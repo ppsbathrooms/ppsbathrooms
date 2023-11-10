@@ -371,20 +371,16 @@ html::-webkit-scrollbar {
     position: absolute;
     right: 20px;
 }
+#footerLeft {
+    position: absolute;
+    left: 0px;
+}
 
-#footerRight a, #contactFooterLeft {
+#footerRight a, #footerLeft a {
     color: var(--bgText);
     text-decoration: none;
     transition: color .25s;
     margin-left: 15px;
-}
-
-#contactFooterLeft {
-    position: static;
-    border: 1px solid green;
-    right: 10px;
-    bottom: 10px;
-    display: none;
 }
 
 #footerRight a:hover ,#contactFooterLeft:hover, #return:hover {
