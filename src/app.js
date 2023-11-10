@@ -161,6 +161,36 @@ app.get('/admin', (req, res) => {
   }
 });
 
+app.get('/feedback', (req, res) => {
+  if(req.session.authenticated) {
+    fs.readFile('feedback.txt', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+      } else {
+        // Send the content of the text file as a response
+        res.send(data);
+      }
+    });
+  }
+  else {
+    res.render('html/404.html')
+  }
+});
+
+app.get('/admin/logout', (req, res) => {
+  req.session.authenticated = false;
+  res.redirect('/admin');
+});
+
+//404 keep at end of redirects
+app.get('*', (req, res) => {
+  res.status(404).render('html/404.html', {});
+});
+
+// #endregion
+
+// #region Posts
 
 app.post('/admin', async (req, res) => {
   const { username, password } = req.body;
@@ -181,27 +211,6 @@ app.post('/admin', async (req, res) => {
   });
 });
 
-app.get('/admin/dashboard', (req, res) => {
-  if (req.session.authenticated) {
-    res.sendFile(__dirname + '/dashboard.html');
-  } else {
-    res.redirect('/admin');
-  }
-});
-
-app.get('/admin/logout', (req, res) => {
-  req.session.authenticated = false;
-  res.redirect('/admin');
-});
-
-//404 keep at end of redirects
-app.get('*', (req, res) => {
-  res.status(404).render('html/404.html', {});
-});
-
-// #endregion
-
-// #region Posts
 
 //recieve post request, send update
 app.post('/bathroomUpdate', function(req, res) {
@@ -224,9 +233,11 @@ app.post('/bathroomUpdate', function(req, res) {
   }
 });
 
+
+
 app.post('/sendFeedback', function(req, res) {
-console.log(chalk.gray("feedback submitted: " + req.body.feedback));
-submitFeedback(req.body.feedback);
+  console.log(chalk.gray("feedback submitted: " + req.body.feedback));
+  submitFeedback(req.body.feedback);
 });
 
 // #endregion
@@ -282,13 +293,23 @@ function getPassword(school) {
 
 // Gets the current datetime
 function dateTime() {
-var currentdate = new Date(); 
-return (new Date().getMonth()+1)  + "/" 
-                + currentdate.getDate() + "/"
-                + currentdate.getFullYear() + " @ "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
+    var currentdate = new Date();
+    var month = currentdate.getMonth() + 1;
+    var day = currentdate.getDate();
+    var year = currentdate.getFullYear().toString().slice(-2);
+    var hours = currentdate.getHours();
+    var minutes = currentdate.getMinutes();
+    var seconds = currentdate.getSeconds();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // handle midnight (12 AM)
+
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    var formattedDate = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ' ' + ampm;
+    return formattedDate;
 }
 
 // Writes text to a file

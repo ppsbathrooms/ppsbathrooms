@@ -542,7 +542,7 @@ html::-webkit-scrollbar {
 }
 
 
-    @media (max-width: 800px) {
+@media (max-width: 800px) {
     #mapSvg {
         width: 80vw;
         margin-bottom: 25px;

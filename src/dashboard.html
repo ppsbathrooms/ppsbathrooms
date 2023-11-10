@@ -3,13 +3,248 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>admin dash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+
+    <script src="../thirdParty/jquery.min.js"></script>
+    <title>ppsbathrooms | admin</title>
 </head>
 
+<style>
+    :root {
+        --background: #090d1e;
+        --foreground: #212533;
+        --navbarWidth: 145px;
+    }
+
+    body {
+        font-family: monospace;
+        background-color: var(--background);
+        color: #fff;
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    body img {
+        user-select: none;
+    }
+
+    #logout {
+        font-family: monospace;
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        color: #fff;
+        border: none;
+        background: #505460;
+        padding: 5px 10px 5px 10px;
+        border-radius: 5px;
+        transition: background-color .25s;
+        cursor: pointer;
+    }
+
+    #logout:hover {
+        background: #666C7D;
+        transition: background-color .25s;
+    }
+
+    #navbar {
+        position: fixed;
+        width: var(--navbarWidth);
+        height: 100%;
+        left: 0;
+        top: 0;
+        padding-top: 20px;
+        background: var(--foreground);
+    }
+
+    #navbar button {
+        height: 50px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        transition: .15s;
+        background: none;
+        text-decoration: none;
+        border: none;
+        color: #aaa;
+        cursor: pointer;
+        font-family: monospace;
+        padding-left: 20px;
+    }
+
+    #navbar p {
+        margin-left: 10px;
+        font-size: 14px;
+    }
+
+    #navbar img {
+        filter: brightness(80%);
+        transition: .15s;
+    }
+
+    #navbar button:hover img {
+        filter: brightness(100%);
+        transition: .15s;
+    }
+
+    #navbar button:hover {
+        color: #fff;
+    }
+
+    #navbar .selected {
+        color: #fff;
+        cursor: default;
+    }
+
+    #navbar .selected img {
+        filter: brightness(100%)
+    }
+
+    #pannels {
+        position: fixed;
+        top: 0;
+        left: var(--navbarWidth);
+        width: 100%;
+        height: 100%;
+        padding: 0px 15px 0px 15px;
+    }
+
+    #feedbackDisplay {
+        width: 500px;
+        padding: 10px;
+        border-radius: 10px;
+        background: var(--foreground);
+        overflow: auto;
+        max-height: 50vh;
+    }
+
+    #feedbackDisplay pre {
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        margin: 0;
+    }
+
+    #feedbackDisplay::-webkit-scrollbar {
+        display: none;
+    }
+
+    #icon16 {
+        width: 16px;
+        height: 16px;
+    }
+
+    .invisButton {
+        background: none;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .1s;
+    }
+
+    .flex {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #feedbackRefresh {
+        padding: 0;
+        margin-left: 10px;
+    }
+
+    #feedbackRefresh img {
+        aspect-ratio: 1;
+    }
+
+    #feedbackRefresh:hover {
+        filter: brightness(80%);
+    }
+
+    #dashboard {
+        display: none;
+    }
+
+    @media (max-width: 800px) {
+        #navbar p {
+            display: none;
+        }
+
+        #navbar {
+            width: 60px;
+        }
+
+        #pannels {
+            left: 60px;
+        }
+
+        #feedbackDisplay {
+            width: calc(100vw - 110px);
+        }
+    }
+</style>
+
 <body>
-    <p>admin dashboard</p>
-    <a href="/admin/logout">logout</a>
+    <div id="navbar">
+        <button id="navbarFeedback" class="selected">
+            <img id="icon16" src="style/icons/messages.svg">
+            <p>feedback</p>
+        </button>
+        <button id="navbarDashboard">
+            <img id="icon16" src="style/icons/chart.svg">
+            <p>dashboard</p>
+        </button>
+    </div>
+    <div id="pannels">
+        <div id="feedback">
+            <h1 style="display: inline-block">feedback</h1>
+            <button id="feedbackRefresh" style="display: inline-block" class="invisButton flex"
+                onclick="updateFeedback();"><img id="icon16" src="style/icons/refresh.svg"></button>
+            <div id="feedbackDisplay"></div>
+        </div>
+        <div id="dashboard">
+            <p>dashboard thingy</p>
+        </div>
+    </div>
+    <button onclick="location.href='/admin/logout';" id="logout">logout</button>
 </body>
 
 </html>
+
+<script>
+    $(document).ready(function () {
+        updateFeedback();
+    });
+
+    function updateFeedback() {
+        $('#feedbackDisplay').html('')
+        $.get('/feedback', function (data) {
+            if (data == '') {
+                data = 'no feedback'
+            }
+            data = data.split('\n').reverse().join('\n');
+            $('#feedbackDisplay').append('<pre>' + data + '</pre>');
+        }).fail(function (error) {
+            console.error('error fetching feedback:', error);
+        });
+    }
+
+    $('#navbarFeedback').click(function (e) {
+        hideAllPannels();
+        $('#navbarFeedback').addClass("selected");
+        $('#feedback').fadeIn(50);
+    });
+
+    $('#navbarDashboard').click(function (e) {
+        hideAllPannels();
+        $('#navbarDashboard').addClass("selected");
+        $('#dashboard').fadeIn(50);
+    });
+
+    function hideAllPannels() {
+        $('#dashboard, #feedback').hide();
+        $('#navbarDashboard, #navbarFeedback').removeClass("selected");
+    }
+</script>
