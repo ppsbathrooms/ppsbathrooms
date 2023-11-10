@@ -1,2 +1,2 @@
 {"username":"admin","password":"$2b$10$9oFyx7xMqRmNN.DYrTdI0OQg2tI48dEHruYXng/wUYwwI/dsvtTl2","_id":"adminLogin"}
-{"name":"bathrooms","value":["1,0,1,1,1,1,1,1,0,1,1,1,1,1","0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1","1,0,1,1,1"],"_id":"schoolData"}
+{"name":"bathrooms","value":["1,1,1,1,1,1,1,1,0,1,1,1,1,1","0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1","1,0,1,1,1"],"_id":"schoolData"}

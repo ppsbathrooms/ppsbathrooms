@@ -112,7 +112,7 @@
         padding: 0px 15px 0px 15px;
     }
 
-    #feedbackDisplay {
+    .txtDisplay {
         width: 500px;
         padding: 10px;
         border-radius: 10px;
@@ -121,13 +121,13 @@
         max-height: 50vh;
     }
 
-    #feedbackDisplay pre {
+    .txtDisplay pre {
         word-wrap: break-word;
         white-space: pre-wrap;
         margin: 0;
     }
 
-    #feedbackDisplay::-webkit-scrollbar {
+    .txtDisplay::-webkit-scrollbar {
         display: none;
     }
 
@@ -150,20 +150,21 @@
         justify-content: center;
     }
 
-    #feedbackRefresh {
+    #refresh {
         padding: 0;
         margin-left: 10px;
     }
 
-    #feedbackRefresh img {
+    #refresh img {
         aspect-ratio: 1;
     }
 
-    #feedbackRefresh:hover {
+    #refresh:hover {
         filter: brightness(80%);
     }
 
-    #dashboard {
+    #dashboard,
+    #feedback {
         display: none;
     }
 
@@ -180,7 +181,7 @@
             left: 60px;
         }
 
-        #feedbackDisplay {
+        .txtDisplay {
             width: calc(100vw - 110px);
         }
     }
@@ -188,9 +189,13 @@
 
 <body>
     <div id="navbar">
-        <button id="navbarFeedback" class="selected">
+        <button id="navbarFeedback">
             <img id="icon16" src="style/icons/messages.svg">
             <p>feedback</p>
+        </button>
+        <button id="navbarLogs" class="selected">
+            <img id="icon16" src="style/icons/logs.svg">
+            <p>logs</p>
         </button>
         <button id="navbarDashboard">
             <img id="icon16" src="style/icons/chart.svg">
@@ -200,9 +205,19 @@
     <div id="pannels">
         <div id="feedback">
             <h1 style="display: inline-block">feedback</h1>
-            <button id="feedbackRefresh" style="display: inline-block" class="invisButton flex"
-                onclick="updateFeedback();"><img id="icon16" src="style/icons/refresh.svg"></button>
-            <div id="feedbackDisplay"></div>
+            <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateFeedback();"><img
+                    id="icon16" src="style/icons/refresh.svg"></button>
+            <div class="txtDisplay" id="feedbackDisplay"></div>
+        </div>
+        <div id="logs">
+            <h1 style="display: inline-block">logs</h1>
+            <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateLogs();"><img
+                    id="icon16" src="style/icons/refresh.svg"></button>
+            <h3>bathroom updates</h3>
+            <div class="txtDisplay" id="brDisplay"></div><br>
+            <h3>admin logins</h3>
+            <div class="txtDisplay" id="loginsDisplay"></div><br>
+            <!-- <div class="txtDisplay" id="logsDisplay"></div><br><br> -->
         </div>
         <div id="dashboard">
             <p>dashboard thingy</p>
@@ -215,7 +230,7 @@
 
 <script>
     $(document).ready(function () {
-        updateFeedback();
+        updateLogs();
     });
 
     function updateFeedback() {
@@ -231,20 +246,62 @@
         });
     }
 
+    function updateLogs() {
+        $('#brDisplay').html('')
+        $.get('/brupdates', function (data) {
+            if (data == '') {
+                data = 'no bathroom updates'
+            }
+            data = data.split('\n').reverse().join('\n');
+            $('#brDisplay').append('<pre>' + data + '</pre>');
+        }).fail(function (error) {
+            console.error('error fetching logs:', error);
+        });
+        $('#loginsDisplay').html('')
+        $.get('/logins', function (data) {
+            if (data == '') {
+                data = 'no admin logins'
+            }
+            data = data.split('\n').reverse().join('\n');
+            $('#loginsDisplay').append('<pre>' + data + '</pre>');
+        }).fail(function (error) {
+            console.error('error fetching logs:', error);
+        });
+    }
+
+    //default directory
+    dir = 'logs';
     $('#navbarFeedback').click(function (e) {
-        hideAllPannels();
-        $('#navbarFeedback').addClass("selected");
-        $('#feedback').fadeIn(50);
+        if (dir != 'feedback') {
+            dir = 'feedback';
+            updateFeedback();
+            hideAllPannels();
+            $('#navbarFeedback').addClass("selected");
+            $('#feedback').fadeIn(50);
+        }
+    });
+
+    $('#navbarLogs').click(function (e) {
+        if (dir != 'logs') {
+            dir = 'logs';
+            updateLogs();
+            hideAllPannels();
+            $('#navbarLogs').addClass("selected");
+            $('#logs').fadeIn(50);
+        }
     });
 
     $('#navbarDashboard').click(function (e) {
-        hideAllPannels();
-        $('#navbarDashboard').addClass("selected");
-        $('#dashboard').fadeIn(50);
+        if (dir != 'dash') {
+            dir = 'dash';
+            hideAllPannels();
+            $('#navbarDashboard').addClass("selected");
+            $('#dashboard').fadeIn(50);
+        }
     });
 
     function hideAllPannels() {
-        $('#dashboard, #feedback').hide();
-        $('#navbarDashboard, #navbarFeedback').removeClass("selected");
+        $('#dashboard, #feedback, #logs').hide();
+        $('#navbarDashboard, #navbarFeedback, #navbarLogs').removeClass("selected");
     }
 </script>

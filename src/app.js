@@ -10,6 +10,7 @@ const fs = require('fs');
 const app = express(); // Creates an app for your servers client
 const chalk = require('chalk'); // Easy console colors
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -20,12 +21,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 })); // Express modules / packages
 
-app.use(session({ secret: 'DHPVOGY1rSZ3r43lNtOwZ7trSMvURlPtpN0T6jm1RCsxxSfBtJPSa0kGZXB3dlvO', resave: true, saveUninitialized: true }));
+secretKey = crypto.randomBytes(64).toString('hex');
+app.use(session({ secret: secretKey, resave: true, saveUninitialized: true }));
 app.use(express.static('views')); // load the files that are in the views directory
 
 // #endregion
 
 // #region Database Stuff
+
 var Datastore = require('nedb');
 var db = new Datastore({ filename: 'db.db' });
 
@@ -161,14 +164,48 @@ app.get('/admin', (req, res) => {
   }
 });
 
+
+
+//admin info
 app.get('/feedback', (req, res) => {
   if(req.session.authenticated) {
-    fs.readFile('feedback.txt', 'utf8', (err, data) => {
+    fs.readFile('txt/feedback.txt', 'utf8', (err, data) => {
       if (err) {
         console.error(err);
         res.status(500).send('Internal Server Error');
       } else {
-        // Send the content of the text file as a response
+        res.send(data);
+      }
+    });
+  }
+  else {
+    res.render('html/404.html')
+  }
+});
+
+app.get('/brupdates', (req, res) => {
+  if(req.session.authenticated) {
+    fs.readFile('txt/brUpdate.txt', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+      } else {
+        res.send(data);
+      }
+    });
+  }
+  else {
+    res.render('html/404.html')
+  }
+});
+
+app.get('/logins', (req, res) => {
+  if(req.session.authenticated) {
+    fs.readFile('txt/logins.txt', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+      } else {
         res.send(data);
       }
     });
@@ -203,6 +240,7 @@ app.post('/admin', async (req, res) => {
 
     if (user && bcrypt.compareSync(password, user.password)) {
       req.session.authenticated = true;
+      writeToFile('logins', req.headers['x-forwarded-for'] || req.socket.remoteAddress, true);
       res.redirect('/admin');
     } else {
       console.log(chalk.red('wrong login'))
@@ -226,7 +264,7 @@ app.post('/bathroomUpdate', function(req, res) {
 
     res.json({ isCorrect: true});
     setBrData(school, values);
-
+    writeToFile('brUpdate', school + ' set to ' + values, true, null);
   } else {
     console.log(chalk.red("Wrong pass for " + school + ": '", providedPassword, "'"));
     res.json({ isCorrect: false});
@@ -237,18 +275,24 @@ app.post('/bathroomUpdate', function(req, res) {
 
 app.post('/sendFeedback', function(req, res) {
   console.log(chalk.gray("feedback submitted: " + req.body.feedback));
-  submitFeedback(req.body.feedback);
+  writeToFile('feedback', req.body.feedback, true, null);
 });
 
 // #endregion
 
 // #region Other Nonsense
+// Writes text to a file
+async function writeToFile(filename, newText, includeDate, other) {
+  filename = 'txt/' + filename;
+  fs.readFile(filename + '.txt', function(err, buf) {
+    var previousText = String(buf);
+    date = includeDate ? dateTime() : '';
 
+    var txt = previousText + '\n' + date + " | " + String(newText);
 
-function submitFeedback(feedback) {
-  fs.readFile('feedback.txt', function(err, buf) {
-    var text = String(buf);
-    writetofile(text, 'feedback', dateTime() + " | " + feedback);
+    fs.writeFile(filename + '.txt', txt, err => {
+      if (err) throw err;
+    });
   });
 }
 
@@ -311,15 +355,6 @@ function dateTime() {
     var formattedDate = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ' ' + ampm;
     return formattedDate;
 }
-
-// Writes text to a file
-async function writetofile(txtFileContents, file, read) {
-  var newText = txtFileContents + '\n' + read;
-
-  fs.writeFile(file + '.txt', newText, err => {
-    if (err) throw err;
-  });
-};
 
 app.route('/reqtypes')
   .get(function(req, res) {
