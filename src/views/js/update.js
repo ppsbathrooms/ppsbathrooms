@@ -33,21 +33,8 @@ function buttonPressed(brNumber) {
     document.getElementById("submitButton").innerHTML = '<img id="icon16" src="/style/icons/check.svg"></img> <p> ('+numDiff+')</p>';
 }
 
-//displays password popup (pp heh)
-function submitData() {
-    $("#navbarBackground").animate({width: 'hide'}, 100);
-    $("#bottomButtonNavbarShift").animate({width: 'hide'}, 100);
-    
-    $("#submitButton").fadeOut(100);
-
-    $("#passwordPopup").css("display", "flex")
-    $("#ppBackdrop").fadeIn(100);
-
-    $('#ppInput').focus();
-}
-
-$("#highlight").fadeOut();
-$("#triHighlight").fadeOut();
+$("#highlight").hide();
+$("#triHighlight").hide();
 
 // highlight specific room
 function highlightRoom(roomNum) {
@@ -102,53 +89,6 @@ function toggleBathrooms(shown) {
     else { $('#svgBathrooms, #svgButtons').fadeOut(250); }
 }
 
-//highlight rooms event
-var notHighlighted = true;
-function promptRoomHighlight() {
-    if (notHighlighted) {
-        var num = prompt("enter room number", "");
-        let result = /^\d+$/.test(num);
-        if (!result) { alert("thats not a number..."); }
-        else if (num == null) { alert("no room entered"); }
-        else if (!highlightRoom(num)) {
-            alert("cound not find room " + num);
-            return;
-        }
-        else {
-            notHighlighted = false;
-            removeHighlight = document.getElementById("highlightRoomButton");
-            removeHighlight.innerHTML = "<img id='icon16' src='style/icons/x.svg'>";
-            toggleBathrooms(false);
-        }
-    }
-    else {
-        notHighlighted = true;
-        document.getElementById("highlightRoomButton").innerHTML = "<img id='icon16' src='style/icons/find.svg'>";
-        $("#cancelHighlightButton").fadeOut(100);
-        $("#highlight").fadeOut(250);
-        $("#triHighlight").fadeOut(250);
-        toggleBathrooms(true);
-    }
-}
-
-//submit feedback event
-function submitFeedback() {
-    var feedback = prompt("enter feedback", "");
-    if (feedback === "")
-        return;
-
-    // Send data to server
-    $(document).ready(function () {
-        $.post("/sendfeedback",
-            {
-                feedback: feedback,
-            },
-            function (data, status) {
-            });
-    });
-    alert("Thank you for helping us improve ppsbathrooms!")
-}
-
 //shows bathroom update buttons
 function setupButtons() {
     pageID = $('#pageID').html();
@@ -174,85 +114,156 @@ function setupButtons() {
 
     //detect bottom button click event, different detection for appended elements
     $(document).on('click','#feedbackButton',function(e) {
-        submitFeedback();
+        createPopup('feedback', 'submit feedback');
     });
 
     $(document).on('click','#highlightRoomButton',function(e) {
-        promptRoomHighlight();
+        if (notHighlighted) {
+            createPopup('highlight', 'enter room number');
+        }
+        else {
+            notHighlighted = true;
+            document.getElementById("highlightRoomButton").innerHTML = "<img id='icon16' src='style/icons/find.svg'>";
+            $("#cancelHighlightButton").fadeOut(100);
+            $("#highlight").fadeOut(250);
+            $("#triHighlight").fadeOut(250);
+            toggleBathrooms(true);
+        }
     });
 
     $(document).on('click','#submitButton',function(e) {
-        submitData();
+        createPopup('brData', 'enter password', '#passwordInfo', '#submitButton');
     });
 }
 
-//x key for pp
-$('#ppx').click(function (e) {
-    $("#passwordPopup").fadeOut(100)
-    $("#ppBackdrop").fadeOut(100);
-    $("#submitButton").fadeIn(100);
-});
+function createPopup(id, title, helpDestination, buttonsToHide) {
+    $("#navbarBackground").animate({width: 'hide'}, 100);
+    $("#bottomButtonNavbarShift").animate({width: 'hide'}, 100);
 
+    $('#popupTitle').html(title);
+    $('#popupId').html(id);
+    $('#popupButtons').html(buttonsToHide);
+    helpDestination = helpDestination ? helpDestination : '';
+    $('#popupHelp').attr('href', '/help' + helpDestination)
+    $('#pInput').val('')
+    $("#popupError").html('');
+
+    $("#popup").css('display', 'flex');
+    $(buttonsToHide).fadeOut(50);
+    $("#pBackdrop").fadeIn(100);
+    $('#pInput').focus();
+}
+
+$('#px').click(function (e) {
+    $('#pInput').val('')
+    $("#popup").fadeOut(100)
+    $("#pBackdrop").fadeOut(100);
+    fadeButtons = $('#popupButtons').html()
+    if(fadeButtons != '') {
+        $('#popupButtons').html('')
+        $(fadeButtons).fadeIn(100);
+    }
+});
 
 numWrong = 0;
+var notHighlighted = true;
 
-//sends data to server and determines if password is correct or not
-$('#passwordSubmit').click(function (e) {
-    const pass = $('#ppInput').val();
+$('#popupSubmit').click(function (e) {
+    const userInput = $('#pInput').val();
+    if (userInput !== '') {
+        switch ($('#popupId').html()) {
+            case 'brData':
+                $(this).attr("disabled", "disabled");
 
-    if (pass !== '') {
-        $(this).attr("disabled", "disabled");
+                $.post("/bathroomUpdate", {
+                    values: brData,
+                    school: pageID,
+                    confirmation: userInput
+                }, function (data, status) { // server response
+                    if (data.isCorrect) {
+                        $('#ppInput').val('');
 
-        $.post("/bathroomUpdate", {
-            values: brData,
-            school: pageID,
-            confirmation: pass
-        }, function (data, status) { // server response
-            if (data.isCorrect) {
-                $('#ppInput').val('');
+                        numDiff = 0;
+                        originalData = [...brData];
 
-                numDiff = 0;
-                originalData = [...brData];
+                        numWrong = 0;
 
-                numWrong = 0;
+                        $("#popup").fadeOut(100);
+                        $("#pBackdrop").fadeOut(100);
+                        $("#popupError").html('');
+                        $("#popupError").fadeOut(100);
+                    } else {
+                        if(!(numWrong > 4)) {
+                            $('#pInput').val('');
+                            $("#popupError").html('incorrect password');
+                            $("#popupError").fadeIn(100);
+                            numWrong ++
+                        }
+                        else {
+                            $("#pInputBg").hide();
+                            numWrong = 0;
+                        }
+                    }
+                });
+                $(this).removeAttr("disabled");
+                break;
+            
+            case 'feedback': 
+                $(this).attr("disabled", "disabled");
+                $(document).ready(function () {
+                    $.post("/sendfeedback",
+                        {
+                            feedback: userInput,
+                        },
+                        function (data, status) {
+                        });
+                });
+                $("#popup").fadeOut(100);
+                $("#pBackdrop").fadeOut(100);
+                $(this).removeAttr("disabled");
+            break;
 
-                $("#passwordPopup").fadeOut(100);
-                $("#ppBackdrop").fadeOut(100);
-                $("#wrongPass").fadeIn(100);
-            } else {
-                if(!(numWrong > 4)) {
-                    $('#ppInput').val('');
-                    $("#wrongPass").fadeIn(100);
-                    numWrong ++
+            case 'highlight':
+                let result = /^\d+$/.test(userInput);
+                console.log(result)
+                if (!result) { 
+                    $("#popupError").html('enter a number');
+                    $("#popupError").fadeIn(100);
+                }
+                else if (userInput == null) { alert("no room entered"); }
+                else if (!highlightRoom(userInput)) {
+                    $("#popupError").html('cound not find room ' + userInput);
+                    $("#popupError").fadeIn(100);
+                    return;
                 }
                 else {
-                    $("#ppInputBg").hide();
-                    numWrong = 0;
+                    $("#popupError").fadeOut(100);
+                    $("#popup").fadeOut(100);
+                    $("#pBackdrop").fadeOut(100);
+                    notHighlighted = false;
+                    removeHighlight = document.getElementById("highlightRoomButton");
+                    removeHighlight.innerHTML = "<img id='icon16' src='style/icons/x.svg'>";
+                    toggleBathrooms(false);
                 }
-            }
-        });
-
-
-        $(this).removeAttr("disabled");
+                break;
+        }
     }
 });
 
-//submits password on enter key
-$('#ppInput').on('keypress', function (e) {
+$('#pInput').on('keypress', function (e) {
     if(e.which === 13){
-        $('#passwordSubmit').click();
+        $('#popupSubmit').click();
     }
 });
 
-//displays submit button
-$("#ppInput").on("input", function() {
+$("#pInput").on("input", function() {
     if($(this).val() != '') {
-        $('#passwordSubmit').animate({opacity:1},25);
-        $('#passwordSubmit').css('cursor', 'pointer')
+        $('#popupSubmit').animate({opacity:1},25);
+        $('#popupSubmit').css('cursor', 'pointer')
     }
     else {
-        $('#passwordSubmit').animate({opacity:0},50);
-        $('#passwordSubmit').css('cursor', 'default');
+        $('#popupSubmit').animate({opacity:0},50);
+        $('#popupSubmit').css('cursor', 'default');
     }
 });
 

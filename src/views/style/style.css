@@ -5,8 +5,8 @@
     --bgTextHover: #B1BAD6;
     --buttonHover: #666C7D;
     --navbar: #24303d;
-    --ppBg: #202227;
-    --ppInput: #373B43;
+    --pBg: #202227;
+    --pInput: #373B43;
 }
 
 body {
@@ -413,7 +413,7 @@ html::-webkit-scrollbar {
     margin-bottom: 100px;
 }
 
-#passwordPopup {
+#popup {
     display: none;
     position: fixed;
     top: 0;
@@ -423,7 +423,7 @@ html::-webkit-scrollbar {
     align-items: center;
 }
 
-#passwordHelp {
+#popupHelp{
     font-size: 10px;
     color: var(--bgText);
     text-decoration: none;
@@ -433,12 +433,16 @@ html::-webkit-scrollbar {
     transition: color .25s;
 }
 
-#passwordHelp:hover {
+#popupId, #popupButtons {
+    display: none;
+}
+
+#popupHelp:hover {
     color: var(--bgTextHover);
     transition: color .25s;
 }
 
-#ppBackdrop {
+#pBackdrop {
     display: none;
     background: rgba(0, 0, 0, .75);
     width: 100%;
@@ -449,8 +453,8 @@ html::-webkit-scrollbar {
     z-index: -1;
 }
 
-#ppBackground {
-    background: var(--ppBg);
+#popupBackground {
+    background: var(--pBg);
     box-shadow: 1px 2px 2px rgba(0, 0, 0, .2);
     width:  350px;
     height: 130px;
@@ -460,14 +464,14 @@ html::-webkit-scrollbar {
     flex-direction: column;
 }
 
-#ppBackground p {
+#popupTitle {
     font-size: 16px;
     width: 100%;
     text-align: center;
     color: #fff;
 }
 
-#ppInput {
+#pInput {
     all: unset;
     padding: 3px;
     margin-left: 3px;
@@ -479,8 +483,8 @@ html::-webkit-scrollbar {
     height: 15px;
 }
 
-#ppInputBg {
-    background: var(--ppInput);
+#pInputBg {
+    background: var(--pInput);
     width: 270px;
     height: 25px;
     border-radius: 5px;
@@ -490,7 +494,7 @@ html::-webkit-scrollbar {
     align-items: center;
 }
 
-#passwordSubmit {
+#popupSubmit {
     background: none;
     border: none;
     display: flex;
@@ -500,7 +504,7 @@ html::-webkit-scrollbar {
     opacity: 0;
 }
 
-#ppx {
+#px {
     position: absolute;
     margin-top: 5px;
     margin-left: 315px;
@@ -514,7 +518,7 @@ html::-webkit-scrollbar {
     align-items: center;
 }
 
-#ppx img {
+#px img {
     user-select: none;
     width:  16px;
     height: 16px;
@@ -522,7 +526,7 @@ html::-webkit-scrollbar {
 }
 
 /* double id to make it marked as important */
-#wrongPass#wrongPass, #wrongPass2#wrongPass2 {
+#popupError#popupError {
     font-size: 12px;
     color: #ff0000;
     display: none;

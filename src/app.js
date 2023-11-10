@@ -288,7 +288,7 @@ async function writeToFile(filename, newText, includeDate, other) {
     var previousText = String(buf);
     date = includeDate ? dateTime() : '';
 
-    var txt = previousText + '\n' + date + " | " + String(newText);
+    var txt = date + " | " + String(newText) + '\n' + previousText;
 
     fs.writeFile(filename + '.txt', txt, err => {
       if (err) throw err;

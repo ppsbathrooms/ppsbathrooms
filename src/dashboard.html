@@ -239,7 +239,6 @@
             if (data == '') {
                 data = 'no feedback'
             }
-            data = data.split('\n').reverse().join('\n');
             $('#feedbackDisplay').append('<pre>' + data + '</pre>');
         }).fail(function (error) {
             console.error('error fetching feedback:', error);
@@ -252,7 +251,6 @@
             if (data == '') {
                 data = 'no bathroom updates'
             }
-            data = data.split('\n').reverse().join('\n');
             $('#brDisplay').append('<pre>' + data + '</pre>');
         }).fail(function (error) {
             console.error('error fetching logs:', error);
@@ -262,7 +260,6 @@
             if (data == '') {
                 data = 'no admin logins'
             }
-            data = data.split('\n').reverse().join('\n');
             $('#loginsDisplay').append('<pre>' + data + '</pre>');
         }).fail(function (error) {
             console.error('error fetching logs:', error);
