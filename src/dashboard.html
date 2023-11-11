@@ -39,7 +39,7 @@
         color: #fff;
         border: none;
         background: #505460;
-        padding: 5px 10px 5px 10px;
+        padding: 7px 10px 7px 10px;
         border-radius: 5px;
         transition: background-color .25s;
         cursor: pointer;
@@ -168,6 +168,31 @@
         display: none;
     }
 
+    @media (min-width: 801px) {
+        #feedbackPannel {
+            margin-left: 45px;
+        }
+
+        #logsPannel {
+            display: flex;
+        }
+
+        #leftColumn {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 1260px) {
+        #feedbackPannel {
+            margin: 0;
+        }
+
+        #logsPannel {
+            display: block;
+        }
+    }
+
     @media (max-width: 800px) {
         #navbar p {
             display: none;
@@ -189,10 +214,6 @@
 
 <body>
     <div id="navbar">
-        <button id="navbarFeedback">
-            <img id="icon16" src="style/icons/messages.svg">
-            <p>feedback</p>
-        </button>
         <button id="navbarLogs" class="selected">
             <img id="icon16" src="style/icons/logs.svg">
             <p>logs</p>
@@ -207,17 +228,23 @@
             <h1 style="display: inline-block">feedback</h1>
             <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateFeedback();"><img
                     id="icon16" src="style/icons/refresh.svg"></button>
-            <div class="txtDisplay" id="feedbackDisplay"></div>
         </div>
         <div id="logs">
             <h1 style="display: inline-block">logs</h1>
             <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateLogs();"><img
                     id="icon16" src="style/icons/refresh.svg"></button>
-            <h3>bathroom updates</h3>
-            <div class="txtDisplay" id="brDisplay"></div><br>
-            <h3>admin logins</h3>
-            <div class="txtDisplay" id="loginsDisplay"></div><br>
-            <!-- <div class="txtDisplay" id="logsDisplay"></div><br><br> -->
+            <div id="logsPannel">
+                <div id="leftColumn">
+                    <h3>bathroom updates</h3>
+                    <div class="txtDisplay" id="brDisplay"></div><br>
+                    <h3>admin logins</h3>
+                    <div class="txtDisplay" id="loginsDisplay"></div><br>
+                </div>
+                <div id="feedbackPannel">
+                    <h3>feedback</h3>
+                    <div class="txtDisplay" id="feedbackDisplay"></div>
+                </div>
+            </div>
         </div>
         <div id="dashboard">
             <p>dashboard thingy</p>
@@ -234,15 +261,7 @@
     });
 
     function updateFeedback() {
-        $('#feedbackDisplay').html('')
-        $.get('/feedback', function (data) {
-            if (data == '') {
-                data = 'no feedback'
-            }
-            $('#feedbackDisplay').append('<pre>' + data + '</pre>');
-        }).fail(function (error) {
-            console.error('error fetching feedback:', error);
-        });
+
     }
 
     function updateLogs() {
@@ -263,6 +282,15 @@
             $('#loginsDisplay').append('<pre>' + data + '</pre>');
         }).fail(function (error) {
             console.error('error fetching logs:', error);
+        });
+        $('#feedbackDisplay').html('')
+        $.get('/feedback', function (data) {
+            if (data == '') {
+                data = 'no feedback'
+            }
+            $('#feedbackDisplay').append('<pre>' + data + '</pre>');
+        }).fail(function (error) {
+            console.error('error fetching feedback:', error);
         });
     }
 

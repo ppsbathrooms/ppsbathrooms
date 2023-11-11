@@ -108,11 +108,13 @@ html::-webkit-scrollbar {
     position: absolute;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     flex-direction: column;
     bottom: 0;
     left: 0;
-    height: 50px;
+    height: 150px;
     width: 100%;
+    margin-top: auto;
 }
 
 #navButtonsBottom a {

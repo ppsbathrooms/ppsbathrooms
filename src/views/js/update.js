@@ -148,6 +148,13 @@ function createPopup(id, title, helpDestination, buttonsToHide) {
     $('#pInput').val('')
     $("#popupError").html('');
 
+    if(id == 'highlight') {
+        $('#pInput').attr('oninput', "this.value = this.value.replace(/[^0-9]/g, '')");
+    }
+    else {
+        $('#pInput').attr('oninput', '');
+    }
+
     $("#popup").css('display', 'flex');
     $(buttonsToHide).fadeOut(50);
     $("#pBackdrop").fadeIn(100);

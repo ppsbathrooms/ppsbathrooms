@@ -1,16 +1,18 @@
 // #region Imports & Setup
-
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 
 const fs = require('fs');
+const config = require('../config.json');
 
 const app = express(); // Creates an app for your servers client
 const chalk = require('chalk'); // Easy console colors
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -24,30 +26,41 @@ app.use(bodyParser.urlencoded({
 secretKey = crypto.randomBytes(64).toString('hex');
 app.use(session({ secret: secretKey, resave: true, saveUninitialized: true }));
 app.use(express.static('views')); // load the files that are in the views directory
-
 // #endregion
 
 // #region Database Stuff
 
-var Datastore = require('nedb');
-var db = new Datastore({ filename: 'db.db' });
+const uri = config.uri;
 
-db.loadDatabase(function (error) {   
-  if (error) {
-      console.log(chalk.red('FATAL: local database could not be loaded. Caused by: ' + error));
-      throw error;
-    }
-    console.log(chalk.green('local database loaded successfully'))
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
 });
 
-//updates bathroom data
-function setBrData(school, value) {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    v = doc.value;
+db = client.db("ppsbathrooms");
+brDataColl = db.collection("brData");
 
-    chs = v[0];
-    fhs = v[1];
-    ihs = v[2];
+client.connect()
+  .then(() => {
+    console.error(chalk.green('connected to database'));
+  })
+  .catch(err => {
+    console.error('Failed to connect to the database:', err);
+  });
+
+//updates bathroom data
+
+async function setBrData(school, value) {
+  try {
+    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = doc.value;
+
+    chs = doc[0];
+    fhs = doc[1];
+    ihs = doc[2];
 
     switch(school) {
       case 'chs':
@@ -62,76 +75,99 @@ function setBrData(school, value) {
     }
 
     newValue = [chs, fhs, ihs]
-
-    db.update(
-      { _id: 'schoolData'}, 
-      { $set: { value: newValue} },
-      {},
-      db.loadDatabase()
-    );
-  });
+    await updateBrs(newValue);
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
   console.log(chalk.gray(school, 'set to', value));
+}
+
+
+
+async function updateBrs(newValue) {
+  try {
+    await client.connect();
+    console.log(chalk.gray('connected to database'));
+    console.log(newValue)
+    await brDataColl.updateOne({ _id: "schoolData" }, { $set: {value: newValue }}, {});
+    console.log('brdata updated');
+    // await client.close();
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
 }
 
 // #endregion
 
 // #region Pages
-
 // Bathrooms
-app.get('/', (req, res) => {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    if (err) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      var dataToSendToClient = {
-        brData: doc.value,
-        school: null
-      }
-      res.render('html/home', { data: dataToSendToClient });
-    }
-  });
+app.get('/', async (req, res) => {
+  try {
+    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = doc.value;
+
+    const dataToSendToClient = {
+      brData: doc,
+      school: null
+    };
+
+    res.render('html/home', { data: dataToSendToClient });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 });
 
-app.get('/cleveland', (req, res) => {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    if (err) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      var dataToSendToClient = {
-        brData: doc.value,
-        school: 'chs'
-      }
-      res.render('html/home', { data: dataToSendToClient });
-    }
-  });
+
+app.get('/cleveland', async (req, res) => {
+  try {
+    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = doc.value;
+
+    const dataToSendToClient = {
+      brData: doc,
+      school: 'chs'
+    };
+
+    res.render('html/home', { data: dataToSendToClient });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 });
 
-app.get('/franklin', (req, res) => {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    if (err) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      var dataToSendToClient = {
-        brData: doc.value,
-        school: 'fhs'
-      }
-      res.render('html/home', { data: dataToSendToClient });
-    }
-  });
+app.get('/franklin', async (req, res) => {
+  try {
+    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = doc.value;
+    
+    const dataToSendToClient = {
+      brData: doc,
+      school: 'fhs'
+    };
+
+    res.render('html/home', { data: dataToSendToClient });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 });
 
-app.get('/ida', (req, res) => {
-  db.findOne({ name: 'bathrooms' }, function(err, doc) {
-    if (err) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      var dataToSendToClient = {
-        brData: doc.value,
-        school: 'ihs'
-      }
-      res.render('html/home', { data: dataToSendToClient });
-    }
-  });
+app.get('/ida', async (req, res) => {
+  try {
+    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = doc.value;
+    
+    const dataToSendToClient = {
+      brData: doc,
+      school: 'ihs'
+    };
+
+    res.render('html/home', { data: dataToSendToClient });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 });
 
 app.get('/help', (req, res) => {
@@ -231,22 +267,20 @@ app.get('*', (req, res) => {
 
 app.post('/admin', async (req, res) => {
   const { username, password } = req.body;
-
-  db.findOne({ username: username }, (err, user) => {
-    if (err) {
-      console.log('err');
-      throw err;
-    }
-
-    if (user && bcrypt.compareSync(password, user.password)) {
-      req.session.authenticated = true;
-      writeToFile('logins', req.headers['x-forwarded-for'] || req.socket.remoteAddress, true);
-      res.redirect('/admin');
-    } else {
-      console.log(chalk.red('wrong login'))
-      res.redirect('/admin');
-    }
-  });
+  try {
+      doc = await brDataColl.findOne({ username: username });
+      if (username && bcrypt.compareSync(password, doc.password)) {
+        req.session.authenticated = true;
+        writeToFile('logins', req.headers['x-forwarded-for'] || req.socket.remoteAddress, true);
+        res.redirect('/admin');
+      } else {
+        console.log(chalk.red('wrong login'))
+        res.redirect('/admin');
+      }
+    }catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 });
 
 

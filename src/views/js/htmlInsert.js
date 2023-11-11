@@ -12,6 +12,7 @@ $('#navbar').html(
       '<img id="helpButton" src="../style/icons/help.svg" style="width: 25px; height: 25px;"></img>' +
     '</div>' +
     '<div id="navButtonsBottom">' +
+        '<a href="/admin">login</a>' +
         '<a href="/privacy">privacy</a>' +
         '<a href="/terms">terms</a>' +
     '</div>'
@@ -40,10 +41,7 @@ $('#footer').html(
   '<div id="footerRight">' +
   '<a id="footerContact" href="/contact">contact</a>' +
   '<a href="/help">help</a>'+
-  '</div>' +
-  '<div id="footerLeft">' +
-  '<a href="/admin">login</a>' +
-  '</div>'
+  '</div>' 
   );
 
 //different footer when not displaying map
