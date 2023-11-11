@@ -104,6 +104,7 @@
     }
 
     #pannels {
+        overflow-y: scroll;
         position: fixed;
         top: 0;
         left: var(--navbarWidth);
@@ -186,6 +187,7 @@
     @media (max-width: 1260px) {
         #feedbackPannel {
             margin: 0;
+            margin-bottom: 75px;
         }
 
         #logsPannel {
@@ -268,7 +270,8 @@
             }
             else {
                 data.reverse().forEach(data => {
-                    $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
+                    var newData = smallScreen ? data.school + ' set to ' + data.value : data.time + ' | ' + data.school + ' set to ' + data.value;
+                    $('#brDisplay').append('<pre>' + newData + '</pre>');
                 });
             }
         }).fail(function (error) {
@@ -281,7 +284,8 @@
             }
             else {
                 data.reverse().forEach(data => {
-                    $('#loginsDisplay').append('<pre>' + data.time + ' | ' + data.ip + '</pre>');
+                    var newData = smallScreen ? data.ip : data.time + ' | ' + data.ip;
+                    $('#loginsDisplay').append('<pre>' + newData + '</pre>');
                 });
             }
         }).fail(function (error) {
@@ -296,7 +300,8 @@
             }
             else {
                 data.reverse().forEach(data => {
-                    $('#feedbackDisplay').append('<pre>' + data.time + ' | ' + data.value + '</pre>');
+                    var newData = smallScreen ? data.value : data.time + ' | ' + data.value;
+                    $('#feedbackDisplay').append('<pre>' + newData + '</pre>');
                 });
             }
         }).fail(function (error) {
@@ -339,4 +344,24 @@
         $('#dashboard, #feedback, #logs').hide();
         $('#navbarDashboard, #navbarFeedback, #navbarLogs').removeClass("selected");
     }
+
+    smallScreen = false;
+
+    // $(document).ready(function () {
+    //     checkScreenSize();
+
+    //     $(window).resize(function () {
+    //         checkScreenSize();
+    //     });
+    // });
+
+    // function checkScreenSize() {
+    //     newSize = $(window).width() < 801;
+    //     if (smallScreen != newSize) {
+    //         updateLogs();
+    //     }
+    //     if (false) {
+    //         smallScreen = newSize = $(window).width() < 801;
+    //     }
+    // }
 </script>

@@ -20,6 +20,8 @@ if(isSchoolPage) {
 function selectSchool(school, redirect) {
     document.title = "ppsbathrooms | " + schoolNameConvert(school, false) 
 
+    $('#px').click();
+
     $(".schoolChoice").hide();
 
     $("#pageID").html(school);
@@ -57,6 +59,7 @@ var currentPage = window.location.href.toString().split(window.location.host)[1]
 window.onpopstate = function()
 {
     newPage = window.location.href.toString().split(window.location.host)[1];
+    $('#px').click();
 
     isSchoolPickPage = (newPage == '/') ? true: false;
     if(isSchoolPickPage) {
