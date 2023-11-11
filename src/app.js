@@ -5,7 +5,16 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const fs = require('fs');
-const config = require('../config.json');
+
+if (process.env.URI) {
+  uri = process.env.URI;
+}
+else {
+  const configData = fs.readFileSync('../config.json', 'utf-8');
+  const config = JSON.parse(configData);
+  uri = config.uri;
+}
+
 
 const app = express(); // Creates an app for your servers client
 const chalk = require('chalk'); // Easy console colors
@@ -30,7 +39,6 @@ app.use(express.static('views')); // load the files that are in the views direct
 
 // #region Database Stuff
 
-const uri = config.uri;
 
 const client = new MongoClient(uri, {
   serverApi: {
