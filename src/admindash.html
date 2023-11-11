@@ -260,35 +260,45 @@
         updateLogs();
     });
 
-    function updateFeedback() {
-
-    }
-
     function updateLogs() {
         $('#brDisplay').html('')
         $.get('/brupdates', function (data) {
-            if (data == '') {
-                data = 'no bathroom updates'
+            if (data.length == 0) {
+                $('#brDisplay').append('<pre>' + 'no bathroom updates' + '</pre>');
             }
-            $('#brDisplay').append('<pre>' + data + '</pre>');
+            else {
+                data.reverse().forEach(data => {
+                    $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
+                });
+            }
         }).fail(function (error) {
             console.error('error fetching logs:', error);
         });
         $('#loginsDisplay').html('')
         $.get('/logins', function (data) {
-            if (data == '') {
-                data = 'no admin logins'
+            if (data.length == 0) {
+                $('#loginsDisplay').append('<pre>' + 'no admin logins' + '</pre>');
             }
-            $('#loginsDisplay').append('<pre>' + data + '</pre>');
+            else {
+                data.reverse().forEach(data => {
+                    $('#loginsDisplay').append('<pre>' + data.time + ' | ' + data.ip + '</pre>');
+                });
+            }
         }).fail(function (error) {
             console.error('error fetching logs:', error);
         });
+
+
         $('#feedbackDisplay').html('')
         $.get('/feedback', function (data) {
-            if (data == '') {
-                data = 'no feedback'
+            if (data.length == 0) {
+                $('#feedbackDisplay').append('<pre>' + 'no feedback' + '</pre>');
             }
-            $('#feedbackDisplay').append('<pre>' + data + '</pre>');
+            else {
+                data.reverse().forEach(data => {
+                    $('#feedbackDisplay').append('<pre>' + data.time + ' | ' + data.value + '</pre>');
+                });
+            }
         }).fail(function (error) {
             console.error('error fetching feedback:', error);
         });

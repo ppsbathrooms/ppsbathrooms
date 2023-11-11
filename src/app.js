@@ -49,7 +49,7 @@ const client = new MongoClient(uri, {
 });
 
 db = client.db("ppsbathrooms");
-brDataColl = db.collection("brData");
+dataColl = db.collection("data");
 
 client.connect()
   .then(() => {
@@ -63,7 +63,7 @@ client.connect()
 
 async function setBrData(school, value) {
   try {
-    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
 
     chs = doc[0];
@@ -95,10 +95,7 @@ async function setBrData(school, value) {
 async function updateBrs(newValue) {
   try {
     await client.connect();
-    console.log(chalk.gray('connected to database'));
-    console.log(newValue)
-    await brDataColl.updateOne({ _id: "schoolData" }, { $set: {value: newValue }}, {});
-    console.log('brdata updated');
+    await dataColl.updateOne({ _id: "schoolData" }, { $set: {value: newValue }}, {});
     // await client.close();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
@@ -111,7 +108,7 @@ async function updateBrs(newValue) {
 // Bathrooms
 app.get('/', async (req, res) => {
   try {
-    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
 
     const dataToSendToClient = {
@@ -129,7 +126,7 @@ app.get('/', async (req, res) => {
 
 app.get('/cleveland', async (req, res) => {
   try {
-    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
 
     const dataToSendToClient = {
@@ -146,7 +143,7 @@ app.get('/cleveland', async (req, res) => {
 
 app.get('/franklin', async (req, res) => {
   try {
-    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     
     const dataToSendToClient = {
@@ -163,7 +160,7 @@ app.get('/franklin', async (req, res) => {
 
 app.get('/ida', async (req, res) => {
   try {
-    doc = await brDataColl.findOne({ _id: 'schoolData' });
+    doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     
     const dataToSendToClient = {
@@ -204,58 +201,68 @@ app.get('/admin', (req, res) => {
     res.sendFile(__dirname + '/views/html/admin/login.html');
   }
   else {
-    res.sendFile(__dirname + '/dashboard.html');
+    res.sendFile(__dirname + '/admindash.html');
   }
 });
 
 
 
 //admin info
-app.get('/feedback', (req, res) => {
-  if(req.session.authenticated) {
-    fs.readFile('txt/feedback.txt', 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-      } else {
-        res.send(data);
-      }
-    });
-  }
-  else {
-    res.render('html/404.html')
+
+app.get('/feedback', async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      await client.connect();
+      const db = client.db('ppsbathrooms');
+      const collection = db.collection('feedback');
+
+      const feedbackEntries = await collection.find().toArray();
+
+      res.send(feedbackEntries);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.render('html/404.html');
   }
 });
 
-app.get('/brupdates', (req, res) => {
-  if(req.session.authenticated) {
-    fs.readFile('txt/brUpdate.txt', 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-      } else {
-        res.send(data);
-      }
-    });
-  }
-  else {
-    res.render('html/404.html')
+app.get('/brupdates', async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      await client.connect();
+      const db = client.db('ppsbathrooms');
+      const collection = db.collection('bathrooms');
+
+      const bathroomUpdates = await collection.find().toArray();
+
+      res.send(bathroomUpdates);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.render('html/404.html');
   }
 });
 
-app.get('/logins', (req, res) => {
-  if(req.session.authenticated) {
-    fs.readFile('txt/logins.txt', 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-      } else {
-        res.send(data);
-      }
-    });
-  }
-  else {
-    res.render('html/404.html')
+app.get('/logins', async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      await client.connect();
+      const db = client.db('ppsbathrooms');
+      const collection = db.collection('adminlogins');
+
+      const logins = await collection.find().toArray();
+
+      res.send(logins);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.render('html/404.html');
   }
 });
 
@@ -276,10 +283,10 @@ app.get('*', (req, res) => {
 app.post('/admin', async (req, res) => {
   const { username, password } = req.body;
   try {
-      doc = await brDataColl.findOne({ username: username });
+      doc = await dataColl.findOne({ username: username });
       if (username && bcrypt.compareSync(password, doc.password)) {
         req.session.authenticated = true;
-        writeToFile('logins', req.headers['x-forwarded-for'] || req.socket.remoteAddress, true);
+        createDocument(req, 'adminlogins')
         res.redirect('/admin');
       } else {
         console.log(chalk.red('wrong login'))
@@ -306,7 +313,7 @@ app.post('/bathroomUpdate', function(req, res) {
 
     res.json({ isCorrect: true});
     setBrData(school, values);
-    writeToFile('brUpdate', school + ' set to ' + values, true, null);
+    createDocument(req, 'bathrooms', values, school)
   } else {
     console.log(chalk.red("Wrong pass for " + school + ": '", providedPassword, "'"));
     res.json({ isCorrect: false});
@@ -314,11 +321,29 @@ app.post('/bathroomUpdate', function(req, res) {
 });
 
 
-
 app.post('/sendFeedback', function(req, res) {
   console.log(chalk.gray("feedback submitted: " + req.body.feedback));
-  writeToFile('feedback', req.body.feedback, true, null);
+  createDocument(req, 'feedback', req.body.feedback)
 });
+
+async function createDocument(request, collectionName, value, school) {
+    try {
+        await client.connect();
+        const database = client.db('ppsbathrooms');
+        const collection = database.collection(collectionName);
+        
+        await collection.insertOne({
+            value: value,
+            school: school,
+            time: dateTime(),
+            ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress
+        });
+
+        // console.log(`Document created with _id: ${result.insertedId}`);
+    } catch (err) {
+        console.error('Error: ', err);
+    }
+}
 
 // #endregion
 
@@ -380,12 +405,14 @@ function getPassword(school) {
 // Gets the current datetime
 function dateTime() {
     var currentdate = new Date();
-    var month = currentdate.getMonth() + 1;
-    var day = currentdate.getDate();
-    var year = currentdate.getFullYear().toString().slice(-2);
-    var hours = currentdate.getHours();
-    var minutes = currentdate.getMinutes();
-    var seconds = currentdate.getSeconds();
+    var pst = new Date(currentdate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+
+    var month = pst.getMonth() + 1;
+    var day = pst.getDate();
+    var year = pst.getFullYear().toString().slice(-2);
+    var hours = pst.getHours();
+    var minutes = pst.getMinutes();
+    var seconds = pst.getSeconds();
     var ampm = hours >= 12 ? 'PM' : 'AM';
 
     hours = hours % 12;

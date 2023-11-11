@@ -150,9 +150,15 @@ function createPopup(id, title, helpDestination, buttonsToHide) {
 
     if(id == 'highlight') {
         $('#pInput').attr('oninput', "this.value = this.value.replace(/[^0-9]/g, '')");
+        $('#pInput').attr('type', "text");
+    }
+    else if (id == 'brData') {
+        $('#pInput').attr('type', "password");
+        $('#pInput').attr('oninput', '');
     }
     else {
         $('#pInput').attr('oninput', '');
+        $('#pInput').attr('type', "text");
     }
 
     $("#popup").css('display', 'flex');
