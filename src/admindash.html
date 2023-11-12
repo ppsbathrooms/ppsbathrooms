@@ -155,6 +155,7 @@
     #refresh {
         padding: 0;
         margin-left: 10px;
+        display: inline-block;
     }
 
     #refresh img {
@@ -198,6 +199,10 @@
     }
 
     @media (max-width: 800px) {
+        body {
+            font-size: 10px;
+        }
+
         #navbar p {
             display: none;
         }
@@ -231,11 +236,16 @@
     <div id="pannels">
         <div id="logs">
             <h1 style="display: inline-block">logs</h1>
-            <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateLogs();"><img
-                    id="icon16" src="style/icons/refresh.svg"></button>
+            <button id="refresh" class="invisButton flex" onclick="updateLogs();"><img id="icon16"
+                    src="style/icons/refresh.svg"></button>
             <div id="logsPannel">
                 <div id="leftColumn">
-                    <h3>bathroom updates</h3>
+                    <div>
+                        <h3 style="display: inline-block">bathroom updates</h3>
+                        <button id="refresh" style="margin-left: 5px;" class="invisButton flex"
+                            onclick="toggleBrUpdateFull();"><img style="width: 12px;vertical-align: middle;"
+                                src="style/icons/repeat.svg"></button>
+                    </div>
                     <div class="txtDisplay" id="brDisplay"></div><br>
                     <h3>admin logins</h3>
                     <div class="txtDisplay" id="loginsDisplay"></div><br>
@@ -248,12 +258,14 @@
         </div>
         <div id="dashboard">
             <h1 style="display: inline-block">dashboard</h1>
-            <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateDash();"><img
-                    id="icon16" src="style/icons/refresh.svg"></button>
+            <button id="refresh" class="invisButton flex" onclick="updateDash();"><img id="icon16"
+                    src="style/icons/refresh.svg"></button>
             <h3>page visits</h3>
             <div class="txtDisplay flex">
                 <canvas id="pageVisitChart"></canvas>
             </div>
+            <h3 id="brUpdateText"></h3>
+            <h3 id="visitsText"></h3>
         </div>
     </div>
     <button onclick="location.href='/admin/logout';" id="logout">logout</button>
@@ -264,18 +276,40 @@
 <script>
     $(document).ready(function () {
         updateLogs();
-        updateDash();
     });
 
+    let brUpdateFull = false;
+    let brUpdateData = null;
+
+    function toggleBrUpdateFull() {
+        $('#brDisplay').html('')
+        data = brUpdateData;
+
+        brUpdateFull = !brUpdateFull;
+        data.forEach(data => {
+            if (brUpdateFull) {
+                $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
+            }
+            else {
+                $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' ' + data.numChanged + ' bathrooms updated' + '</pre>');
+            }
+        });
+    }
     function updateLogs() {
         $('#brDisplay').html('')
         $.get('/brupdates', function (data) {
+            brUpdateData = data;
             if (data.length == 0) {
                 $('#brDisplay').append('<pre>' + 'no bathroom updates' + '</pre>');
             }
             else {
                 data.reverse().forEach(data => {
-                    $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
+                    if (brUpdateFull) {
+                        $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
+                    }
+                    else {
+                        $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' ' + data.numChanged + ' bathrooms updated' + '</pre>');
+                    }
                 });
             }
         }).fail(function (error) {
@@ -341,8 +375,11 @@
         }
     });
 
+    let totalVisits = 0;
+
     function updateDash() {
-        $('#pageVisitDisplay').html('');
+        $('#pageVisitDisplay, #bathroomUpdates, #brUpdateText, #visitsText').html('');
+        totalVisits = 0;
         $.get('/pageVisits', function (data) {
             if (data.length === 0) {
                 $('#pageVisitDisplay').append('<pre>' + 'no page visits' + '</pre>');
@@ -352,11 +389,19 @@
                 data.reverse().forEach(dataPoint => {
                     pageViewChart.data.labels.push(dataPoint.date);
                     pageViewChart.data.datasets[0].data.push(dataPoint.visits);
-                    $('#pageVisitDisplay').append('<pre>' + dataPoint.date + ' | ' + dataPoint.visits + '</pre>');
+                    // $('#pageVisitDisplay').append('<pre>' + dataPoint.date + ' | ' + dataPoint.visits + '</pre>');
+                    totalVisits += Number(dataPoint.visits);
                 });
+                $('#visitsText').append('<pre>' + 'total page visits - ' + totalVisits + '</pre>');
 
                 pageViewChart.update();
             }
+        }).fail(function (error) {
+            console.error('error fetching feedback:', error);
+        });
+
+        $.get('/bathroomUpdate', function (data) {
+            $('#brUpdateText').append('<pre>' + 'bathroom updates - ' + data.value + '</pre>');
         }).fail(function (error) {
             console.error('error fetching feedback:', error);
         });

@@ -61,7 +61,7 @@ client.connect()
 
 //updates bathroom data
 
-async function setBrData(school, value) {
+async function setBrData(school, value, request) {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
@@ -83,6 +83,7 @@ async function setBrData(school, value) {
     }
 
     newValue = [chs, fhs, ihs]
+    dbEntry(request, 'bathrooms', value, school, numDiffCharacters(newValue, doc))
     await updateBrs(newValue);
   } catch (error) {
     console.error('Unable to connect to the database:', error);
@@ -93,6 +94,7 @@ async function setBrData(school, value) {
 
 
 async function updateBrs(newValue) {
+  brUpdated();
   try {
     await client.connect();
     await dataColl.updateOne({ _id: "schoolData" }, { $set: {value: newValue }}, {});
@@ -233,6 +235,24 @@ app.get('/feedback', async (req, res) => {
   }
 });
 
+app.get('/bathroomUpdate', async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      await client.connect();
+      const db = client.db('ppsbathrooms');
+      const collection = db.collection('data');
+      const bathroomUpdate = await collection.findOne({ _id: 'bathroomUpdates' });
+
+      res.send(bathroomUpdate);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.render('html/404.html');
+  }
+});
+
 app.get('/pageVisits', async (req, res) => {
   if (req.session.authenticated) {
     try {
@@ -256,7 +276,6 @@ app.get('/brupdates', async (req, res) => {
   if (req.session.authenticated) {
     try {
       await client.connect();
-      const db = client.db('ppsbathrooms');
       const collection = db.collection('bathrooms');
 
       const bathroomUpdates = await collection.find().toArray();
@@ -310,7 +329,7 @@ app.post('/admin', async (req, res) => {
       doc = await dataColl.findOne({ username: username });
       if (username && bcrypt.compareSync(password, doc.password)) {
         req.session.authenticated = true;
-        createDocument(req, 'adminlogins')
+        dbEntry(req, 'adminlogins', false, false)
         res.redirect('/admin');
       } else {
         console.log(chalk.red('wrong login'))
@@ -336,8 +355,7 @@ app.post('/bathroomUpdate', function(req, res) {
     values = values.replace(/\s/g, '');
 
     res.json({ isCorrect: true});
-    setBrData(school, values);
-    createDocument(req, 'bathrooms', values, school)
+    setBrData(school, values, req);
   } else {
     console.log(chalk.red("Wrong pass for " + school + ": '", providedPassword, "'"));
     res.json({ isCorrect: false});
@@ -347,21 +365,27 @@ app.post('/bathroomUpdate', function(req, res) {
 
 app.post('/sendFeedback', function(req, res) {
   console.log(chalk.gray("feedback submitted: " + req.body.feedback));
-  createDocument(req, 'feedback', req.body.feedback)
+  dbEntry(req, 'feedback', req.body.feedback)
 });
 
-async function createDocument(request, collectionName, value, school) {
+async function dbEntry(request, collectionName, value, school, numChanged) {
     try {
         await client.connect();
         const collection = db.collection(collectionName);
-        
-        await collection.insertOne({
-            value: value,
-            school: school,
+        const dbentry = {
             time: dateTime(),
             ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress
-        });
-
+        };
+        if (school) {
+            dbentry.school = school;
+        }
+        if(value) {
+          dbentry.value = value;
+        }     
+        if(numChanged) {
+          dbentry.numChanged = numChanged;
+        }     
+        await collection.insertOne(dbentry);
     } catch (err) {
         console.error('Error: ', err);
     }
@@ -398,12 +422,41 @@ async function pageVisited() {
   }
 }
 
+async function brUpdated() {
+  try {
+    await client.connect();
+    await dataColl.updateOne (
+      { _id: 'bathroomUpdates' },
+      { $inc: { value: 1 } }
+    );
+  } catch (err) {
+    console.error('Error: ', err);
+  }
+}
 
 
 
 // #endregion
 
 // #region Other Nonsense
+function numDiffCharacters(arr1, arr2) {
+    let differentCharacters = 0;
+
+    for (let i = 0; i < arr1.length; i++) {
+        const str1 = arr1[i];
+        const str2 = arr2[i];
+
+        for (let j = 0; j < Math.min(str1.length, str2.length); j++) {
+            if (str1[j] !== str2[j]) {
+                differentCharacters++;
+            }
+        }
+
+        differentCharacters += Math.abs(str1.length - str2.length);
+    }
+
+    return differentCharacters;
+}
 // Writes text to a file
 async function writeToFile(filename, newText, includeDate, other) {
   filename = 'txt/' + filename;
