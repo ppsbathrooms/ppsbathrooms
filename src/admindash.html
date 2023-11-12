@@ -7,6 +7,7 @@
     <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
 
     <script src="../thirdParty/jquery.min.js"></script>
+    <script src="../thirdParty/chart.min.js"></script>
     <title>ppsbathrooms | admin</title>
 </head>
 
@@ -164,10 +165,11 @@
         filter: brightness(80%);
     }
 
-    #dashboard,
-    #feedback {
+
+    #dashboard {
         display: none;
     }
+
 
     @media (min-width: 801px) {
         #feedbackPannel {
@@ -211,6 +213,7 @@
         .txtDisplay {
             width: calc(100vw - 110px);
         }
+
     }
 </style>
 
@@ -226,11 +229,6 @@
         </button>
     </div>
     <div id="pannels">
-        <div id="feedback">
-            <h1 style="display: inline-block">feedback</h1>
-            <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateFeedback();"><img
-                    id="icon16" src="style/icons/refresh.svg"></button>
-        </div>
         <div id="logs">
             <h1 style="display: inline-block">logs</h1>
             <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateLogs();"><img
@@ -249,7 +247,13 @@
             </div>
         </div>
         <div id="dashboard">
-            <p>dashboard thingy</p>
+            <h1 style="display: inline-block">dashboard</h1>
+            <button id="refresh" style="display: inline-block" class="invisButton flex" onclick="updateDash();"><img
+                    id="icon16" src="style/icons/refresh.svg"></button>
+            <h3>page visits</h3>
+            <div class="txtDisplay flex">
+                <canvas id="pageVisitChart"></canvas>
+            </div>
         </div>
     </div>
     <button onclick="location.href='/admin/logout';" id="logout">logout</button>
@@ -260,6 +264,7 @@
 <script>
     $(document).ready(function () {
         updateLogs();
+        updateDash();
     });
 
     function updateLogs() {
@@ -270,8 +275,7 @@
             }
             else {
                 data.reverse().forEach(data => {
-                    var newData = smallScreen ? data.school + ' set to ' + data.value : data.time + ' | ' + data.school + ' set to ' + data.value;
-                    $('#brDisplay').append('<pre>' + newData + '</pre>');
+                    $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
                 });
             }
         }).fail(function (error) {
@@ -284,8 +288,7 @@
             }
             else {
                 data.reverse().forEach(data => {
-                    var newData = smallScreen ? data.ip : data.time + ' | ' + data.ip;
-                    $('#loginsDisplay').append('<pre>' + newData + '</pre>');
+                    $('#loginsDisplay').append('<pre>' + data.time + ' | ' + data.ip + '</pre>');
                 });
             }
         }).fail(function (error) {
@@ -300,14 +303,65 @@
             }
             else {
                 data.reverse().forEach(data => {
-                    var newData = smallScreen ? data.value : data.time + ' | ' + data.value;
-                    $('#feedbackDisplay').append('<pre>' + newData + '</pre>');
+                    $('#feedbackDisplay').append('<pre>' + data.time + ' | ' + data.value + '</pre>');
                 });
             }
         }).fail(function (error) {
             console.error('error fetching feedback:', error);
         });
     }
+
+    const pageViewChart = new Chart(document.getElementById('pageVisitChart'), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Page Visits',
+                data: [],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                cubicInterpolationMode: 'monotone'
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+            },
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        }
+    });
+
+    function updateDash() {
+        $('#pageVisitDisplay').html('');
+        $.get('/pageVisits', function (data) {
+            if (data.length === 0) {
+                $('#pageVisitDisplay').append('<pre>' + 'no page visits' + '</pre>');
+            } else {
+                pageViewChart.data.labels = [];
+                pageViewChart.data.datasets[0].data = [];
+                data.reverse().forEach(dataPoint => {
+                    pageViewChart.data.labels.push(dataPoint.date);
+                    pageViewChart.data.datasets[0].data.push(dataPoint.visits);
+                    $('#pageVisitDisplay').append('<pre>' + dataPoint.date + ' | ' + dataPoint.visits + '</pre>');
+                });
+
+                pageViewChart.update();
+            }
+        }).fail(function (error) {
+            console.error('error fetching feedback:', error);
+        });
+    }
+
 
     //default directory
     dir = 'logs';
@@ -334,6 +388,7 @@
     $('#navbarDashboard').click(function (e) {
         if (dir != 'dash') {
             dir = 'dash';
+            updateDash();
             hideAllPannels();
             $('#navbarDashboard').addClass("selected");
             $('#dashboard').fadeIn(50);
@@ -345,23 +400,4 @@
         $('#navbarDashboard, #navbarFeedback, #navbarLogs').removeClass("selected");
     }
 
-    smallScreen = false;
-
-    // $(document).ready(function () {
-    //     checkScreenSize();
-
-    //     $(window).resize(function () {
-    //         checkScreenSize();
-    //     });
-    // });
-
-    // function checkScreenSize() {
-    //     newSize = $(window).width() < 801;
-    //     if (smallScreen != newSize) {
-    //         updateLogs();
-    //     }
-    //     if (false) {
-    //         smallScreen = newSize = $(window).width() < 801;
-    //     }
-    // }
 </script>

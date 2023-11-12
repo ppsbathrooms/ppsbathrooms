@@ -115,7 +115,7 @@ app.get('/', async (req, res) => {
       brData: doc,
       school: null
     };
-
+    pageVisited();
     res.render('html/home', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
@@ -133,7 +133,7 @@ app.get('/cleveland', async (req, res) => {
       brData: doc,
       school: 'chs'
     };
-
+    pageVisited();
     res.render('html/home', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
@@ -150,7 +150,7 @@ app.get('/franklin', async (req, res) => {
       brData: doc,
       school: 'fhs'
     };
-
+    pageVisited();
     res.render('html/home', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
@@ -167,7 +167,7 @@ app.get('/ida', async (req, res) => {
       brData: doc,
       school: 'ihs'
     };
-
+    pageVisited();
     res.render('html/home', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
@@ -177,22 +177,27 @@ app.get('/ida', async (req, res) => {
 
 app.get('/help', (req, res) => {
   res.render('html/help.html');
+  pageVisited();
 });
 
 app.get('/contact', (req, res) => {
   res.render('html/contact.html');
+  pageVisited();
 });
 
 app.get('/privacy', (req, res) => {
   res.render('html/privacy.html');
+  pageVisited();
 });
 
 app.get('/terms', (req, res) => {
   res.render('html/terms.html');
+  pageVisited();
 });
 
 app.get('/schools', (req, res) => {
   res.render('html/schools.html');
+  pageVisited();
 });
 
 
@@ -219,6 +224,25 @@ app.get('/feedback', async (req, res) => {
       const feedbackEntries = await collection.find().toArray();
 
       res.send(feedbackEntries);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.render('html/404.html');
+  }
+});
+
+app.get('/pageVisits', async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      await client.connect();
+      const db = client.db('ppsbathrooms');
+      const collection = db.collection('pageVisits');
+
+      const visits = await collection.find().toArray();
+
+      res.send(visits);
     } catch (err) {
       console.error(err);
       res.status(500).send('Internal Server Error');
@@ -329,8 +353,7 @@ app.post('/sendFeedback', function(req, res) {
 async function createDocument(request, collectionName, value, school) {
     try {
         await client.connect();
-        const database = client.db('ppsbathrooms');
-        const collection = database.collection(collectionName);
+        const collection = db.collection(collectionName);
         
         await collection.insertOne({
             value: value,
@@ -339,11 +362,44 @@ async function createDocument(request, collectionName, value, school) {
             ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress
         });
 
-        // console.log(`Document created with _id: ${result.insertedId}`);
     } catch (err) {
         console.error('Error: ', err);
     }
 }
+
+async function pageVisited() {
+  try {
+    const currentdate = new Date();
+    const pst = new Date(currentdate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+
+    const month = pst.getMonth() + 1;
+    const day = pst.getDate();
+    const year = pst.getFullYear();
+    const date = `${year}-${month}-${day}`;
+
+    await client.connect();
+    const collection = db.collection('pageVisits');
+    const filter = { date: date };
+
+    const existingDocument = await collection.findOne(filter);
+
+    if (existingDocument) {
+      // If the document exists, update the 'visits' field by incrementing it
+      await collection.updateOne(filter, { $inc: { visits: 1 } });
+    } else {
+      // If the document doesn't exist, insert a new one with 'visits' set to 1
+      await collection.insertOne({
+        date: date,
+        visits: 1
+      });
+    }
+  } catch (err) {
+    console.error('Error: ', err);
+  }
+}
+
+
+
 
 // #endregion
 
