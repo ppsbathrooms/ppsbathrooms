@@ -595,7 +595,7 @@ function chsMap() {
 function fhsMap() {
     $('.map').html(
     '<div id="mapHolder">' +
-        '<svg id="mapSvg" viewBox="0 0 520 1415">' +
+        '<svg id="mapSvg" viewBox="0 0 533 1415">' +
         '<g transform="translate(237.33 691.32)">' +
             '<a id="button24">' +
             '<rect x="34.405" y="152.05" width="9.2652" height="15.637" style="fill:#2B99E0;stroke-width:0" />' +
@@ -738,7 +738,7 @@ function fhsMap() {
                 '<rect rx="4" x="-169.82" y="-633.86" width="15" height="15" id="br1" />' +
             '</a>' +
             '<a id="square3">' +
-                '<rect rx="4" x="-80.306" y="-583.9" width="15" height="15" id="br2" />' +
+                '<rect rx="4" x="-80.306" y="-588.9" width="15" height="15" id="br2" />' +
             '</a>' +
             '<a id="square4">' +
                 '<rect rx="4" x="112.01" y="-479.73" width="15" height="15" id="br3" />' +
@@ -750,7 +750,7 @@ function fhsMap() {
                 '<rect rx="4" x="185.07" y="-537.51" width="15" height="15" id="br5" />' +
             '</a>' +
             '<a id="square7">' +
-                '<rect rx="4" x="-80.306" y="-563.96" width="15" height="15" id="br6" />' +
+                '<rect rx="4" x="-80.306" y="-568.96" width="15" height="15" id="br6" />' +
             '</a>' +
             '<a id="square8">' +
                 '<rect rx="4" x="-90.519" y="-163.06" width="15" height="15" id="br7" />' +

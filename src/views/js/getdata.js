@@ -7,7 +7,7 @@ function getData() {
 
     newStatus = navigator.onLine ? brData : -1;
 
-    for (var i = 0; i < 14; i++) {
+    for (var i = 0; i < 34; i++) {
         setStatus(i, newStatus[i]);
     }
     
