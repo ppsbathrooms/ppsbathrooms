@@ -386,7 +386,7 @@
             } else {
                 pageViewChart.data.labels = [];
                 pageViewChart.data.datasets[0].data = [];
-                data.reverse().forEach(dataPoint => {
+                data.forEach(dataPoint => {
                     pageViewChart.data.labels.push(dataPoint.date);
                     pageViewChart.data.datasets[0].data.push(dataPoint.visits);
                     // $('#pageVisitDisplay').append('<pre>' + dataPoint.date + ' | ' + dataPoint.visits + '</pre>');
