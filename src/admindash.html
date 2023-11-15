@@ -260,7 +260,7 @@
             <h1 style="display: inline-block">dashboard</h1>
             <button id="refresh" class="invisButton flex" onclick="updateDash();"><img id="icon16"
                     src="style/icons/refresh.svg"></button>
-            <h3>page visits</h3>
+            <h3>page requests</h3>
             <div class="txtDisplay flex">
                 <canvas id="pageVisitChart"></canvas>
             </div>
@@ -382,7 +382,7 @@
         totalVisits = 0;
         $.get('/pageVisits', function (data) {
             if (data.length === 0) {
-                $('#pageVisitDisplay').append('<pre>' + 'no page visits' + '</pre>');
+                $('#pageVisitDisplay').append('<pre>' + 'no page requests' + '</pre>');
             } else {
                 pageViewChart.data.labels = [];
                 pageViewChart.data.datasets[0].data = [];
@@ -392,7 +392,7 @@
                     // $('#pageVisitDisplay').append('<pre>' + dataPoint.date + ' | ' + dataPoint.visits + '</pre>');
                     totalVisits += Number(dataPoint.visits);
                 });
-                $('#visitsText').append('<pre>' + 'total page visits - ' + totalVisits + '</pre>');
+                $('#visitsText').append('<pre>' + 'total page requests - ' + totalVisits + '</pre>');
 
                 pageViewChart.update();
             }

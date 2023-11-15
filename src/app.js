@@ -16,8 +16,8 @@ else {
 }
 
 
-const app = express(); // Creates an app for your servers client
-const chalk = require('chalk'); // Easy console colors
+const app = express(); // creates app for server's client
+const chalk = require('chalk'); // console colors
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
@@ -50,6 +50,7 @@ const client = new MongoClient(uri, {
 
 db = client.db("ppsbathrooms");
 dataColl = db.collection("data");
+userColl = db.collection("users");
 
 client.connect()
   .then(() => {
@@ -326,21 +327,23 @@ app.get('*', (req, res) => {
 app.post('/admin', async (req, res) => {
   const { username, password } = req.body;
   try {
-      doc = await dataColl.findOne({ username: username });
-      if (username && bcrypt.compareSync(password, doc.password)) {
+    const user = await userColl.findOne({ username });
+    if (user) {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (passwordMatch) {
         req.session.authenticated = true;
-        dbEntry(req, 'adminlogins', false, false)
         res.redirect('/admin');
       } else {
-        console.log(chalk.red('wrong login'))
         res.redirect('/admin');
       }
-    }catch (error) {
-    console.error('An error occurred:', error);
-    res.status(500).json({ error: 'An error occurred' });
+    } else {
+        res.redirect('/admin');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 //recieve post request, send update
 app.post('/bathroomUpdate', function(req, res) {
