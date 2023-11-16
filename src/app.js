@@ -204,56 +204,50 @@ app.get('/schools', (req, res) => {
 });
 
 
-app.get('/admin', (req, res) => {
+app.get('/admin', async (req, res) => {
   if(!req.session.authenticated) {
     res.sendFile(__dirname + '/views/html/admin/login.html');
   }
   else {
-    res.sendFile(__dirname + '/admindash.html');
+// #region admin data
+    const brUpdates = await db.collection('bathrooms').find({}).toArray();
+    const formattedBrUpdates = brUpdates.reverse().map(entry => `${entry.time} ${' | '} ${entry.school} ${entry.numChanged} ${' bathrooms updated'}`).join('<br>');
+
+    const feedback = await db.collection('feedback').find({}).toArray();
+    const formattedFeedback = feedback.reverse().map(entry => `${entry.time} ${' | '} ${entry.value}`).join('<br>');
+
+    const adminData = await db.collection('adminlogins').find({}).toArray();
+    const formattedAdminData = adminData.reverse().map(entry => `${entry.time} ${' | '} ${entry.ip}`).join('<br>');
+// #endregion
+    let dataToSend = {};
+    if (req.session.userAccess === '0') {
+      dataToSend = {
+        feedback: formattedFeedback,
+        brUpdates: formattedBrUpdates,
+        adminData: formattedAdminData
+      };
+
+    } else if (req.session.userAccess === '1') {
+      dataToSend = {
+        feedback: formattedFeedback,
+        brUpdates: formattedBrUpdates,
+      };
+    }
+    
+  fs.readFile('admindash.html', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading file:', err);
+      res.status(500).send('Internal server error');
+    } else {
+      const modifiedHTML = injectDataIntoHTML(data, dataToSend);
+
+      res.send(modifiedHTML);
+    }
+  });
   }
 });
-
-
 
 //admin info
-
-app.get('/feedback', async (req, res) => {
-  if (req.session.authenticated) {
-    try {
-      await client.connect();
-      const db = client.db('ppsbathrooms');
-      const collection = db.collection('feedback');
-
-      const feedbackEntries = await collection.find().toArray();
-
-      res.send(feedbackEntries);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-    }
-  } else {
-    res.render('html/404.html');
-  }
-});
-
-app.get('/bathroomUpdate', async (req, res) => {
-  if (req.session.authenticated) {
-    try {
-      await client.connect();
-      const db = client.db('ppsbathrooms');
-      const collection = db.collection('data');
-      const bathroomUpdate = await collection.findOne({ _id: 'bathroomUpdates' });
-
-      res.send(bathroomUpdate);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-    }
-  } else {
-    res.render('html/404.html');
-  }
-});
-
 app.get('/pageVisits', async (req, res) => {
   if (req.session.authenticated) {
     try {
@@ -264,43 +258,6 @@ app.get('/pageVisits', async (req, res) => {
       const visits = await collection.find().toArray();
 
       res.send(visits);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-    }
-  } else {
-    res.render('html/404.html');
-  }
-});
-
-app.get('/brupdates', async (req, res) => {
-  if (req.session.authenticated) {
-    try {
-      await client.connect();
-      const collection = db.collection('bathrooms');
-
-      const bathroomUpdates = await collection.find().toArray();
-
-      res.send(bathroomUpdates);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-    }
-  } else {
-    res.render('html/404.html');
-  }
-});
-
-app.get('/logins', async (req, res) => {
-  if (req.session.authenticated) {
-    try {
-      await client.connect();
-      const db = client.db('ppsbathrooms');
-      const collection = db.collection('adminlogins');
-
-      const logins = await collection.find().toArray();
-
-      res.send(logins);
     } catch (err) {
       console.error(err);
       res.status(500).send('Internal Server Error');
@@ -332,6 +289,7 @@ app.post('/admin', async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
         req.session.authenticated = true;
+        req.session.userAccess = user.access;
         res.redirect('/admin');
       } else {
         res.redirect('/admin');
@@ -370,6 +328,40 @@ app.post('/sendFeedback', function(req, res) {
   console.log(chalk.gray("feedback submitted: " + req.body.feedback));
   dbEntry(req, 'feedback', req.body.feedback)
 });
+
+function injectDataIntoHTML(htmlContent, data) {
+  let adminLogins;
+  if(data.adminData) {
+    adminLogins = 
+      '<h3>admin logins</h3>' +
+      '<div class="txtDisplay">' +
+          data.adminData +
+      '</div><br>';
+  } else {
+    adminLogins = '';
+  }
+  const modifiedHTML = htmlContent
+    .replace('{{logs}}',
+      '<div id="logsPannel">' +
+          '<div id="leftColumn">' +
+              '<div>' +
+                  '<h3 style="display: inline-block">bathroom updates</h3>' +
+              '</div>' +
+              '<div class="txtDisplay">' +
+                  data.brUpdates +
+              '</div><br>' +
+              adminLogins +
+          '</div>' +
+          '<div id="feedbackPannel">' +
+              '<h3>feedback</h3>' +
+              '<div class="txtDisplay">' +
+                  data.feedback +
+              '</div>' +
+          '</div>' +
+      '</div>'
+    )
+  return modifiedHTML;
+}
 
 async function dbEntry(request, collectionName, value, school, numChanged) {
     try {

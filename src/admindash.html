@@ -236,30 +236,10 @@
     <div id="pannels">
         <div id="logs">
             <h1 style="display: inline-block">logs</h1>
-            <button id="refresh" class="invisButton flex" onclick="updateLogs();"><img id="icon16"
-                    src="style/icons/refresh.svg"></button>
-            <div id="logsPannel">
-                <div id="leftColumn">
-                    <div>
-                        <h3 style="display: inline-block">bathroom updates</h3>
-                        <button id="refresh" style="margin-left: 5px;" class="invisButton flex"
-                            onclick="toggleBrUpdateFull();"><img style="width: 12px;vertical-align: middle;"
-                                src="style/icons/repeat.svg"></button>
-                    </div>
-                    <div class="txtDisplay" id="brDisplay"></div><br>
-                    <h3>admin logins</h3>
-                    <div class="txtDisplay" id="loginsDisplay"></div><br>
-                </div>
-                <div id="feedbackPannel">
-                    <h3>feedback</h3>
-                    <div class="txtDisplay" id="feedbackDisplay"></div>
-                </div>
-            </div>
+            {{logs}}
         </div>
         <div id="dashboard">
             <h1 style="display: inline-block">dashboard</h1>
-            <button id="refresh" class="invisButton flex" onclick="updateDash();"><img id="icon16"
-                    src="style/icons/refresh.svg"></button>
             <h3>page requests</h3>
             <div class="txtDisplay flex">
                 <canvas id="pageVisitChart"></canvas>
@@ -275,76 +255,8 @@
 
 <script>
     $(document).ready(function () {
-        updateLogs();
+        updateDash();
     });
-
-    let brUpdateFull = false;
-    let brUpdateData = null;
-
-    function toggleBrUpdateFull() {
-        $('#brDisplay').html('')
-        data = brUpdateData;
-
-        brUpdateFull = !brUpdateFull;
-        data.forEach(data => {
-            if (brUpdateFull) {
-                $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
-            }
-            else {
-                $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' ' + data.numChanged + ' bathrooms updated' + '</pre>');
-            }
-        });
-    }
-    function updateLogs() {
-        $('#brDisplay').html('')
-        $.get('/brupdates', function (data) {
-            brUpdateData = data;
-            if (data.length == 0) {
-                $('#brDisplay').append('<pre>' + 'no bathroom updates' + '</pre>');
-            }
-            else {
-                data.reverse().forEach(data => {
-                    if (brUpdateFull) {
-                        $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' set to ' + data.value + '</pre>');
-                    }
-                    else {
-                        $('#brDisplay').append('<pre>' + data.time + ' | ' + data.school + ' ' + data.numChanged + ' bathrooms updated' + '</pre>');
-                    }
-                });
-            }
-        }).fail(function (error) {
-            console.error('error fetching logs:', error);
-        });
-        $('#loginsDisplay').html('')
-        $.get('/logins', function (data) {
-            if (data.length == 0) {
-                $('#loginsDisplay').append('<pre>' + 'no admin logins' + '</pre>');
-            }
-            else {
-                data.reverse().forEach(data => {
-                    $('#loginsDisplay').append('<pre>' + data.time + ' | ' + data.ip + '</pre>');
-                });
-            }
-        }).fail(function (error) {
-            console.error('error fetching logs:', error);
-        });
-
-
-        $('#feedbackDisplay').html('')
-        $.get('/feedback', function (data) {
-            if (data.length == 0) {
-                $('#feedbackDisplay').append('<pre>' + 'no feedback' + '</pre>');
-            }
-            else {
-                data.reverse().forEach(data => {
-                    $('#feedbackDisplay').append('<pre>' + data.time + ' | ' + data.value + '</pre>');
-                });
-            }
-        }).fail(function (error) {
-            console.error('error fetching feedback:', error);
-        });
-    }
-
     const pageViewChart = new Chart(document.getElementById('pageVisitChart'), {
         type: 'line',
         data: {
@@ -389,7 +301,7 @@
                 data.forEach(dataPoint => {
                     pageViewChart.data.labels.push(dataPoint.date);
                     pageViewChart.data.datasets[0].data.push(dataPoint.visits);
-                    // $('#pageVisitDisplay').append('<pre>' + dataPoint.date + ' | ' + dataPoint.visits + '</pre>');
+
                     totalVisits += Number(dataPoint.visits);
                 });
                 $('#visitsText').append('<pre>' + 'total page requests - ' + totalVisits + '</pre>');
@@ -410,20 +322,9 @@
 
     //default directory
     dir = 'logs';
-    $('#navbarFeedback').click(function (e) {
-        if (dir != 'feedback') {
-            dir = 'feedback';
-            updateFeedback();
-            hideAllPannels();
-            $('#navbarFeedback').addClass("selected");
-            $('#feedback').fadeIn(50);
-        }
-    });
-
     $('#navbarLogs').click(function (e) {
         if (dir != 'logs') {
             dir = 'logs';
-            updateLogs();
             hideAllPannels();
             $('#navbarLogs').addClass("selected");
             $('#logs').fadeIn(50);
@@ -433,7 +334,6 @@
     $('#navbarDashboard').click(function (e) {
         if (dir != 'dash') {
             dir = 'dash';
-            updateDash();
             hideAllPannels();
             $('#navbarDashboard').addClass("selected");
             $('#dashboard').fadeIn(50);
