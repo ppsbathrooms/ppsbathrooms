@@ -43,13 +43,11 @@ html::-webkit-scrollbar {
 }
 
 #navbarButton {
-    /* border: 1px solid green; */
     width: 25px;
     height: 25px;
     position: fixed;
     right: 15px;
     top: 15px;
-    /* margin: 50px auto; */
     -webkit-transform: rotate(0deg);
     -moz-transform: rotate(0deg);
     -o-transform: rotate(0deg);
@@ -59,7 +57,7 @@ html::-webkit-scrollbar {
     -o-transition: .5s ease-in-out;
     transition: .5s ease-in-out;
     cursor: pointer;
-    z-index: 4;
+    z-index: 5;
 }
 
 #navbarButton span {
@@ -152,12 +150,33 @@ html::-webkit-scrollbar {
     z-index: 3;
 }
 
+#navbarBackground::-webkit-scrollbar {
+    display: none;
+}
+
 #schoolButtons {
     display: flex;
     height: 100%;
     align-items: flex-end;
     flex-direction: column;
     margin-top: 45px;
+}
+
+#navbarTopFade {
+    position: absolute;
+    z-index: 4;
+    top: -50px;
+    right: 0px;
+    pointer-events: none;
+    background-image: linear-gradient(to top,rgba(0,0,0,0), #0a0c15 40%);
+    width: 200px;
+    height: 9em;
+}
+
+#navbarScroll {
+    position: absolute;
+    bottom: -150px;
+    right: 0;
 }
 
 #schoolButtons p, #schoolButtons a {
@@ -209,7 +228,6 @@ html::-webkit-scrollbar {
     color: #fff;
     height: 15px;
     font-size: 16px;
-    /* border: 1px solid green; */
 }
 
 #navbarLogin p {
@@ -235,6 +253,7 @@ html::-webkit-scrollbar {
     border-radius: 5px;
     font-family: monospace;
     cursor: pointer;
+    transition: color .25s;
 }
 
 .redBorder {
@@ -254,8 +273,8 @@ html::-webkit-scrollbar {
 }
 
 #navbarLoginButton:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transition: background-color .25s;
+    color: #bbb;
+    transition: color .25s;
 }
 
 #navLoginInputBg {
@@ -271,7 +290,7 @@ html::-webkit-scrollbar {
 
 #navButtonsBottom {
     width: 200px;
-    position: absolute;
+    position: sticky;
     bottom: 20px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -714,6 +733,9 @@ html::-webkit-scrollbar {
 }
 
 @media (max-width: 800px) {
+    #navbarBackground {
+        overflow-y: scroll;
+    }
     #mapSvg {
         width: 80vw;
         margin-bottom: 25px;

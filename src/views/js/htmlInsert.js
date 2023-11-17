@@ -10,6 +10,7 @@ $('#navbar').html(
       '<span></span>' +
       '<span></span>' +
     '</div>' +
+    '<div id="navbarTopFade"></div>' +
     '<div id="navbarBackground">' +
       '<div id="schoolButtons">' +
         '<div>' +
@@ -35,10 +36,10 @@ $('#navbar').html(
       '<div id="navbarLogin">' +
         '<form id="navLoginForm">' +
           '<div id="navLoginInputBg">' +
-            '<input type="text" placeholder="username" id="username" name="username" autocomplete="off" required>' +
+            '<input type="text" placeholder="username" id="username" name="username" autocomplete="off">' +
           '</div>' +
           '<div id="navLoginInputBg">' +
-            '<input type="password" placeholder="password" id="password" name="password" autocomplete="off" required>' +
+            '<input type="password" placeholder="password" id="password" name="password" autocomplete="off">' +
           '</div>' +
           '<div id="navLoginContainer">' +
             '<button id="navbarLoginButton" type="submit">login</button>' +
@@ -51,6 +52,7 @@ $('#navbar').html(
         '<a href="/privacy">privacy</a>' +
         '<a href="/terms">terms</a>' +
       '</div>' +
+      '<div id="navbarScroll"></div>' +
     '</div>' +
   '</div>'
 );
@@ -77,6 +79,11 @@ $('#footer').html(
 
 $('#navbarSignIn').click(function() {
   $(this).fadeOut(100)
+  
+  $("#navbarScroll")[0].scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+  });
 
   $('#navbarLogin').fadeIn(400)
   $("#navbarLogin").animate({
@@ -86,9 +93,12 @@ $('#navbarSignIn').click(function() {
 });
 
 $("#navbarButton").click(function(){
-  $(this).toggleClass('open');
+  if(!$(this).hasClass('open')) {
+    resetSignIn();
+    $('#navbarBackground').scrollTop(0);
+  }
   var rightValue = $('#navbarBackground').css('right');
-
+  $(this).toggleClass('open');
   if(rightValue == '0px') {
     $("#navbarBackground").animate({right: '-200px'}, 100);
     if($(window).width() < 801) {
@@ -100,9 +110,9 @@ $("#navbarButton").click(function(){
     $("#navbarBackground").animate({right: '0px'}, 100);
     if($(window).width() < 801) {
       $("#mapHolder").animate({left: '-200px'}, 100);
-    }
-    if(window.location.href.toString().split(window.location.host)[1] == '/') {
-      $("#titleLower, #mainTitle, #menuLabels").animate({left: '-200px'}, 100);
+      if(window.location.href.toString().split(window.location.host)[1] == '/') {
+        $("#titleLower, #mainTitle, #menuLabels").animate({left: '-200px'}, 100);
+      }
     }
   }
   
@@ -153,12 +163,13 @@ function fourNavbar(school) {
 }
 
 //footer help redirect
-$("#helpButton").click(function(){
+$("#helpButton").click(function() {
   window.location.href = "/help";
   currentPage = window.location.href.toString().split(window.location.host)[1]
 });
 
-$("#homeRedirect").click(function(){
+$("#homeRedirect").click(function() {
+  $("#titleLower, #mainTitle, #menuLabels").css('left', '-200px');
   document.title = "ppsbathrooms | home";
   $("#pageID").html('school');
   $('.map').html('');
@@ -172,10 +183,19 @@ $("#homeRedirect").click(function(){
 });
 
 function hideNavbar() {
+  if($('#navbarBackground').css('right') == "0px") {  
     $('#navbarButton').toggleClass('open');
     $("#navbarBackground").animate({right: '-200px'}, 100);
-  if($(window).width() < 801) {
-    $("#mapHolder").css('left', '-200px');
-    $("#mapHolder").animate({left: '0px'}, 100);
+
+    if($(window).width() < 801) {
+      $("#mapHolder").css('left', '-200px');
+      $("#mapHolder").animate({left: '0px'}, 100);
+    }
   }
+}
+
+function resetSignIn() {
+    $('#navbarSignIn').fadeIn(0)
+    $('#navbarLogin').fadeOut(0)
+    $("#navbarLogin").css('top','290px')
 }

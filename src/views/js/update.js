@@ -238,7 +238,6 @@ $('#popupSubmit').click(function (e) {
 
             case 'highlight':
                 let result = /^\d+$/.test(userInput);
-                console.log(result)
                 if (!result) { 
                     $("#popupError").html('enter a number');
                     $("#popupError").fadeIn(100);
@@ -307,31 +306,36 @@ $(window).ready(function() {
 $(document).ready(function() {
   $('#navLoginForm').submit(function(event) {
     event.preventDefault();
+    
+    allInputsHaveText = ($('#username').val() != '') && ($('#password').val() != '');
 
-    var formData = $(this).serialize();
 
-    $.ajax({
-      type: 'POST',
-      url: '/admin',
-      data: formData,
-      success: function(response) {
-        if(response.accessDenied) {
-            $('#navLoginForm')[0].reset();
-            $('#username').focus();
+    console.log(allInputsHaveText)
+    if(allInputsHaveText) {
+        var formData = $(this).serialize();
 
-            $('#navbarLoginButton').addClass('redBorder');
+        $.ajax({
+        type: 'POST',
+        url: '/admin',
+        data: formData,
+        success: function(response) {
+            if(response.accessDenied) {
+                $('#navLoginForm')[0].reset();
+                $('#username').focus();
 
-            setTimeout(function() {
-                $('#navbarLoginButton').removeClass('redBorder');
-            }, 500);
-        } else {
-            location.href = '/admin'
+                $('#navbarLoginButton').addClass('redBorder');
+
+                setTimeout(function() {
+                    $('#navbarLoginButton').removeClass('redBorder');
+                }, 500);
+            } else {
+                location.href = '/admin'
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX request error:', status, error);
         }
-        console.log(response.accessDenied);
-      },
-      error: function(xhr, status, error) {
-        console.error('AJAX request error:', status, error);
-      }
-    });
+        });
+    }
   });
 });
