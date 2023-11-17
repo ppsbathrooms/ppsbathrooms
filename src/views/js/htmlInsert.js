@@ -79,17 +79,19 @@ $('#footer').html(
 
 $('#navbarSignIn').click(function() {
   $(this).fadeOut(100)
-  
-  $("#navbarScroll")[0].scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-  });
 
   $('#navbarLogin').fadeIn(400)
   $("#navbarLogin").animate({
       top: '273px'
   }, { duration: 300, queue: false });
-  $('#username').focus();
+  $("#navbarScroll")[0].scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+  });
+
+  if($(window).width() > 800) {
+    $('#username').focus();
+  }
 });
 
 $("#navbarButton").click(function(){
@@ -158,7 +160,12 @@ $("#ihsNavbar").click(function(){
 
 //change navbar functionality for 404 page, redirect instead of replacing map
 function fourNavbar(school) {
-  window.location.replace("/" + schoolNameConvert(school, false));
+  if(school) {
+    window.location.replace("/" + schoolNameConvert(school, false));
+  }
+  else {
+  window.location.replace("/");
+  }
   currentPage = window.location.href.toString().split(window.location.host)[1]
 }
 
@@ -169,17 +176,22 @@ $("#helpButton").click(function() {
 });
 
 $("#homeRedirect").click(function() {
-  $("#titleLower, #mainTitle, #menuLabels").css('left', '-200px');
-  document.title = "ppsbathrooms | home";
-  $("#pageID").html('school');
-  $('.map').html('');
-  $('.schoolChoice').css('display', 'flex');
-  $('#footer').css('position', 'absolute');
-  $('#buttons').hide(100);
-  window.history.pushState('page2', 'Title', '/')
-  currentPage = '/';
-  $("#titleLower, #mainTitle, #menuLabels").animate({left: '0px'}, 100);
-  hideNavbar();
+  if(isSchoolPage) {
+    $("#titleLower, #mainTitle, #menuLabels").css('left', '-200px');
+    document.title = "ppsbathrooms | home";
+    $("#pageID").html('school');
+    $('.map').html('');
+    $('.schoolChoice').css('display', 'flex');
+    $('#footer').css('position', 'absolute');
+    $('#buttons').hide(100);
+    window.history.pushState('page2', 'Title', '/')
+    currentPage = '/';
+    $("#titleLower, #mainTitle, #menuLabels").animate({left: '0px'}, 100);
+    hideNavbar();
+  } else {
+    fourNavbar();
+  }
+
 });
 
 function hideNavbar() {

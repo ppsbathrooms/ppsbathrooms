@@ -211,7 +211,7 @@ html::-webkit-scrollbar {
 
 #navbarLogin {
     display: none;
-    position: fixed;
+    position: absolute;
     top: 290px;
     margin: 0;
     margin: 10px;
@@ -362,6 +362,8 @@ html::-webkit-scrollbar {
     text-align: center;
     border: none;
     background: transparent;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     transition: background-color .25s;
     padding: 10px;
     margin-left: 15px;
