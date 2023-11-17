@@ -144,7 +144,11 @@ html::-webkit-scrollbar {
     top: 0;
     right: -200px;
     background: rgba(0, 0, 0, 0);
-    backdrop-filter: blur(10px);
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(10px);
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 
@@ -342,8 +346,8 @@ html::-webkit-scrollbar {
     text-decoration: none;
     text-align: center;
     border: none;
-    background: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);    transition: background-color .25s;
+    background: transparent;
+    transition: background-color .25s;
     padding: 10px;
     margin-left: 15px;
     border-radius: 10px;
