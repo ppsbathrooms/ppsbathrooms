@@ -1,3 +1,8 @@
+@font-face {
+    font-family: barlowBold;
+    src: url(../style/fonts/Barlow-Bold.ttf);
+}
+
 :root {
     --background: #0a0c15;
     --subtitle: rgba(200, 211, 239, .8);
@@ -38,17 +43,81 @@ html::-webkit-scrollbar {
 }
 
 #navbarButton {
+    /* border: 1px solid green; */
+    width: 25px;
+    height: 25px;
     position: fixed;
-    background: none;
-    border: none;
-    padding: 5px;
-    margin: 0;
-    z-index: 2;
-    user-select: none;
-    top:  15px;
-    left: 15px;
+    right: 15px;
+    top: 15px;
+    /* margin: 50px auto; */
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .5s ease-in-out;
+    -moz-transition: .5s ease-in-out;
+    -o-transition: .5s ease-in-out;
+    transition: .5s ease-in-out;
     cursor: pointer;
     z-index: 4;
+}
+
+#navbarButton span {
+    display: block;
+    position: absolute;
+    height: 4px;
+    width: 100%;
+    background: #fff;
+    border-radius: 9px;
+    opacity: 1;
+    left: 0;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .1s ease-in-out;
+    -moz-transition: .1s ease-in-out;
+    -o-transition: .1s ease-in-out;
+    transition: .1s ease-in-out;
+}
+
+#navbarButton span:nth-child(1) {
+    top: 0px;
+}
+
+#navbarButton span:nth-child(2),
+#navbarButton span:nth-child(3) {
+    top: 9px;
+}
+
+#navbarButton span:nth-child(4) {
+    top: 18px;
+}
+
+#navbarButton.open span:nth-child(1) {
+    top: 9px;
+    width: 0%;
+    left: 50%;
+}
+
+#navbarButton.open span:nth-child(2) {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+#navbarButton.open span:nth-child(3) {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+#navbarButton.open span:nth-child(4) {
+    top: 9px;
+    width: 0%;
+    left: 50%;
 }
 
 #pageID {
@@ -56,6 +125,8 @@ html::-webkit-scrollbar {
 }
 
 #mapHolder {
+    position: absolute;
+    left: 0px;
     display: flex;
     justify-content: center;
     width: 100%;
@@ -69,67 +140,156 @@ html::-webkit-scrollbar {
 #navbarBackground {
     position: fixed;
     height: 100%;
-    width: 64px;
+    width: 200px;
     top: 0;
-    left: 0;
-    background: var(--navbar);
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    display: none;
+    right: -200px;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(10px);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+
     user-select: none;
     z-index: 3;
 }
 
 #schoolButtons {
     display: flex;
-    width: 100%;
     height: 100%;
-    align-items: center;
+    align-items: flex-end;
     flex-direction: column;
-    padding-top: 65px;
+    margin-top: 45px;
 }
 
-#schoolButtons img {
-    width:  40px;
-    height: 40px;
+#schoolButtons p, #schoolButtons a {
+    text-decoration: none;
+    font-family: barlowBold;
+    display: inline-block;
+    color: #fff;
+    font-size: 40px;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 5px;
+    width: 100%;
+    text-align: right;
+}
+
+#schoolButtons div {
+    margin-right: 15px;
     cursor: pointer;
-    opacity: .75;
-    transition: opacity 0.2s;
-    padding-bottom: 10px;
-}
-
-#schoolButtons img:hover {
-    opacity: 1;
-    transition: opacity 0.2s;
-}
-
-
-#navButtonsBottom {
-    position: absolute;
+    width: calc(100% - 25px);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    flex-direction: column;
-    bottom: 0;
+}
+
+#schoolButtons img {
+    display: none;
+    width:  40px;
+    height: 40px;
+    cursor: pointer;
+    padding-bottom: 10px;
+}
+
+#navbarLogin {
+    display: none;
+    position: fixed;
+    top: 290px;
+    margin: 0;
+    margin: 10px;
+    width: 180px;
+    border-radius: 10px;
+}
+
+#navbarLogin input {
+    all: unset;
+    width: 160px;
+    padding: 7px;
+    border-radius: 5px;
+    background: transparent;
+    color: #fff;
+    height: 15px;
+    font-size: 16px;
+    /* border: 1px solid green; */
+}
+
+#navbarLogin p {
+    font-size: 12px;
+    color: #fff;
+}
+
+#navLoginContainer {
     left: 0;
-    height: 150px;
-    width: 100%;
-    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+#navbarLoginButton {
+    margin: 0 !important;
+    font-size: 16px;
+    margin-left: auto;
+    color: #fff;
+    border: none;
+    background: transparent;
+    border: 1px solid #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    cursor: pointer;
+}
+
+.redBorder {
+    animation: redBorderFade .5s ease forwards;
+}
+
+@keyframes redBorderFade {
+    0% {
+        border-color: red;
+        color: red;
+    }
+
+    100% {
+        border-color: #fff;
+        color: #fff;
+    }
+}
+
+#navbarLoginButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transition: background-color .25s;
+}
+
+#navLoginInputBg {
+    background: transparent;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    border: 1px solid #fff;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#navButtonsBottom {
+    width: 200px;
+    position: absolute;
+    bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 15px;
 }
 
 #navButtonsBottom a {
-    color: #fff;
+    text-align: center;
+    color: var(--bgText);
     text-decoration: none;
-    margin-bottom: 10px;
-    opacity: .75;
-    transition: opacity 0.2s;
+    border-radius: 5px;
+    transition: .2s;
 }
 
 #navButtonsBottom a:hover {
-    opacity: 1;
-    transition: opacity 0.2s;
+    color: var(--bgTextHover)
 }
-
 .termstext {
     color: #fff;
     margin: 25px;
@@ -137,7 +297,6 @@ html::-webkit-scrollbar {
 }
 
 #svgBathrooms {
-    /* display: none; */
     cursor: pointer;
 }
 
@@ -152,9 +311,10 @@ html::-webkit-scrollbar {
 }
 
 #footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    bottom: 0px;
     width: 100%;
-    height: 45px;
-    bottom: 0;
     justify-content: center;
     align-items: center;
     font-size: 12px;
@@ -178,14 +338,12 @@ html::-webkit-scrollbar {
     z-index: 2;
 }
 
-#submitButton,
-#highlightRoomButton,
-#feedbackButton {
+#submitButton {
     text-decoration: none;
     text-align: center;
     border: none;
-    background: var(--bgText);
-    transition: background-color .25s;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);    transition: background-color .25s;
     padding: 10px;
     margin-left: 15px;
     border-radius: 10px;
@@ -543,6 +701,17 @@ html::-webkit-scrollbar {
     }
 }
 
+@media (max-height: 480px) {
+    #navbarSignIn {
+        display: none !important;
+    }
+}
+
+@media (max-height: 710px) and (min-width: 800px){
+    #titleUpper {
+        margin-top: 30px;
+    }
+}
 
 @media (max-width: 800px) {
     #mapSvg {

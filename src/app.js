@@ -269,7 +269,7 @@ app.get('/pageVisits', async (req, res) => {
 
 app.get('/admin/logout', (req, res) => {
   req.session.authenticated = false;
-  res.redirect('/admin');
+  res.redirect('/');
 });
 
 //404 keep at end of redirects
@@ -290,12 +290,12 @@ app.post('/admin', async (req, res) => {
       if (passwordMatch) {
         req.session.authenticated = true;
         req.session.userAccess = user.access;
-        res.redirect('/admin');
+        res.json({ accessDenied: false});
       } else {
-        res.redirect('/admin');
+        res.json({ accessDenied: true});
       }
     } else {
-        res.redirect('/admin');
+        res.json({ accessDenied: true});
     }
   } catch (error) {
     console.error('Error:', error);

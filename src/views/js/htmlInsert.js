@@ -2,30 +2,62 @@ pageId = $('#pageID').html();
 
 //append navbar
 $('#navbar').html(
-  '<img src="../style/icons/noWifi.svg" id="noWifi"></img>' +
-  '<button id="navbarButton"><img id="icon24" src="../style/icons/bars.svg"></button>' + 
-  '<div id="navbarBackground">' +
-    '<div id="schoolButtons">' +
-      '<img id="chsNavbar" src="../style/images/logos/clevelandLogo.png"></img>' +
-      '<img id="fhsNavbar" src="../style/images/logos/franklinLogo.png"></img>' + 
-      '<img id="ihsNavbar" src="../style/images/logos/idaLogo.png"></img>' +
-      '<img id="helpButton" src="../style/icons/help.svg" style="width: 25px; height: 25px;"></img>' +
+  '<div id="navbar">' +
+    '<img src="../style/icons/noWifi.svg" id="noWifi"></img>' +
+    '<div id="navbarButton">' +
+      '<span></span>' +
+      '<span></span>' +
+      '<span></span>' +
+      '<span></span>' +
     '</div>' +
-    '<div id="navButtonsBottom">' +
-        '<a href="/admin">login</a>' +
+    '<div id="navbarBackground">' +
+      '<div id="schoolButtons">' +
+        '<div>' +
+          '<p id="homeRedirect">home</>' +
+        '</div>' +
+        '<div id="chsNavbar">' +
+          '<p>cleveland</p>' +
+          '<img id="chsNav" src="../style/images/logos/clevelandLogo.png"></img>' +
+        '</div>' +
+        '<div id="fhsNavbar">' +
+          '<p>franklin</p>' +
+          '<img src="../style/images/logos/franklinLogo.png"></img>' +
+        '</div>' +
+        '<div id="ihsNavbar">' +
+          '<p>ida</p>' +
+          '<img src="../style/images/logos/idaLogo.png"></img>' +
+        '</div>' +
+        '<hr style="width: 85%;">' +
+        '<div id="ihsNavbar">' +
+          '<p id="navbarSignIn">sign in</p>' +
+        '</div>' +
+      '</div>' +
+      '<div id="navbarLogin">' +
+        '<form id="navLoginForm">' +
+          '<div id="navLoginInputBg">' +
+            '<input type="text" placeholder="username" id="username" name="username" autocomplete="off" required>' +
+          '</div>' +
+          '<div id="navLoginInputBg">' +
+            '<input type="password" placeholder="password" id="password" name="password" autocomplete="off" required>' +
+          '</div>' +
+          '<div id="navLoginContainer">' +
+            '<button id="navbarLoginButton" type="submit">login</button>' +
+          '</div>' +
+        '</form>' +
+      '</div>' +
+      '<div id="navButtonsBottom">' +
+        '<a href="/help">help</a>' +
+        '<a href="/contact">contact</a>' +
         '<a href="/privacy">privacy</a>' +
         '<a href="/terms">terms</a>' +
-    '</div>'
+      '</div>' +
+    '</div>' +
+  '</div>'
 );
 
 //append bottom buttons
 $('#buttons').html(
   '<div>' +
-    '<div class="bottomButtonHolder">' +
-      '<div id="bottomButtonNavbarShift"></div>' + 
-      '<button id="feedbackButton" title="give feedback"><img id="icon16" src="/style/icons/feedback.svg"></img></button>' +
-      '<button id="highlightRoomButton" title="highlight a room"><img id="icon16" src="/style/icons/find.svg"></img></button>' +
-    '</div>' +
     '<div class="bottomSubmit">' +
       '<button id="submitButton" title="submit bathroom changes"><img id="icon16" src="/style/icons/check.svg"></img>' +
         '<p> (0)</p>' +
@@ -40,26 +72,36 @@ $('#footer').html(
   '<p id="footerText">© sid collective 2023</p>' +
   '<div id="footerRight">' +
   '<a id="footerContact" href="/contact">contact</a>' +
-  '<a href="/help">help</a>'+
-  '</div>' 
-  );
+  '<a href="/help">help</a>' 
+);
 
-//different footer when not displaying map
-$(document).ready(function() {
-  schoolDisplayFooter();
+$('#navbarSignIn').click(function() {
+  $(this).fadeOut(100)
+
+  $('#navbarLogin').fadeIn(400)
+  $("#navbarLogin").animate({
+      top: '273px'
+  }, { duration: 300, queue: false });
+  $('#username').focus();
 });
 
-function schoolDisplayFooter() {
-  $('#footer').css('display', 'flex');
-  if($('#pageID').html() == 'schools' || $('#pageID').html() == 'contact') {
-    $('#footer').css('position', 'absolute');
-  }
-}
-
-//navbar functions
 $("#navbarButton").click(function(){
-  $("#navbarBackground").animate({width: 'toggle'}, 100);
-  $("#bottomButtonNavbarShift").animate({width: 'toggle'}, 100);
+  $(this).toggleClass('open');
+  var rightValue = $('#navbarBackground').css('right');
+
+  if(rightValue == '0px') {
+    $("#navbarBackground").animate({right: '-200px'}, 100);
+    if($(window).width() < 801) {
+      $("#mapHolder").animate({left: '0px'}, 100);
+    }
+  }
+  else {
+    $("#navbarBackground").animate({right: '0px'}, 100);
+    if($(window).width() < 801) {
+      $("#mapHolder").animate({left: '-200px'}, 100);
+    }
+  }
+  
 });
 
 //no wifi icon
@@ -73,6 +115,7 @@ isSchoolPage = (pageId != '404') && (pageId != 'help')
 $("#chsNavbar").click(function(){
   if(isSchoolPage) {
     selectSchool('chs', true)
+    hideNavbar();
   }
   else {
     fourNavbar('chs');
@@ -82,6 +125,7 @@ $("#chsNavbar").click(function(){
 $("#fhsNavbar").click(function(){
   if(isSchoolPage) {
     selectSchool('fhs', true)
+    hideNavbar();
   }
   else {
     fourNavbar('fhs');
@@ -91,6 +135,7 @@ $("#fhsNavbar").click(function(){
 $("#ihsNavbar").click(function(){
   if(isSchoolPage) {
     selectSchool('ihs', true)
+    hideNavbar();
   }
   else {
     fourNavbar('ihs');
@@ -108,3 +153,24 @@ $("#helpButton").click(function(){
   window.location.href = "/help";
   currentPage = window.location.href.toString().split(window.location.host)[1]
 });
+
+$("#homeRedirect").click(function(){
+  document.title = "ppsbathrooms | home";
+  $("#pageID").html('school');
+  $('.map').html('');
+  $('.schoolChoice').css('display', 'flex');
+  $('#footer').css('position', 'absolute');
+  $('#buttons').hide(100);
+  window.history.pushState('page2', 'Title', '/')
+  currentPage = '/'
+  hideNavbar();
+});
+
+function hideNavbar() {
+    $('#navbarButton').toggleClass('open');
+    $("#navbarBackground").animate({right: '-200px'}, 100);
+  if($(window).width() < 801) {
+    $("#mapHolder").css('left', '-200px');
+    $("#mapHolder").animate({left: '0px'}, 100);
+  }
+}

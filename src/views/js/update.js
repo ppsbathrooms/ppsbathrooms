@@ -137,7 +137,7 @@ function setupButtons() {
 }
 
 function createPopup(id, title, helpDestination, buttonsToHide) {
-    $("#navbarBackground").animate({width: 'hide'}, 100);
+    $("#navbarBackground").animate({right: '-200px'}, 100);
     $("#bottomButtonNavbarShift").animate({width: 'hide'}, 100);
 
     $('#popupTitle').html(title);
@@ -301,4 +301,37 @@ $(window).ready(function() {
     setTimeout(function() {
         $('#menuLabels').animate({opacity:'1'}, {duration: 750, easing: 'swing', queue: false});
     }, 250);
+});
+
+
+$(document).ready(function() {
+  $('#navLoginForm').submit(function(event) {
+    event.preventDefault();
+
+    var formData = $(this).serialize();
+
+    $.ajax({
+      type: 'POST',
+      url: '/admin',
+      data: formData,
+      success: function(response) {
+        if(response.accessDenied) {
+            $('#navLoginForm')[0].reset();
+            $('#username').focus();
+
+            $('#navbarLoginButton').addClass('redBorder');
+
+            setTimeout(function() {
+                $('#navbarLoginButton').removeClass('redBorder');
+            }, 500);
+        } else {
+            location.href = '/admin'
+        }
+        console.log(response.accessDenied);
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX request error:', status, error);
+      }
+    });
+  });
 });

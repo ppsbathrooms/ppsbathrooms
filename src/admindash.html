@@ -311,12 +311,6 @@
         }).fail(function (error) {
             console.error('error fetching feedback:', error);
         });
-
-        $.get('/bathroomUpdate', function (data) {
-            $('#brUpdateText').append('<pre>' + 'bathroom updates - ' + data.value + '</pre>');
-        }).fail(function (error) {
-            console.error('error fetching feedback:', error);
-        });
     }
 
 
