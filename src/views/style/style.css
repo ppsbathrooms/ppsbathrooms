@@ -143,15 +143,11 @@ html::-webkit-scrollbar {
     width: 200px;
     top: 0;
     right: -200px;
-    background: rgba(0, 0, 0, 0);
-    -webkit-filter: blur(5px);
-    -moz-filter: blur(5px);
-    -o-filter: blur(5px);
-    -ms-filter: blur(5px);
-    filter: blur(10px);
+    background: transparent;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-
     user-select: none;
     z-index: 3;
 }
