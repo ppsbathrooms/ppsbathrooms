@@ -93,12 +93,16 @@ $("#navbarButton").click(function(){
     $("#navbarBackground").animate({right: '-200px'}, 100);
     if($(window).width() < 801) {
       $("#mapHolder").animate({left: '0px'}, 100);
+      $("#titleLower, #mainTitle, #menuLabels").animate({left: '0px'}, 100);
     }
   }
   else {
     $("#navbarBackground").animate({right: '0px'}, 100);
     if($(window).width() < 801) {
       $("#mapHolder").animate({left: '-200px'}, 100);
+    }
+    if(window.location.href.toString().split(window.location.host)[1] == '/') {
+      $("#titleLower, #mainTitle, #menuLabels").animate({left: '-200px'}, 100);
     }
   }
   
@@ -162,7 +166,8 @@ $("#homeRedirect").click(function(){
   $('#footer').css('position', 'absolute');
   $('#buttons').hide(100);
   window.history.pushState('page2', 'Title', '/')
-  currentPage = '/'
+  currentPage = '/';
+  $("#titleLower, #mainTitle, #menuLabels").animate({left: '0px'}, 100);
   hideNavbar();
 });
 
