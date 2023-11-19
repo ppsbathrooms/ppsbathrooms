@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+
+    <script src="../thirdParty/jquery.min.js"></script>
+    <script src="../thirdParty/chart.min.js"></script>
+    <title>ppsbathrooms | admin</title>
+</head>
+
+{{style}}
+
+<body>
+    <img id='topLogo' src="/style/images/logo.png">
+    <div id="top">
+        <button onclick="location.href='/admin/logout';">LOGOUT</button>
+        <p>{{username}}</p>
+    </div>
+    <div id="navbar">
+        {{navbar}}
+    </div>
+    <div id="pannels">
+        <div id="logs">
+            {{logs}}
+        </div>
+        <div id="dashboard">
+            <h3>page requests</h3>
+            <div class="txtDisplay flex">
+                <canvas id="pageVisitChart"></canvas>
+            </div>
+            <h3 id="brUpdateText"></h3>
+            <h3 id="visitsText"></h3>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    $(document).ready(function () {
+        updateDash();
+    });
+    const pageViewChart = new Chart(document.getElementById('pageVisitChart'), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Page Visits',
+                data: [],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                cubicInterpolationMode: 'monotone'
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+            },
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        }
+    });
+
+    let totalVisits = 0;
+
+    function updateDash() {
+        $('#pageVisitDisplay, #bathroomUpdates, #brUpdateText, #visitsText').html('');
+        totalVisits = 0;
+        $.get('/pageVisits', function (data) {
+            if (data.length === 0) {
+                $('#pageVisitDisplay').append('<pre>' + 'no page requests' + '</pre>');
+            } else {
+                pageViewChart.data.labels = [];
+                pageViewChart.data.datasets[0].data = [];
+                data.forEach(dataPoint => {
+                    pageViewChart.data.labels.push(dataPoint.date);
+                    pageViewChart.data.datasets[0].data.push(dataPoint.visits);
+
+                    totalVisits += Number(dataPoint.visits);
+                });
+                $('#visitsText').append('<pre>' + 'total page requests - ' + totalVisits + '</pre>');
+
+                pageViewChart.update();
+            }
+        }).fail(function (error) {
+            console.error('error fetching feedback:', error);
+        });
+    }
+
+
+
+</script>
+
+{{navbarJs}}

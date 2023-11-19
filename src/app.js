@@ -203,8 +203,7 @@ app.get('/schools', (req, res) => {
   pageVisited();
 });
 
-
-app.get('/admin', async (req, res) => {
+  app.get('/admin', async (req, res) => {
   if(!req.session.authenticated) {
     res.sendFile(__dirname + '/views/html/admin/login.html');
   }
@@ -219,31 +218,29 @@ app.get('/admin', async (req, res) => {
     const adminData = await db.collection('adminlogins').find({}).toArray();
     const formattedAdminData = adminData.reverse().map(entry => `${entry.time} ${' | '} ${entry.ip}`).join('<br>');
 // #endregion
-    let dataToSend = {};
-    if (req.session.userAccess === '0') {
-      dataToSend = {
-        feedback: formattedFeedback,
-        brUpdates: formattedBrUpdates,
-        adminData: formattedAdminData
-      };
+    let dataToSend = {
+      navItems: ['Logs','Dashboard'],
+      feedback: formattedFeedback,
+      brUpdates: formattedBrUpdates,
+      styleData: await readFile('admin/adminStyle.css'),
+      username: req.session.username,
+    };
 
-    } else if (req.session.userAccess === '1') {
-      dataToSend = {
-        feedback: formattedFeedback,
-        brUpdates: formattedBrUpdates,
-      };
+    if (req.session.userAccess === '0') {
+      dataToSend.navItems = ['Logs','Dashboard', 'Schools', 'Admin']
+      dataToSend.adminData = formattedAdminData;
     }
     
-  fs.readFile('admindash.html', 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading file:', err);
-      res.status(500).send('Internal server error');
-    } else {
-      const modifiedHTML = injectDataIntoHTML(data, dataToSend);
+    fs.readFile('admin/admindash.html', 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading file:', err);
+        res.status(500).send('Internal server error');
+      } else {
+        const modifiedHTML = injectDataIntoHTML(data, dataToSend);
 
-      res.send(modifiedHTML);
-    }
-  });
+        res.send(modifiedHTML);
+      }
+    });
   }
 });
 
@@ -290,6 +287,7 @@ app.post('/admin', async (req, res) => {
       if (passwordMatch) {
         req.session.authenticated = true;
         req.session.userAccess = user.access;
+        req.session.username = user.username;
         res.json({ accessDenied: false});
       } else {
         res.json({ accessDenied: true});
@@ -331,35 +329,86 @@ app.post('/sendFeedback', function(req, res) {
 
 function injectDataIntoHTML(htmlContent, data) {
   let adminLogins;
+  defaultDir = 'Logs'
+  let navbar = '';
+  let allNavItems = '';
+  let allNavItemsFull = '';
+  const totalNavItems = data.navItems.length;
+
+  data.navItems.forEach((str, index) => {
+    const navItems = '#' + str.toLowerCase() + (index !== totalNavItems - 1 ? ', ' : '');
+    const navItemsFull = '#navbar' + str + (index !== totalNavItems - 1 ? ',' : '');
+
+    allNavItems += navItems;
+    allNavItemsFull += navItemsFull;
+  });
+
+  let navbarJs = 
+  `dir = '` + defaultDir + `'
+      function hideAllPannels() {
+        $('` + allNavItems + `').hide();
+        $('` + allNavItemsFull + `').removeClass("selected");
+      }`;
+
+  data.navItems.forEach((str) => {
+    let htmlClass = '';
+    if(str == defaultDir) {
+      htmlClass = 'class="selected"'
+    }
+    const htmlCode = `
+        <button id="navbar${str}" ` + htmlClass + `>
+            <img id="icon16" src="style/icons/${str}.svg">
+            <p>${str}</p>
+        </button>
+    `;
+
+    const navbarJsInsert = `
+      $('#navbar${str}').click(function (e) {
+          if (dir != '${str}') {
+              dir = '${str}';
+              hideAllPannels();
+              $('#navbar${str}').addClass("selected");
+              $('#${str.toLowerCase()}').fadeIn(50);
+          }
+      });
+    `;
+    navbar += htmlCode;
+    navbarJs += navbarJsInsert;
+  });
+  
   if(data.adminData) {
     adminLogins = 
-      '<h3>admin logins</h3>' +
-      '<div class="txtDisplay">' +
-          data.adminData +
-      '</div><br>';
+      `<h3>admin logins</h3>
+      <div class="txtDisplay">
+          ` + data.adminData + `
+      </div><br>;`
   } else {
     adminLogins = '';
   }
   const modifiedHTML = htmlContent
     .replace('{{logs}}',
-      '<div id="logsPannel">' +
-          '<div id="leftColumn">' +
-              '<div>' +
-                  '<h3 style="display: inline-block">bathroom updates</h3>' +
-              '</div>' +
-              '<div class="txtDisplay">' +
-                  data.brUpdates +
-              '</div><br>' +
-              adminLogins +
-          '</div>' +
-          '<div id="feedbackPannel">' +
-              '<h3>feedback</h3>' +
-              '<div class="txtDisplay">' +
-                  data.feedback +
-              '</div>' +
-          '</div>' +
-      '</div>'
+      `<div id="logsPannel">
+          <div id="leftColumn">
+              <div>
+                  <h3 style="display: inline-block">bathroom updates</h3>
+              </div>
+              <div class="txtDisplay">
+                  ` + data.brUpdates + `
+              </div><br>
+              ` + adminLogins + `
+          </div>
+          <div id="feedbackPannel">
+              <h3>feedback</h3>
+              <div class="txtDisplay">
+                  ` + data.feedback + `
+              </div>
+          </div>
+      </div>`
     )
+    .replace('{{style}}', '<style>' + data.styleData + '</style>')
+    .replace('{{username}}', data.username)
+    .replace('{{navbar}}', navbar)
+    .replace('{{navbarJs}}', '<script>' + navbarJs + '</script>')
   return modifiedHTML;
 }
 
@@ -384,6 +433,18 @@ async function dbEntry(request, collectionName, value, school, numChanged) {
     } catch (err) {
         console.error('Error: ', err);
     }
+}
+
+function readFile(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
 }
 
 async function pageVisited() {

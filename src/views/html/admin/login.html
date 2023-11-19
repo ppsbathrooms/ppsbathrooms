@@ -84,12 +84,35 @@
     #return:hover {
         color: #696E7E;
     }
+
+    #wrongPass {
+        color: red;
+        display: inline-block;
+        margin: 0;
+        margin-left: 20px;
+        padding: 0;
+        opacity: 0;
+    }
+
+    .fade {
+        animation: fade 1.5s ease forwards;
+    }
+
+    @keyframes fade {
+        0% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
 </style>
 
 <body>
     <div id="loginWindow">
         <h2>login</h2>
-        <form action="/admin" method="post">
+        <form id="loginForm">
             <p>username</p>
             <div id="inputBg">
                 <input type="text" id="username" name="username" autocomplete="off" autofocus required>
@@ -99,10 +122,50 @@
                 <input type="password" id="password" name="password" autocomplete="off" required>
             </div><br><br>
             <button id="submitButton" type="submit">login</button>
+            <p id="wrongPass">incorrect password</p>
         </form>
     </div>
     <a href="/" id="return">return</a>
 
 </body>
+
+<script>
+    $(document).ready(function () {
+        $('#loginForm').submit(function (event) {
+            event.preventDefault();
+
+            allInputsHaveText = ($('#username').val() != '') && ($('#password').val() != '');
+
+
+            console.log(allInputsHaveText)
+            if (allInputsHaveText) {
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin',
+                    data: formData,
+                    success: function (response) {
+                        if (response.accessDenied) {
+                            $('#loginForm')[0].reset();
+                            $('#username').focus();
+
+                            $('#wrongPass').addClass('fade');
+
+                            setTimeout(function () {
+                                $('#wrongPass').removeClass('fade');
+                            }, 1500);
+                        } else {
+                            location.href = '/admin';
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX request error:', status, error);
+                    }
+                });
+            }
+        });
+    });
+</script>
 
 </html>

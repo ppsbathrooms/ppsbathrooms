@@ -242,9 +242,7 @@ html::-webkit-scrollbar {
 }
 
 #navbarLoginButton {
-    margin: 0 !important;
     font-size: 16px;
-    margin-left: auto;
     color: #fff;
     border: none;
     background: transparent;
@@ -469,6 +467,7 @@ html::-webkit-scrollbar {
 }
 
 #titleUpper {
+    font-family: barlowBold;
     margin-top: 150px;
     font-size: 72px;
 }
