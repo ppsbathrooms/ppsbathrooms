@@ -357,7 +357,7 @@ function injectDataIntoHTML(htmlContent, data) {
     }
     const htmlCode = `
         <button id="navbar${str}" ` + htmlClass + `>
-            <img id="icon16" src="style/icons/${str}.svg">
+            <img id="icon16" src="style/icons/${str.toLowerCase()}.svg">
             <p>${str}</p>
         </button>
     `;
