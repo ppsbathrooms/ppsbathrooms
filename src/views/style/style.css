@@ -130,7 +130,7 @@ html::-webkit-scrollbar {
     width: 100%;
 }
 
-#mapSvg {
+.mapSvg {
     width: 45vw;
     margin-bottom: 50px;
 }
@@ -737,7 +737,7 @@ html::-webkit-scrollbar {
     #navbarBackground {
         overflow-y: scroll;
     }
-    #mapSvg {
+    .mapSvg {
         width: 80vw;
         margin-bottom: 25px;
     }

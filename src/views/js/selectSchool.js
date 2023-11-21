@@ -7,6 +7,7 @@ isSchoolPage = $.inArray( pageId, schoolPages );
 isSchoolPage = isSchoolPage > 0 ? true : false;
 
 //redirect school pages
+
 if(isSchoolPage) {
     if(schoolRedirect.replace(/\s/g, '').length) {
         selectSchool(schoolRedirect.replace(/\s/g, ""), false)
@@ -14,9 +15,11 @@ if(isSchoolPage) {
     } else {
         $('.schoolChoice').css('display', 'flex');
     }
-}
+}  
+
 
 //go to school page
+
 function selectSchool(school, redirect) {
     document.title = "ppsbathrooms | " + schoolNameConvert(school, false) 
 
@@ -37,13 +40,23 @@ function selectSchool(school, redirect) {
 
     $('#footer').css('position', 'static');
 
-    loadMap();
-
-    getData();
-
-    getDataForUpdate();
-
-    setupButtons();
+    fetch('html/maps/' + school + 'Map.html')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('network response was not ok');
+      }
+      return response.text();
+    })
+    .then(data => {
+        $('.map').html(data);
+        getData();
+        getDataForUpdate();
+        setupButtons();
+    })
+    .catch(error => {
+      console.error('there was a problem fetching the document:', error);
+      return null;
+    });
 
     if(redirect) {
         window.history.pushState('page2', 'Title', '/' + schoolNameConvert(school, false));

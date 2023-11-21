@@ -209,6 +209,8 @@ app.get('/schools', (req, res) => {
   }
   else {
 // #region admin data
+    const brData = await db.collection('data').findOne({ _id: 'schoolData'});
+
     const brUpdates = await db.collection('bathrooms').find({}).toArray();
     const formattedBrUpdates = brUpdates.reverse().map(entry => `${entry.time} ${' | '} ${entry.school} ${entry.numChanged} ${' bathrooms updated'}`).join('<br>');
 
@@ -219,15 +221,16 @@ app.get('/schools', (req, res) => {
     const formattedAdminData = adminData.reverse().map(entry => `${entry.time} ${' | '} ${entry.ip}`).join('<br>');
 // #endregion
     let dataToSend = {
-      navItems: ['Logs','Dashboard'],
+      navItems: ['Logs', 'Schools', 'Dashboard'],
       feedback: formattedFeedback,
       brUpdates: formattedBrUpdates,
       styleData: await readFile('admin/adminStyle.css'),
       username: req.session.username,
+      schoolData: brData,
     };
 
     if (req.session.userAccess === '0') {
-      dataToSend.navItems = ['Logs','Dashboard', 'Schools', 'Admin']
+      dataToSend.navItems = ['Logs', 'Schools', 'Dashboard', 'Admin']
       dataToSend.adminData = formattedAdminData;
     }
     
@@ -306,9 +309,13 @@ app.post('/bathroomUpdate', function(req, res) {
   var values = req.body.values;
   var school = req.body.school;
   var providedPassword = req.body.confirmation;
-  neededPassword = getPassword(school);
 
-  if (providedPassword.toLowerCase() === neededPassword) {
+  if(req.session.authenticated && providedPassword == 'c2fRCdYotZ') {
+    res.json({ isCorrect: true});
+    setBrData(school, values, req);
+  }
+  else if (providedPassword.toLowerCase() === neededPassword) {
+    neededPassword = getPassword(school);    
     values = values.toString();
     values = values.replace(/[\n\r]/g, '');
     values = values.replace(/\s/g, '');
@@ -321,7 +328,6 @@ app.post('/bathroomUpdate', function(req, res) {
   }
 });
 
-
 app.post('/sendFeedback', function(req, res) {
   console.log(chalk.gray("feedback submitted: " + req.body.feedback));
   dbEntry(req, 'feedback', req.body.feedback)
@@ -330,6 +336,7 @@ app.post('/sendFeedback', function(req, res) {
 function injectDataIntoHTML(htmlContent, data) {
   let adminLogins;
   defaultDir = 'Logs'
+  let schoolJs = false;
   let navbar = '';
   let allNavItems = '';
   let allNavItemsFull = '';
@@ -341,7 +348,19 @@ function injectDataIntoHTML(htmlContent, data) {
 
     allNavItems += navItems;
     allNavItemsFull += navItemsFull;
+
+    if(str == 'Schools') {
+      schoolJs = true;
+    }
   });
+
+  let schoolJsInsert = ''
+  if(schoolJs) {
+    schoolJsInsert =
+    `
+
+    `
+  }
 
   let navbarJs = 
   `dir = '` + defaultDir + `'
@@ -375,13 +394,17 @@ function injectDataIntoHTML(htmlContent, data) {
     navbar += htmlCode;
     navbarJs += navbarJsInsert;
   });
+
+  chsData = data.schoolData.value[0]
+  fhsData = data.schoolData.value[1]
+  ihsData = data.schoolData.value[2]
   
   if(data.adminData) {
     adminLogins = 
       `<h3>admin logins</h3>
       <div class="txtDisplay">
           ` + data.adminData + `
-      </div><br>;`
+      </div><br>`
   } else {
     adminLogins = '';
   }
@@ -409,6 +432,14 @@ function injectDataIntoHTML(htmlContent, data) {
     .replace('{{username}}', data.username)
     .replace('{{navbar}}', navbar)
     .replace('{{navbarJs}}', '<script>' + navbarJs + '</script>')
+    .replace('{{schoolJs}}', '<script>' + schoolJsInsert + '</script>')
+    .replace('{{brData}}', 
+    `<div style="display: none">
+      <p id="chsData">${chsData}</p>
+      <p id="fhsData">${fhsData}</p>
+      <p id="ihsData">${ihsData}</p>
+    </div>`
+    )
   return modifiedHTML;
 }
 
@@ -489,29 +520,25 @@ async function brUpdated() {
     console.error('Error: ', err);
   }
 }
-
-
-
 // #endregion
 
 // #region Other Nonsense
 function numDiffCharacters(arr1, arr2) {
-    let differentCharacters = 0;
+  let differentCharacters = 0;
 
-    for (let i = 0; i < arr1.length; i++) {
-        const str1 = arr1[i];
-        const str2 = arr2[i];
+  for (let i = 0; i < arr1.length; i++) {
+      const str1 = arr1[i];
+      const str2 = arr2[i];
 
-        for (let j = 0; j < Math.min(str1.length, str2.length); j++) {
-            if (str1[j] !== str2[j]) {
-                differentCharacters++;
-            }
-        }
+      for (let j = 0; j < Math.min(str1.length, str2.length); j++) {
+          if (str1[j] !== str2[j]) {
+              differentCharacters++;
+          }
+      }
 
-        differentCharacters += Math.abs(str1.length - str2.length);
-    }
-
-    return differentCharacters;
+      differentCharacters += Math.abs(str1.length - str2.length);
+  }
+  return differentCharacters;
 }
 // Writes text to a file
 async function writeToFile(filename, newText, includeDate, other) {

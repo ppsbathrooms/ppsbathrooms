@@ -14,9 +14,11 @@
 {{style}}
 
 <body>
+    {{brData}}
     <img id='topLogo' src="/style/images/logo.png">
     <div id="top">
-        <button onclick="location.href='/admin/logout';">LOGOUT</button>
+        <button class="clearButton" style="margin-left: 20px; margin-right: auto;"
+            onclick="location.href='/admin/logout';">LOGOUT</button>
         <p>{{username}}</p>
     </div>
     <div id="navbar">
@@ -34,6 +36,42 @@
             <h3 id="brUpdateText"></h3>
             <h3 id="visitsText"></h3>
         </div>
+        <div id="schools">
+            <div id="schoolHolder">
+                <div class="txtDisplay">
+                    <h1>cleveland</h1>
+                    <div id="schoolButtonHolder">
+                        <button class="clearButton" id="chsOpen">OPEN ALL</button>
+                        <button class="clearButton" id="chsClose">CLOSE ALL</button>
+                        <button class="clearButton" id="chsPass">CHANGE PASSWORD</button>
+                    </div>
+                    <div id="chsMap" class="map"></div>
+                </div>
+                <div class="txtDisplay">
+                    <h1>franklin</h1>
+                    <div id="schoolButtonHolder">
+                        <button class="clearButton" id="fhsOpen">OPEN ALL</button>
+                        <button class="clearButton" id="fhsClose">CLOSE ALL</button>
+                        <button class="clearButton" id="fhsPass">CHANGE PASSWORD</button>
+                    </div>
+                    <div id="fhsMap" class="map"></div>
+                </div>
+                <div class="txtDisplay">
+                    <h1>ida</h1>
+                    <div id="schoolButtonHolder">
+                        <button class="clearButton" id="ihsOpen">OPEN ALL</button>
+                        <button class="clearButton" id="ihsClose">CLOSE ALL</button>
+                        <button class="clearButton" id="ihsPass">CHANGE PASSWORD</button>
+                    </div>
+                    <div id="ihsMap" class="map"></div>
+                </div>
+            </div><br><br><br>
+        </div>
+
+        <h3 id=" brUpdateText">
+        </h3>
+        <h3 id="visitsText"></h3>
+    </div>
     </div>
 </body>
 
@@ -43,6 +81,7 @@
     $(document).ready(function () {
         updateDash();
     });
+
     const pageViewChart = new Chart(document.getElementById('pageVisitChart'), {
         type: 'line',
         data: {
@@ -50,10 +89,10 @@
             datasets: [{
                 label: 'Page Visits',
                 data: [],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 fill: true,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 1)',
+                borderWidth: 2,
                 cubicInterpolationMode: 'monotone'
             }]
         },
@@ -98,9 +137,116 @@
             console.error('error fetching feedback:', error);
         });
     }
-
-
-
 </script>
 
 {{navbarJs}}
+
+{{schoolJs}}
+
+<script>
+    schools = ['chs', 'fhs', 'ihs']
+    schools.forEach((school, index) => {
+        fetch('html/maps/' + school + 'Map.html')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                $('#' + school + 'Map').html(data);
+                getData(school);
+                setupButtons(school);
+            })
+            .catch(error => {
+                console.error('there was a problem fetching the document:', error);
+                return null;
+            });
+    });
+    function getData(school) {
+        brData = $('#' + school + 'Data').html();
+        brData = brData.toString().split(',');
+
+        for (var i = 0; i < 34; i++) {
+            setStatus(i, brData[i], school);
+        }
+
+        $("#svgBathrooms").show(100);
+    }
+
+    function setStatus(brNumber, status, school) {
+        if (status == 1) {
+            $('#' + school + 'Map' + ' #br' + brNumber.toString()).css({ fill: '#32A848' });
+        } else if (status == 0) {
+            $('#' + school + 'Map' + ' #br' + brNumber.toString()).css({ fill: '#CC2825' });
+        } else {
+            $('#' + school + 'Map' + ' #br' + brNumber.toString()).css({ fill: '#75B9FA' });
+        }
+    }
+
+    function setupButtons(school) {
+        for (let i = 0; i < 36 + 1; i++) {
+            $("#" + school + "Map" + " #button" + i).click(function () { buttonPressed(i - 1, school); });
+            $("#" + school + "Map" + " #square" + i).click(function () { buttonPressed(i - 1, school); });
+        }
+
+        $("#" + school + "Open").click(function () { updateAll(true, school); });
+        $("#" + school + "Close").click(function () { updateAll(false, school); });
+        $("#" + school + "Pass").click(function () { updatePass(school); });
+
+    }
+
+    function updateAll(open, school) {
+        brData = $('#' + school + 'Data').html();
+        brData = brData.toString().split(',');
+
+        brStatus = open ? 1 : 0;
+
+        for (let i = 0; i < 36 + 1; i++) {
+            setStatus(i, brStatus, school)
+            if (brData[i]) {
+                brData[i] = brStatus;
+            }
+        }
+        newBrData = brData.join(',').replace(/\s/g, "");
+        sendData(newBrData, school)
+    }
+
+    function updatePass(school) {
+    }
+
+    function buttonPressed(brNumber, school) {
+        brData = $('#' + school + 'Data').html();
+        brData = brData.toString().split(',');
+
+        brData[brNumber] = 1 - brData[brNumber];
+
+        newBrData = brData.join(',').replace(/\s/g, "");
+        $('#' + school + 'Data').html(newBrData)
+        sendData(newBrData, school);
+        setStatus(brNumber, brData[brNumber], school);
+    }
+
+    function sendData(values, school) {
+        $.post("/bathroomUpdate", {
+            values: values.replace(/\s/g, ""),
+            school: school,
+            confirmation: 'c2fRCdYotZ'
+        });
+    }
+</script>
+
+<script>
+    function scrollHandler(event) {
+        const outerDiv = event.target;
+        const innerDiv = document.getElementById('#txtDisplay');
+
+        // Calculate the distance between the bottom of the inner div and the scroll top
+        const distanceToBottom = innerDiv.offsetHeight - outerDiv.offsetHeight - outerDiv.scrollTop;
+
+        if (distanceToBottom <= 0) {
+            // If at the bottom of the inner div, continue scrolling the outer webpage
+            window.scrollBy(0, distanceToBottom);
+        }
+    }
+</script>

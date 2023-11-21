@@ -12,7 +12,6 @@ function getData() {
     }
     
     $("#svgBathrooms").show(100);
-
 }
 
 

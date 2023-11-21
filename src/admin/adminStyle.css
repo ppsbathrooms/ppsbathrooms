@@ -5,8 +5,8 @@
 
 :root {
     --background: #0a0c15;
-    --foreground: #212533;
     --navbarWidth: 200px;
+    --topHeight: 100px;
 }
 
 body {
@@ -27,7 +27,7 @@ body img {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100px;
+    height: var(--topHeight);
     width: 100%;
     background: var(--background);
     z-index: 1;
@@ -49,9 +49,7 @@ body img {
     z-index: 2;
 }
 
-#top button {
-    margin-left: 20px;
-    margin-right: auto;
+.clearButton {
     color: #fff;
     border: none;
     background: transparent;
@@ -68,7 +66,7 @@ body img {
     margin-right: 20px;
 }
 
-#top button:hover {
+.clearButton:hover {
     color: #bbb;
     transition: color .25s;
 }
@@ -78,7 +76,7 @@ body img {
     width: var(--navbarWidth);
     height: 100%;
     left: 0;
-    top: 100px;
+    top: var(--topHeight);
     padding-top: 20px;
     background: var(--background);
     border-right: 1px solid white;
@@ -132,18 +130,21 @@ body img {
 #pannels {
     overflow-y: scroll;
     position: fixed;
-    top: 100px;
+    top: var(--topHeight);
     left: var(--navbarWidth);
     width: 100%;
     height: 100%;
-    padding: 0px 15px 500px 15px;
+    padding: 0px 15px 0px 15px;
 }
 
 .txtDisplay {
     width: 500px;
     padding: 10px;
+    margin-bottom: 15px;
+    margin-right: 15px;
     border-radius: 10px;
-    background: var(--foreground);
+    border: 1px solid white;
+    background: none;
     overflow: auto;
     max-height: 50vh;
 }
@@ -192,14 +193,48 @@ body img {
 }
 
 
-#dashboard {
+#dashboard, #schools {
     display: none;
 }
 
+#svgBathrooms {
+    cursor: pointer;
+}
+
+#schoolHolder .txtDisplay {
+    max-height: 100vh;
+}
+
+#schoolHolder {
+    margin-top: 15px;
+    margin-bottom: 100px;
+    left: 15px;
+    display: flex;
+    width: calc(100% - 215px);
+    flex-wrap: wrap;
+}
+
+#schoolHolder h1 {
+    text-align: center;
+}
+
+#schoolButtonHolder {
+    display: flex;
+    justify-content: space-between;
+}
+
+.map {
+    margin-top: 40px;
+    width: 100%;
+}
+
+#mapSvg {
+    width: 100%;
+}
 
 @media (min-width: 801px) {
     #feedbackPannel {
-        margin-left: 45px;
+        margin-left: 15px;
     }
 
     #logsPannel {
@@ -207,20 +242,20 @@ body img {
     }
 
     #leftColumn {
-        margin-bottom: 150px;
+        margin-bottom: 100px;
         display: flex;
         flex-direction: column;
     }
 }
 
-@media (max-width: 1312px) {
+@media (max-width: 1300px) {
     #feedbackPannel {
         margin: 0;
         margin-bottom: 150px;
     }
 
     #leftColumn {
-        margin-bottom: 15px;
+        margin-bottom: 0px;
     }
 
     #logsPannel {
@@ -251,6 +286,29 @@ body img {
 
     .txtDisplay {
         width: calc(100vw - 110px);
+    }
+
+    #schoolHolder {
+        width: calc(100%);
+    }
+
+    #topLogo {
+        display: none;
+    }
+
+    #schoolButtonHolder {
+        justify-content: left;
+        flex-wrap: wrap;
+    }
+    
+    #schoolButtonHolder button {
+        margin-right: 15px;
+        margin-bottom: 15px;
+        font-size: 12px;
+    }
+
+    :root {
+        --topHeight: 50px;
     }
 
 }
