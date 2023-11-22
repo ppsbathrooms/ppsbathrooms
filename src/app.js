@@ -84,12 +84,14 @@ async function setBrData(school, value, request) {
     }
 
     newValue = [chs, fhs, ihs]
-    dbEntry(request, 'bathrooms', value, school, numDiffCharacters(newValue, doc))
+    numDiff = numDiffCharacters(newValue, doc)
+    if(numDiff > 0) {
+      dbEntry(request, 'bathrooms', value, school, numDiff)
+    }
     await updateBrs(newValue);
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
-  console.log(chalk.gray(school, 'set to', value));
 }
 
 
@@ -227,6 +229,7 @@ app.get('/schools', (req, res) => {
       styleData: await readFile('admin/adminStyle.css'),
       username: req.session.username,
       schoolData: brData,
+      schoolJs: await readFile('admin/inserts/schoolJs.js'),
     };
 
     if (req.session.userAccess === '0') {
@@ -305,38 +308,66 @@ app.post('/admin', async (req, res) => {
 });
 
 //recieve post request, send update
-app.post('/bathroomUpdate', function(req, res) {
-  var values = req.body.values;
-  var school = req.body.school;
-  var providedPassword = req.body.confirmation;
+app.post('/updatePassword', async function(req, res) {
+  school = req.body.school;
+  currentPass = req.body.currentPass;
+  newPass = req.body.newPass;
 
-  if(req.session.authenticated && providedPassword == 'c2fRCdYotZ') {
+  actualPass = await db.collection('data').findOne({ _id: school + 'Pass'});
+
+  if(currentPass == actualPass.password) {
     res.json({ isCorrect: true});
-    setBrData(school, values, req);
+    await db.collection('data').updateOne(
+      {"_id": school + 'Pass'},
+      {$set : {'password': newPass}}
+      );
+      console.log(chalk.white(`${school} password changed: ${currentPass} => ${newPass}`))
   }
-  else if (providedPassword.toLowerCase() === neededPassword) {
-    neededPassword = getPassword(school);    
-    values = values.toString();
-    values = values.replace(/[\n\r]/g, '');
-    values = values.replace(/\s/g, '');
-
-    res.json({ isCorrect: true});
-    setBrData(school, values, req);
-  } else {
-    console.log(chalk.red("Wrong pass for " + school + ": '", providedPassword, "'"));
+  else {
     res.json({ isCorrect: false});
+  }
+
+});
+
+app.post('/bathroomUpdate', async function(req, res) {
+  try {
+    var values = req.body.values;
+    var school = req.body.school;
+    var providedPassword = req.body.confirmation;
+
+    var schoolData = await db.collection('data').findOne({ _id: school + 'Pass' });
+
+    if (!schoolData || !schoolData.password) {
+      console.log("Invalid request or password not found for school: ", school);
+    }
+
+    var neededPassword = schoolData.password;
+
+    if (req.session.authenticated && providedPassword === 'c2fRCdYotZ') {
+      res.json({ isCorrect: true });
+      setBrData(school, values, req);
+    } else {
+      if (neededPassword && providedPassword.toLowerCase() === neededPassword.toLowerCase()) {
+        values = values.toString().replace(/[\n\r\s]/g, '');
+        res.json({ isCorrect: true });
+        setBrData(school, values, req);
+      } else {
+        res.json({ isCorrect: false, error: "Incorrect password" });
+      }
+    }
+  } catch (err) {
+    console.error("Error:", err);
   }
 });
 
+
 app.post('/sendFeedback', function(req, res) {
-  console.log(chalk.gray("feedback submitted: " + req.body.feedback));
   dbEntry(req, 'feedback', req.body.feedback)
 });
 
 function injectDataIntoHTML(htmlContent, data) {
+  const defaultDir = 'Logs'
   let adminLogins;
-  defaultDir = 'Logs'
-  let schoolJs = false;
   let navbar = '';
   let allNavItems = '';
   let allNavItemsFull = '';
@@ -348,106 +379,9 @@ function injectDataIntoHTML(htmlContent, data) {
 
     allNavItems += navItems;
     allNavItemsFull += navItemsFull;
-
-    if(str == 'Schools') {
-      schoolJs = true;
-    }
   });
 
-  let schoolJsInsert = ''
-  if(schoolJs) {
-    schoolJsInsert =
-    `schools = ['chs', 'fhs', 'ihs']
-    schools.forEach((school, index) => {
-        fetch('html/maps/' + school + 'Map.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('network response was not ok');
-                }
-                return response.text();
-            })
-            .then(data => {
-                $('#' + school + 'Map').html(data);
-                getData(school);
-                setupButtons(school);
-            })
-            .catch(error => {
-                console.error('there was a problem fetching the document:', error);
-                return null;
-            });
-    });
-    function getData(school) {
-        brData = $('#' + school + 'Data').html();
-        brData = brData.toString().split(',');
-
-        for (var i = 0; i < 34; i++) {
-            setStatus(i, brData[i], school);
-        }
-
-        $("#svgBathrooms").show(100);
-    }
-
-    function setStatus(brNumber, status, school) {
-        if (status == 1) {
-            $('#' + school + 'Map' + ' #br' + brNumber.toString()).css({ fill: '#32A848' });
-        } else if (status == 0) {
-            $('#' + school + 'Map' + ' #br' + brNumber.toString()).css({ fill: '#CC2825' });
-        } else {
-            $('#' + school + 'Map' + ' #br' + brNumber.toString()).css({ fill: '#75B9FA' });
-        }
-    }
-
-    function setupButtons(school) {
-        for (let i = 0; i < 36 + 1; i++) {
-            $("#" + school + "Map" + " #button" + i).click(function () { buttonPressed(i - 1, school); });
-            $("#" + school + "Map" + " #square" + i).click(function () { buttonPressed(i - 1, school); });
-        }
-
-        $("#" + school + "Open").click(function () { updateAll(true, school); });
-        $("#" + school + "Close").click(function () { updateAll(false, school); });
-        $("#" + school + "Pass").click(function () { updatePass(school); });
-
-    }
-
-    function updateAll(open, school) {
-        brData = $('#' + school + 'Data').html();
-        brData = brData.toString().split(',');
-
-        brStatus = open ? 1 : 0;
-
-        for (let i = 0; i < 36 + 1; i++) {
-            setStatus(i, brStatus, school)
-            if (brData[i]) {
-                brData[i] = brStatus;
-            }
-        }
-        newBrData = brData.join(',').replace(/\s/g, "");
-        sendData(newBrData, school)
-    }
-
-    function updatePass(school) {
-    }
-
-    function buttonPressed(brNumber, school) {
-        brData = $('#' + school + 'Data').html();
-        brData = brData.toString().split(',');
-
-        brData[brNumber] = 1 - brData[brNumber];
-
-        newBrData = brData.join(',').replace(/\s/g, "");
-        $('#' + school + 'Data').html(newBrData)
-        sendData(newBrData, school);
-        setStatus(brNumber, brData[brNumber], school);
-    }
-
-    function sendData(values, school) {
-        $.post("/bathroomUpdate", {
-            values: values.replace(/\s/g, ""),
-            school: school,
-            confirmation: 'c2fRCdYotZ'
-        });
-    }`
-  }
+  schoolJsInsert = data.schoolJs ? data.schoolJs : '';
 
   let navbarJs = 
   `dir = '` + defaultDir + `'
@@ -642,44 +576,6 @@ async function writeToFile(filename, newText, includeDate, other) {
   });
 }
 
-useEnvironmentVariables = process.env.CHSPASS != undefined;
-
-chsPass = process.env.CHSPASS;
-fhsPass = process.env.FHSPASS;
-ihsPass = process.env.IHSPASS;
-
-// Yoinks the password for a school (if you're viewing the public GitHub page plz dont steal)
-// haha suckers you cant steal them any more
-function getPassword(school) {
-  if(useEnvironmentVariables) {
-    switch(school) {
-      case 'chs':
-        password = chsPass;
-        break;
-      case 'fhs': 
-        password = fhsPass;
-        break;
-      case 'ihs':
-        password = ihsPass;
-        break;
-    }
-  } 
-  else {
-    switch(school) {
-      case 'chs':
-        password = 'pass';
-        break;
-      case 'fhs': 
-        password = 'franklinpass'
-        break;
-      case 'ihs':
-        password = 'idapass'
-        break;
-    }
-  }
-
-  return password;
-}
 
 // Gets the current datetime
 function dateTime() {
@@ -714,11 +610,6 @@ app.route('/reqtypes')
   .put(function(req, res) {
     res.send('Put');
   });
-
-// Very very useful, used all the time
-app.get('/multiple/paths', (req, res) => {
-  // exist good
-});
 
 const PORT = process.env.PORT || 42069;
 // thing that works but nobody knows how PLZ DONT TOUCH PLZZZZ

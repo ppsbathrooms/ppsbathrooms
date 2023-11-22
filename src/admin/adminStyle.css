@@ -221,6 +221,7 @@ body img {
 #schoolButtonHolder {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .map {
@@ -230,6 +231,65 @@ body img {
 
 #mapSvg {
     width: 100%;
+}
+
+.passwordHolder {
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+}
+
+.textInputContainer {
+    background: transparent;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    border: 1px solid #fff;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.textInputContainer input {
+    all: unset;
+    padding: 7px;
+    border-radius: 5px;
+    background: transparent;
+    color: #fff;
+    height: 15px;
+    width: 100%;
+    font-size: 16px;
+}
+
+.correctPass {
+    animation: correctPass 1.5s ease forwards;
+}
+.wrongPass {
+    animation: wrongPass .5s ease forwards;
+}
+
+@keyframes correctPass {
+    0% {
+        border-color: green;
+        color: green;
+    }
+
+    100% {
+        border-color: #fff;
+        color: #fff;
+    }
+}
+
+@keyframes wrongPass {
+    0% {
+        border-color: red;
+        color: red;
+    }
+
+    100% {
+        border-color: #fff;
+        color: #fff;
+    }
 }
 
 @media (min-width: 801px) {
@@ -304,6 +364,9 @@ body img {
     #schoolButtonHolder button {
         margin-right: 15px;
         margin-bottom: 15px;
+    }
+
+    .clearButton {
         font-size: 12px;
     }
 
