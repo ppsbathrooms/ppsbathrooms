@@ -29,7 +29,6 @@ function buttonPressed(brNumber) {
         } else if (numDiff === 0) {
         $("#submitButton").fadeOut(100);
     }
-
     document.getElementById("submitButton").innerHTML = '<img id="icon16" src="/style/icons/check.svg"></img> <p> ('+numDiff+')</p>';
 }
 
@@ -313,21 +312,13 @@ $(document).ready(function() {
     console.log(allInputsHaveText)
     if(allInputsHaveText) {
         var formData = $(this).serialize();
-
         $.ajax({
         type: 'POST',
         url: '/admin',
         data: formData,
         success: function(response) {
-            if(response.accessDenied) {
-                $('#navLoginForm')[0].reset();
-                $('#username').focus();
-
-                $('#navbarLoginButton').addClass('redBorder');
-
-                setTimeout(function() {
-                    $('#navbarLoginButton').removeClass('redBorder');
-                }, 500);
+            if(response.status < 1) {
+                failedAuth()
             } else {
                 location.href = '/admin'
             }
@@ -339,3 +330,14 @@ $(document).ready(function() {
     }
   });
 });
+
+function failedAuth(status) {
+    $('#navLoginForm')[0].reset();
+    $('#username').focus();
+
+    $('#navbarLoginButton').addClass('redBorder');
+
+    setTimeout(function() {
+        $('#navbarLoginButton').removeClass('redBorder');
+    }, 500);
+}

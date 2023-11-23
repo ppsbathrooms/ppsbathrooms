@@ -263,7 +263,7 @@ app.get('/admin', async (req, res) => {
       schoolHtml: await readFile('admin/inserts/schools.html'),
     };
     if (req.session.userAccess === '0') {
-      dataToSend.navItems = ['Logs', 'Schools', 'Dashboard', 'Admin']
+      dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard']
       dataToSend.adminData = formattedAdminData;
       dataToSend.users = users;
 
@@ -324,19 +324,23 @@ app.post('/admin', async (req, res) => {
     const user = await userColl.findOne({ username });
     if (user) {
       const passwordMatch = await bcrypt.compare(password, user.password);
-      if (passwordMatch && (user.access >= 0)) {
-        req.session.authenticated = true;
-        req.session.userAccess = user.access;
-        req.session._id = user._id;
-        req.session.username = user.username;
-        dbEntry(req, 'adminlogins', user.username);
-        res.json({ accessDenied: false});
-        
+      if (passwordMatch) {
+        if(user.access < 0) {
+          res.json({status: -1});
+        }
+        else {
+          req.session.authenticated = true;
+          req.session.userAccess = user.access;
+          req.session._id = user._id;
+          req.session.username = user.username;
+          dbEntry(req, 'adminlogins', user.username);
+          res.json({ status: 1});
+        }
       } else {
-        res.json({ accessDenied: true});
+        res.json({ status: 0});
       }
     } else {
-        res.json({ accessDenied: true});
+        res.json({ status: 0});
     }
   } catch (error) {
     console.error('Error:', error);

@@ -101,12 +101,13 @@
         color: red;
         display: inline-block;
         margin: 0;
-        margin-left: 20px;
         padding: 0;
         opacity: 0;
         font-size: 12px;
         font-family: barlowBold;
         text-transform: uppercase;
+        width: 175px;
+        text-align: center;
     }
 
     .fade {
@@ -161,15 +162,8 @@
                     url: '/admin',
                     data: formData,
                     success: function (response) {
-                        if (response.accessDenied) {
-                            $('#loginForm')[0].reset();
-                            $('#username').focus();
-
-                            $('#wrongPass').addClass('fade');
-
-                            setTimeout(function () {
-                                $('#wrongPass').removeClass('fade');
-                            }, 2000);
+                        if (response.status < 1) {
+                            failedAuth(response.status);
                         } else {
                             location.href = '/admin';
                         }
@@ -181,6 +175,20 @@
             }
         });
     });
+
+    function failedAuth(status) {
+        text = (status == 0) ? 'authentication failed' : 'account banned';
+        $('#wrongPass').html(text);
+
+        $('#loginForm')[0].reset();
+        $('#username').focus();
+
+        $('#wrongPass').addClass('fade');
+
+        setTimeout(function () {
+            $('#wrongPass').removeClass('fade');
+        }, 2000);
+    }
 </script>
 
 </html>

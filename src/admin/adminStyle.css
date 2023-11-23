@@ -266,12 +266,12 @@ body img {
 }
 
 .userHolder {
-    width: fit-content;
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 10px;
+    padding-top: 0px;
 }
 
 .user {
@@ -280,7 +280,6 @@ body img {
     flex-direction: column;
     align-items: center;
     position: relative;
-    border-top: 1px solid white;
     border-bottom: 1px solid white;
     padding: 10px;
     padding-bottom: 20px;
@@ -328,6 +327,8 @@ body img {
     font-size: 16px;
     display: flex;
     flex-direction: row;
+    border-bottom: 1px solid white;
+    width: 1000px;
 }
 
 #adminTopTitle p {
@@ -338,12 +339,12 @@ body img {
 }
 
 #adminTopTitle p:nth-child(1) {
-    margin-right: 45px;
+    margin-right: 60px;
 }
 
 #adminTopTitle p:nth-child(2) {
     width: 100px;
-    margin-right: 75px;
+    margin-right: 65px;
 }
 
 #adminTopTitle p:nth-child(3) {
