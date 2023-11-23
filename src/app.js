@@ -490,13 +490,16 @@ function injectDataIntoHTML(htmlContent, data) {
       userInsert = `
                 <div class="user">
                     <div class="userTop">
-                        <p id="userUsername${user._id}">${user.username}</p>
+                        <p class="adminUsername" id="userUsername${user._id}">${user.username}</p>
+                        <h3>access</h3>
                         <select name="access" class="userAccess" id="access${user._id}">
                             <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
                             <option value="1" ${user.access==1 ? ' selected' : '' }>admin</option>
                             <option value="-1" ${user.access==-1 ? ' selected' : '' }>blocked</option>
                         </select>
+                        <h3>user id</h3>
                         <p id="userId${user._id}">${user._id}</p>
+                        <h3>key</h3>
                         <p id="userKey${user._id}">#${user.key}</p>
                         <button id="togglePerms${user._id}" class="clearButton">EDIT PERMISSIONS</button>
                     </div>

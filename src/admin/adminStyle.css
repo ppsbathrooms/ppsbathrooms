@@ -267,7 +267,6 @@ body img {
 
 .userHolder {
     width: fit-content;
-    /* margin-top: 15px; */
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
@@ -286,6 +285,10 @@ body img {
     padding: 10px;
     padding-bottom: 20px;
     padding-top: 20px;
+}
+
+.user h3 {
+    display: none;
 }
 
 .userTop p {
@@ -421,6 +424,56 @@ body img {
     }
 }
 
+@media (max-width: 1250px) {
+    .userTop {
+        flex-direction: column;
+    }
+
+    #adminTopTitle {
+        display: none;
+    }
+
+    .user {
+        align-items: center;
+        border: 1px solid white;
+        border-radius: 10px;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+
+    .userTop button {
+        margin-top: 10px;
+    }
+
+    .user h3, .user p, .userTop select {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin: 0;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .userAccess {
+        display: block;
+        text-align: center;
+        align-self: center;
+    }
+
+    .adminUsername  {
+        font-family: barlowBold;
+        text-transform: uppercase;
+        font-size: 24px;
+    }
+
+    .userHolder {
+        margin-bottom: 150px;
+        margin-top: 15px;
+        width: calc(100% - 240px);
+        justify-content: left;
+    }
+}
+
 @media (max-width: 1300px) {
     #feedbackPannel {
         margin: 0;
@@ -485,6 +538,10 @@ body img {
 
     :root {
         --topHeight: 50px;
+    }
+
+    .userHolder {
+        width: calc(100% - 100px);
     }
 
 }
