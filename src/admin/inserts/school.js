@@ -53,7 +53,6 @@ function setupButtons(school) {
 
     $("#" + school + "ChangePassword").keydown(function (e) { if (e.keyCode == 13) { updatePass(school) } });
     $('#' + school + 'ChangePassword').hide();
-
 }
 
 function updateAll(open, school) {

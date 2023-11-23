@@ -21,7 +21,7 @@ const chalk = require('chalk'); // console colors
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -205,23 +205,53 @@ app.get('/schools', (req, res) => {
   pageVisited();
 });
 
-  app.get('/admin', async (req, res) => {
+app.get('/admin', async (req, res) => {
+  const userId = ObjectId(req.session._id);
+  const user = await db.collection('users').findOne({ _id: userId });
+  
   if(!req.session.authenticated) {
     res.sendFile(__dirname + '/views/html/admin/login.html');
+    return;
   }
+  if(!user) {
+    console.log('no user')
+    return;
+  }
+  
+  req.session.userAccess = user.access;
+  req.session.save();
+
+  if (user.access < 0) {
+    res.redirect('/admin/logout')
+    return;
+  }
+
   else {
 // #region admin data
     const brData = await db.collection('data').findOne({ _id: 'schoolData'});
 
     const brUpdates = await db.collection('bathrooms').find({}).toArray();
-    const formattedBrUpdates = brUpdates.reverse().map(entry => `${entry.time} ${' | '} ${entry.school} ${entry.numChanged} ${' bathrooms updated'}`).join('<br>');
+    const formattedBrUpdates = brUpdates
+      .reverse()
+      .map(entry => `${entry.time} ${' | '} ${entry.school} ${entry.numChanged} ${' bathrooms updated'}`)
+      .join('<br>');
 
     const feedback = await db.collection('feedback').find({}).toArray();
-    const formattedFeedback = feedback.reverse().map(entry => `${entry.time} ${' | '} ${entry.value}`).join('<br>');
+    const formattedFeedback = feedback
+      .reverse()
+      .map(entry => `${entry.time} ${' | '} ${entry.value}`)
+      .join('<br>');
 
     const adminData = await db.collection('adminlogins').find({}).toArray();
-    const formattedAdminData = adminData.reverse().map(entry => `${entry.time} ${' | '} ${entry.ip}`).join('<br>');
+    const formattedAdminData = adminData
+      .filter(entry => entry.ip !== '127.0.0.1')
+      .reverse()
+      .map(entry => `${entry.time} ${entry.value ? `| ${entry.value}` : ''} ${' | '} ${entry.ip}`)
+      .join('<br>');
+
+    const users = await db.collection('users').find({}).toArray();
 // #endregion
+
     let dataToSend = {
       navItems: ['Logs', 'Schools', 'Dashboard'],
       feedback: formattedFeedback,
@@ -229,12 +259,16 @@ app.get('/schools', (req, res) => {
       styleData: await readFile('admin/adminStyle.css'),
       username: req.session.username,
       schoolData: brData,
-      schoolJs: await readFile('admin/inserts/schoolJs.js'),
+      schoolJs: await readFile('admin/inserts/school.js'),
+      schoolHtml: await readFile('admin/inserts/schools.html'),
     };
-
     if (req.session.userAccess === '0') {
       dataToSend.navItems = ['Logs', 'Schools', 'Dashboard', 'Admin']
       dataToSend.adminData = formattedAdminData;
+      dataToSend.users = users;
+
+      dataToSend.adminJs = await readFile('admin/inserts/admin.js');
+      dataToSend.adminHtml = await readFile('admin/inserts/admin.html');
     }
     
     fs.readFile('admin/admindash.html', 'utf8', (err, data) => {
@@ -272,7 +306,7 @@ app.get('/pageVisits', async (req, res) => {
 
 app.get('/admin/logout', (req, res) => {
   req.session.authenticated = false;
-  res.redirect('/');
+  res.redirect('/admin');
 });
 
 //404 keep at end of redirects
@@ -290,11 +324,14 @@ app.post('/admin', async (req, res) => {
     const user = await userColl.findOne({ username });
     if (user) {
       const passwordMatch = await bcrypt.compare(password, user.password);
-      if (passwordMatch) {
+      if (passwordMatch && (user.access >= 0)) {
         req.session.authenticated = true;
         req.session.userAccess = user.access;
+        req.session._id = user._id;
         req.session.username = user.username;
+        dbEntry(req, 'adminlogins', user.username);
         res.json({ accessDenied: false});
+        
       } else {
         res.json({ accessDenied: true});
       }
@@ -309,25 +346,52 @@ app.post('/admin', async (req, res) => {
 
 //recieve post request, send update
 app.post('/updatePassword', async function(req, res) {
-  school = req.body.school;
-  currentPass = req.body.currentPass;
-  newPass = req.body.newPass;
+  if(req.session.authenticated) {
+    school = req.body.school;
+    currentPass = req.body.currentPass;
+    newPass = req.body.newPass;
 
-  actualPass = await db.collection('data').findOne({ _id: school + 'Pass'});
+    actualPass = await db.collection('data').findOne({ _id: school + 'Pass'});
 
-  if(currentPass == actualPass.password) {
-    res.json({ isCorrect: true});
-    await db.collection('data').updateOne(
-      {"_id": school + 'Pass'},
-      {$set : {'password': newPass}}
-      );
-      console.log(chalk.white(`${school} password changed: ${currentPass} => ${newPass}`))
+    if(currentPass == actualPass.password) {
+      res.json({ isCorrect: true});
+      await db.collection('data').updateOne(
+        {"_id": school + 'Pass'},
+        {$set : {'password': newPass}}
+        );
+        console.log(chalk.white(`${school} password changed: ${currentPass} => ${newPass}`))
+    }
+    else {
+      res.json({ isCorrect: false});
+    }
   }
-  else {
-    res.json({ isCorrect: false});
-  }
-
 });
+
+app.post('/updateUser', async function(req, res) {
+  if (req.session.authenticated) {
+    const id = req.body.id;
+    const objectId = ObjectId(id);
+    const valueName = req.body.valueName;
+    const newValue = req.body.newValue;
+
+    const user = await db.collection('users').findOne({ _id: objectId });
+
+    if(id === req.session._id) {
+      console.log('same session')
+      req.session.userAccess = newValue;
+      req.session.save();
+    }
+    if (user) {
+      const updateQuery = { $set: { [valueName]: newValue } };
+
+      await db.collection('users').updateOne({ _id: objectId }, updateQuery);
+      console.log(chalk.white(`${user.username} ${valueName} changed to ${newValue}`));
+    } else {
+      console.log(chalk.red('User not found'));
+    }
+  }
+});
+
 
 app.post('/bathroomUpdate', async function(req, res) {
   try {
@@ -371,6 +435,7 @@ function injectDataIntoHTML(htmlContent, data) {
   let navbar = '';
   let allNavItems = '';
   let allNavItemsFull = '';
+  let userInfo = '';
   const totalNavItems = data.navItems.length;
 
   data.navItems.forEach((str, index) => {
@@ -382,6 +447,10 @@ function injectDataIntoHTML(htmlContent, data) {
   });
 
   schoolJsInsert = data.schoolJs ? data.schoolJs : '';
+  schoolsInsert = data.schoolHtml ? data.schoolHtml : '';
+
+  adminJsInsert = data.adminJs ? '<script>' + data.adminJs + '</script>' : '';
+  adminInsert = data.adminHtml ? data.adminHtml : '';
 
   let navbarJs = 
   `dir = '` + defaultDir + `'
@@ -416,6 +485,39 @@ function injectDataIntoHTML(htmlContent, data) {
     navbarJs += navbarJsInsert;
   });
 
+  if (data.users) {
+    data.users.forEach((user) => {
+      userInsert = `
+                <div class="user">
+                    <div class="userTop">
+                        <p id="userUsername${user._id}">${user.username}</p>
+                        <select name="access" class="userAccess" id="access${user._id}">
+                            <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
+                            <option value="1" ${user.access==1 ? ' selected' : '' }>admin</option>
+                            <option value="-1" ${user.access==-1 ? ' selected' : '' }>blocked</option>
+                        </select>
+                        <p id="userId${user._id}">${user._id}</p>
+                        <p id="userKey${user._id}">#${user.key}</p>
+                        <button id="togglePerms${user._id}" class="clearButton">EDIT PERMISSIONS</button>
+                    </div>
+                    <div id="editPerms${user._id}" class="editPerms">` +
+                      // <div class="changeUserPass" id="changePass${user._id}">
+                      //   <div class="textInputContainer">
+                      //     <input type="text" placeholder="password"></input>
+                      //   </div>
+                      //   <button class="clearButton smallerButton">CHANGE PASSWORD</button>
+                      // </div>
+                      `<p>option 1</p>
+                      <p>option 2</p>
+                      <p>option 3</p>
+                    </div>
+                </div>
+      `;
+      userInfo += userInsert;
+    });
+  }
+
+
   chsData = data.schoolData.value[0]
   fhsData = data.schoolData.value[1]
   ihsData = data.schoolData.value[2]
@@ -429,6 +531,7 @@ function injectDataIntoHTML(htmlContent, data) {
   } else {
     adminLogins = '';
   }
+
   const modifiedHTML = htmlContent
     .replace('{{logs}}',
       `<div id="logsPannel">
@@ -449,18 +552,23 @@ function injectDataIntoHTML(htmlContent, data) {
           </div>
       </div>`
     )
+    
     .replace('{{style}}', '<style>' + data.styleData + '</style>')
     .replace('{{username}}', data.username)
+    .replace('{{admin}}', adminInsert)
+    .replace('{{userList}}', userInfo)
+    .replace('{{adminJs}}', adminJsInsert)
+    .replace('{{userData}}', JSON.stringify(data.users))
     .replace('{{navbar}}', navbar)
     .replace('{{navbarJs}}', '<script>' + navbarJs + '</script>')
     .replace('{{schoolJs}}', '<script>' + schoolJsInsert + '</script>')
+    .replace('{{schools}}', schoolsInsert)
     .replace('{{brData}}', 
     `<div style="display: none">
       <p id="chsData">${chsData}</p>
       <p id="fhsData">${fhsData}</p>
       <p id="ihsData">${ihsData}</p>
-    </div>`
-    )
+    </div>`)
   return modifiedHTML;
 }
 

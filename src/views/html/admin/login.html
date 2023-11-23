@@ -11,9 +11,14 @@
 </head>
 
 <style>
+    @font-face {
+        font-family: barlowBold;
+        src: url(../../style/fonts/Barlow-Bold.ttf);
+    }
+
     body {
         font-family: monospace;
-        background-color: #0a0c15;
+        background: #0a0c15;
         color: #fff;
         height: 100vh;
         display: flex;
@@ -24,13 +29,15 @@
     #loginWindow {
         margin-top: 20vh;
         width: 300px;
-        height: 250px;
-        background: #202227;
+        height: 215px;
+        background: none;
+        border: 1px solid white;
         padding: 5px 15px 5px 15px;
         border-radius: 10px;
     }
 
     h2 {
+        font-family: barlowBold;
         text-align: center;
     }
 
@@ -46,27 +53,32 @@
         height: 15px;
     }
 
-    #submitButton:hover {
-        background: #666C7D;
-        transition: background-color .25s;
-    }
-
-    #submitButton {
+    .clearButton {
         color: #fff;
         border: none;
-        background: #505460;
-        padding: 5px 10px 5px 10px;
+        background: transparent;
+        border: 1px solid #fff;
+        padding: 5px 10px;
         border-radius: 5px;
-        font-family: monospace;
+        font-family: barlowBold;
         cursor: pointer;
+        font-size: 16px;
+        transition: color .25s;
+    }
+
+    .clearButton:hover {
+        color: #bbb;
+        transition: color .25s;
     }
 
     #inputBg {
-        background: #373B43;
+        background: none;
+        border: 1px solid white;
         width: calc(100% - 15px/2);
         height: 25px;
         border-radius: 5px;
         margin-top: 10px;
+        margin-bottom: 20px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -92,10 +104,13 @@
         margin-left: 20px;
         padding: 0;
         opacity: 0;
+        font-size: 12px;
+        font-family: barlowBold;
+        text-transform: uppercase;
     }
 
     .fade {
-        animation: fade 1.5s ease forwards;
+        animation: fade 2s ease forwards;
     }
 
     @keyframes fade {
@@ -107,22 +122,26 @@
             opacity: 0;
         }
     }
+
+    @media (max-width: 800px) {
+        #loginWindow {
+            border: none;
+        }
+    }
 </style>
 
 <body>
     <div id="loginWindow">
-        <h2>login</h2>
+        <h2>LOGIN</h2>
         <form id="loginForm">
-            <p>username</p>
             <div id="inputBg">
-                <input type="text" id="username" name="username" autocomplete="off" autofocus required>
+                <input type="text" id="username" name="username" autocomplete="off" placeholder="username" autofocus>
             </div>
-            <p>password</p>
             <div id="inputBg">
-                <input type="password" id="password" name="password" autocomplete="off" required>
-            </div><br><br>
-            <button id="submitButton" type="submit">login</button>
-            <p id="wrongPass">incorrect password</p>
+                <input type="password" id="password" name="password" placeholder="password" autocomplete="off">
+            </div>
+            <button class="clearButton" id="submitButton" type="submit">login</button>
+            <p id="wrongPass">authorization failed</p>
         </form>
     </div>
     <a href="/" id="return">return</a>
@@ -133,11 +152,7 @@
     $(document).ready(function () {
         $('#loginForm').submit(function (event) {
             event.preventDefault();
-
             allInputsHaveText = ($('#username').val() != '') && ($('#password').val() != '');
-
-
-            console.log(allInputsHaveText)
             if (allInputsHaveText) {
                 var formData = $(this).serialize();
 
@@ -154,7 +169,7 @@
 
                             setTimeout(function () {
                                 $('#wrongPass').removeClass('fade');
-                            }, 1500);
+                            }, 2000);
                         } else {
                             location.href = '/admin';
                         }

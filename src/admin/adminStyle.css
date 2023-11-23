@@ -62,13 +62,17 @@ body img {
     transition: color .25s;
 }
 
-#top p {
-    margin-right: 20px;
-}
-
 .clearButton:hover {
     color: #bbb;
     transition: color .25s;
+}
+
+.smallerButton {
+    font-size: 14px;
+}
+
+#top p {
+    margin-right: 20px;
 }
 
 #navbar {
@@ -193,7 +197,7 @@ body img {
 }
 
 
-#dashboard, #schools {
+#dashboard, #schools, #admin {
     display: none;
 }
 
@@ -259,6 +263,115 @@ body img {
     height: 15px;
     width: 100%;
     font-size: 16px;
+}
+
+.userHolder {
+    width: fit-content;
+    /* margin-top: 15px; */
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.user {
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    padding: 10px;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+.userTop p {
+    margin-right: 60px;
+    overflow: hidden;
+    text-align: center;
+    width: 160px;
+    text-overflow: ellipsis;
+}
+
+.userTop p::-webkit-scrollbar {
+    display: none;
+}
+
+.userTop {
+    display: flex;
+    flex-direction: row;
+}
+
+.userAccess {
+    color: #fff;
+    margin: 0;
+    margin-right: 80px;
+    padding: 3px 5px;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    font-family: monospace;
+}
+
+.userAccess option {
+    color: #000;
+}
+
+#adminTopTitle {
+    margin-left: 10px;
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+}
+
+#adminTopTitle p {
+    font-family: barlowBold;
+    width: 160px;
+    margin-right: 80px;
+    text-align: center;
+}
+
+#adminTopTitle p:nth-child(1) {
+    margin-right: 45px;
+}
+
+#adminTopTitle p:nth-child(2) {
+    width: 100px;
+    margin-right: 75px;
+}
+
+#adminTopTitle p:nth-child(3) {
+    margin-right: 65px;
+}
+
+.editPerms {
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    margin-left: auto;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+}
+
+.editPerms p, .editPerms button {
+    text-align: center;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.changeUserPass {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}
+
+.changeUserPass button {
+    margin-left: 20px;
 }
 
 .correctPass {
