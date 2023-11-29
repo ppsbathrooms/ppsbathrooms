@@ -15,7 +15,6 @@ else {
   uri = config.uri;
 }
 
-
 const app = express(); // creates app for server's client
 const chalk = require('chalk'); // console colors
 const bcrypt = require('bcrypt');
@@ -26,6 +25,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 
 app.use(bodyParser.json()); // Express modules / packages
 app.use(bodyParser.urlencoded({
@@ -64,7 +68,6 @@ client.connect()
 //updates bathroom data
 
 async function updateExtensionData() {
-  console.log('extension data updated')
   data = await db.collection('data').findOne({ _id: 'schoolData'});
   values = JSON.stringify(data.value)
   fs.writeFile('views/data.json', values, err => {
