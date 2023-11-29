@@ -205,6 +205,12 @@ app.get('/schools', (req, res) => {
   pageVisited();
 });
 
+//data for extension
+app.get('/data', async (req, res) => {
+  data = await db.collection('data').findOne({ _id: 'schoolData'});
+  res.send(data.value);
+});
+
 app.get('/admin', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
@@ -495,16 +501,20 @@ function injectDataIntoHTML(htmlContent, data) {
                 <div class="user">
                     <div class="userTop">
                         <p class="adminUsername" id="userUsername${user._id}">${user.username}</p>
-                        <h3>access</h3>
-                        <select name="access" class="userAccess" id="access${user._id}">
-                            <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
-                            <option value="1" ${user.access==1 ? ' selected' : '' }>admin</option>
-                            <option value="-1" ${user.access==-1 ? ' selected' : '' }>blocked</option>
-                        </select>
+                        <div>
+                          <h3>access</h3>
+                          <select name="access" class="userAccess" id="access${user._id}">
+                              <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
+                              <option value="1" ${user.access==1 ? ' selected' : '' }>admin</option>
+                              <option value="-1" ${user.access==-1 ? ' selected' : '' }>blocked</option>
+                          </select>
+                        </div>
                         <h3>user id</h3>
                         <p id="userId${user._id}">${user._id}</p>
-                        <h3>key</h3>
-                        <p id="userKey${user._id}">#${user.key}</p>
+                        <div>
+                          <h3>key</h3>
+                          <p id="userKey${user._id}">#${user.key}</p>
+                        </div>
                         <button id="togglePerms${user._id}" class="clearButton">EDIT PERMISSIONS</button>
                     </div>
                     <div id="editPerms${user._id}" class="editPerms">` +

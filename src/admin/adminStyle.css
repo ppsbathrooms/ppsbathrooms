@@ -268,7 +268,8 @@ body img {
 .userHolder {
     border-radius: 10px;
     display: flex;
-    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: column;
     justify-content: space-between;
     padding: 10px;
     padding-top: 0px;
@@ -435,9 +436,9 @@ body img {
     }
 
     .user {
+        width: calc(100% - 30px);
         align-items: center;
-        border: 1px solid white;
-        border-radius: 10px;
+        /* border: 1px solid white; */
         margin-right: 20px;
         margin-bottom: 20px;
     }
@@ -453,6 +454,15 @@ body img {
         margin: 0;
         margin-top: 5px;
         margin-bottom: 5px;
+    }
+
+    .user {
+        border-bottom: 1px solid white;
+        padding-top: 0px;
+    }
+
+    .userTop div {
+        display: flex;
     }
 
     .userAccess {
