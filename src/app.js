@@ -55,12 +55,24 @@ userColl = db.collection("users");
 client.connect()
   .then(() => {
     console.error(chalk.green('connected to database'));
+    updateExtensionData();
   })
   .catch(err => {
     console.error('Failed to connect to the database:', err);
   });
 
 //updates bathroom data
+
+async function updateExtensionData() {
+  console.log('extension data updated')
+  data = await db.collection('data').findOne({ _id: 'schoolData'});
+  values = JSON.stringify(data.value)
+  fs.writeFile('views/data.json', values, err => {
+    if (err) {
+      throw err
+    }
+  });
+}
 
 async function setBrData(school, value, request) {
   try {
@@ -94,14 +106,12 @@ async function setBrData(school, value, request) {
   }
 }
 
-
-
 async function updateBrs(newValue) {
   brUpdated();
   try {
     await client.connect();
     await dataColl.updateOne({ _id: "schoolData" }, { $set: {value: newValue }}, {});
-    // await client.close();
+    updateExtensionData();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
@@ -203,12 +213,6 @@ app.get('/terms', (req, res) => {
 app.get('/schools', (req, res) => {
   res.render('html/schools.html');
   pageVisited();
-});
-
-//data for extension
-app.get('/data', async (req, res) => {
-  data = await db.collection('data').findOne({ _id: 'schoolData'});
-  res.send(data.value);
 });
 
 app.get('/admin', async (req, res) => {
