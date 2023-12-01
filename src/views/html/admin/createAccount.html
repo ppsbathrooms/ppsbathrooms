@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+
+    <script src="../thirdParty/jquery.min.js"></script>
+    <script src="html/admin/createAccount.js"></script>
+    <title>ppsbathrooms | create account</title>
+</head>
+
+<style>
+    @font-face {
+        font-family: barlowBold;
+        src: url(../../style/fonts/Barlow-Bold.ttf);
+    }
+
+    body {
+        background: #0a0c15;
+        font-family: monospace;
+        overflow: hidden;
+    }
+
+    #createAccountWindow {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+    }
+
+
+    #createAccount {
+        margin-top: 20vh;
+        width: 400px;
+        height: 305px;
+        border-radius: 10px;
+        border: 1px solid white;
+        color: #fff;
+        padding: 5px 15px;
+    }
+
+    h2 {
+        font-family: barlowBold;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    input {
+        all: unset;
+        padding: 3px;
+        margin-left: 3px;
+        width: calc(100% - 15px/2);
+        border-radius: 5px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        height: 15px;
+    }
+
+    .clearButton {
+        color: #fff;
+        border: none;
+        background: transparent;
+        border: 1px solid #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-family: barlowBold;
+        cursor: pointer;
+        font-size: 16px;
+        transition: color .25s;
+    }
+
+    .clearButton:hover {
+        color: #bbb;
+        transition: color .25s;
+    }
+
+    #inputBg {
+        background: none;
+        border: 1px solid white;
+        width: calc(100% - 15px/2);
+        height: 25px;
+        border-radius: 5px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .createAccountIcon {
+        width: 16px;
+        aspect-ratio: 1;
+        margin-right: 5px;
+    }
+
+    #usernameIcon,
+    #emailIcon,
+    #passwordIcon,
+    #passwordConfirmIcon {
+        display: none;
+    }
+
+    #bottomBar {
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    #errorText {
+        margin-left: 20px;
+        text-align: center;
+        color: rgb(150, 65, 65);
+        opacity: 0;
+    }
+</style>
+
+<body>
+    <div id="createAccountWindow">
+        <div id="createAccount">
+            <h2>CREATE ACCOUNT</h2>
+            <div id="inputBg">
+                <input type="text" id="username" name="username" placeholder="username" minlength="6" maxlength="32"
+                    autocomplete="off" spellcheck="false" autofocus>
+                <img id="usernameIcon" class="createAccountIcon" src="../../style/icons/x.svg" alt="">
+            </div>
+            <div id="inputBg">
+                <input type="text" id="email" name="email" placeholder="email" autocomplete="off" spellcheck="false">
+                <img id="emailIcon" class="createAccountIcon" src="../../style/icons/x.svg" alt="">
+            </div>
+            <div id="inputBg">
+                <input type="password" id="password" name="password" placeholder="password" autocomplete="off"
+                    spellcheck="false">
+                <img id="passwordIcon" class="createAccountIcon" src="../../style/icons/x.svg" alt="">
+            </div>
+            <div id="inputBg">
+                <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="confirm password"
+                    autocomplete="off" spellcheck="false">
+                <img id="passwordConfirmIcon" class="createAccountIcon" src="../../style/icons/x.svg" alt="">
+            </div>
+            <div id="bottomBar">
+                <button class="clearButton" id="createAccountButton" type="submit">create account</button>
+                <p id="errorText">error</p>
+            </div>
+        </div>
+    </div>
+
+</body>

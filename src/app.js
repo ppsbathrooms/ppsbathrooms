@@ -218,6 +218,11 @@ app.get('/schools', (req, res) => {
   pageVisited();
 });
 
+app.get('/createAccount', (req, res) => {
+  res.render('html/admin/createAccount.html');
+  pageVisited();
+});
+
 app.get('/admin', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
