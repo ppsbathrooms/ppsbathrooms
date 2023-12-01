@@ -100,7 +100,7 @@ function setupButtons() {
             numBathrooms = 35;
             break;
         case 'ihs':
-            numBathrooms = 5;
+            numBathrooms = 10;
             break;
     }
 
