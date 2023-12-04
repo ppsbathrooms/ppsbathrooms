@@ -738,7 +738,7 @@ html::-webkit-scrollbar {
         overflow-y: scroll;
     }
     .mapSvg {
-        width: 80vw;
+        width: 90vw;
         margin-bottom: 25px;
     }
     #helpMap {
