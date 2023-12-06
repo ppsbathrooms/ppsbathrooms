@@ -76,7 +76,7 @@ window.onpopstate = function()
 
     isSchoolPickPage = (newPage == '/') ? true: false;
     if(isSchoolPickPage) {
-        document.title = "ppsbathrooms | home";
+        document.title = "ppsbathrooms";
         $("#pageID").html('school');
         $('.map').html('');
         $('.schoolChoice').css('display', 'flex');

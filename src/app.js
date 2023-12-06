@@ -198,6 +198,11 @@ app.get('/help', (req, res) => {
   pageVisited();
 });
 
+app.get('/about', (req, res) => {
+  res.render('html/about.html');
+  pageVisited();
+});
+
 app.get('/contact', (req, res) => {
   res.render('html/contact.html');
   pageVisited();

@@ -31,6 +31,23 @@ html::-webkit-scrollbar {
     width: 0px;
 }
 
+.clearButton {
+    color: #fff;
+    border: none;
+    background: transparent;
+    border: 1px solid #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: barlowBold;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color .25s;
+}
+
+.clearButton:hover {
+    color: #bbb;
+    transition: color .25s;
+}
 
 #icon24 {
     width:  24px;
@@ -46,8 +63,8 @@ html::-webkit-scrollbar {
     width: 25px;
     height: 25px;
     position: fixed;
-    right: 15px;
-    top: 15px;
+    right: 25px;
+    top:   25px;
     -webkit-transform: rotate(0deg);
     -moz-transform: rotate(0deg);
     -o-transform: rotate(0deg);
@@ -125,6 +142,7 @@ html::-webkit-scrollbar {
 #mapHolder {
     position: absolute;
     left: 0px;
+    top: 100px;
     display: flex;
     justify-content: center;
     width: 100%;
@@ -705,6 +723,29 @@ html::-webkit-scrollbar {
     aspect-ratio: 1;
 }
 
+.header {
+    height: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    z-index: 2;
+    display: flex;
+    background: var(--background);
+}
+
+#logo {
+    width: 300px;
+    cursor: pointer;
+    height: 75px;
+    margin-left: 30px;
+}
+
+svg#logo {
+    z-index: 5;
+}
+
 /* double id to make it marked as important */
 #popupError#popupError {
     font-size: 12px;
@@ -733,6 +774,11 @@ html::-webkit-scrollbar {
     }
 }
 
+@media (max-width: 420px) {
+    #logo {
+        width: 150px;
+    }
+}
 @media (max-width: 800px) {
     #navbarBackground {
         overflow-y: scroll;

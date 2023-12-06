@@ -12,18 +12,18 @@
 </head>
 
 <body>
-    <div id="navbar"></div>
+    <div class="header"></div>
 
     <p id="pageID">contact</p>
 
     <div id="contactHolder">
         <h1>contact us</h1>
         <div id="contactIconHolder">
-            <a target="_blank" href="mailto:ppsbathrooms@gmail.com"><img id="icon24" src="../style/icons/email.svg"></a>
+            <a id="contactEmail" target="_blank" href="mailto:ppsbathrooms@gmail.com">ppsbathrooms@gmail.com</a><br><br>
             <a target="_blank" href="https://www.instagram.com/ppsbathrooms/"><img id="icon24"
                     src="../style/icons/instagram.svg"></a>
             <a target="_blank" href="https://discord.gg/qwY9258CNA"><img id="icon24"
-                    src="../style/icons/discord.svg"></a>
+                    src="../style/icons/discord.svg"></a><br><br>
         </div>
     </div>
 
@@ -33,5 +33,21 @@
 <script src="../js/htmlInsert.js"></script>
 <script src="../js/selectSchool.js"></script>
 <script src="../js/update.js"></script>
+<style>
+    #contactEmail {
+        color: #fff;
+        font-family: monospace;
+        font-size: 20px;
+        text-decoration: none;
+    }
+
+    #contactHolder {
+        font-family: barlowBold;
+    }
+
+    #contactHolder a {
+        margin: 10px;
+    }
+</style>
 
 </html>

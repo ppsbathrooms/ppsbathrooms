@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../style/style.css">
+
+    <script src="../thirdParty/jquery.min.js"></script>
+    <title>ppsbathrooms | about</title>
+</head>
+
+<style>
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    #aboutTopImageHolder {
+        overflow-x: hidden;
+        width: 100vw;
+        filter: brightness(80%);
+        user-select: none;
+        display: flex;
+        justify-content: center;
+    }
+
+    #aboutTopImage {
+        width: 100%;
+        align-items: center;
+        margin-top: 120px;
+    }
+
+    #aboutHeader {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        font-family: barlowBold;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    #about {
+        position: fixed;
+        left: 60px;
+        right: 60px;
+        border: 1px solid white;
+        top: 20px;
+    }
+
+    #aboutSlogan {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        top: 200px;
+        align-items: center;
+        flex-direction: column;
+        color: #fff;
+        font-size: 32px;
+        text-align: center;
+    }
+
+    #aboutSlogan button {
+        margin-top: 10px;
+        font-size: 22px;
+        filter: drop-shadow(0px 0px 4px #000);
+    }
+
+    #aboutBody {
+        margin-top: -120px;
+        position: absolute;
+        color: #fff;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #aboutBody img {
+        width: 45vw;
+        height: auto;
+        max-height: 100%;
+        object-fit: contain;
+        user-select: none;
+    }
+
+    #aboutBody div {
+        display: flex;
+        width: 80vw;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+
+    #aboutBody div div {
+        width: 40vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #aboutBody p {
+        font-size: 20px;
+    }
+
+    #aboutBody h1 {
+        font-family: barlowBold;
+    }
+
+    @media (max-width: 1000px) {
+        #aboutBody {
+            margin-top: 0px;
+        }
+
+        #aboutBody div {
+            width: 90vw;
+        }
+
+        #aboutBody img {
+            width: 45vw;
+        }
+
+        #aboutSlogan {
+            font-size: 24px;
+        }
+    }
+
+    @media (max-width: 650px) {
+        #aboutBody img {
+            width: 80vw;
+        }
+
+        #aboutBody div {
+            flex-direction: column;
+        }
+
+        #aboutBodyLeft {
+            display: flex;
+            flex-direction: column-reverse !important;
+            align-items: center !important;
+        }
+
+        #aboutBodyRight {
+            flex-direction: column !important;
+        }
+
+        #aboutBody div div {
+            width: 100%;
+        }
+
+        #aboutSlogan {
+            font-size: 16px;
+            top: 100px;
+        }
+
+        #aboutSlogan h2 {
+            width: 50vw;
+        }
+
+        #aboutTopImage {
+            /* transform: scale(1.5); */
+            width: 150%;
+        }
+    }
+</style>
+
+<body>
+    <div class="header"></div>
+    <p id="pageID">about</p>
+    <div id="aboutTopImageHolder">
+        <img id="aboutTopImage" src="../style/images/about/allBathrooms.png">
+    </div>
+
+    <div id="aboutSlogan">
+        <h2>real time bathroom availability</h2>
+        <button onclick="location.href = '/contact';" class="clearButton">contact us</button>
+    </div>
+
+    <div id="aboutBody">
+        <div id="aboutBodyLeft">
+            <div class="aboutText">
+                <h1>simple fast data for students</h1>
+                <p>ppsbathrooms provides real time data on the availability of bathrooms at high schools across portland
+                    public schools. </p>
+                <p>each bathroom has a coorisponding square next to it. green represents an open bathroom, and red
+                    represents a bathroom that has been closed.</p>
+            </div>
+            <img src="../style/images/about/openClosed.png">
+        </div>
+        <div id="aboutBodyRight">
+            <img src="../style/images/about/allSchools.png">
+            <div class="aboutText">
+                <h1>multi school coverage</h1>
+                <p>ppsbathrooms has real time coverage for three high schools in the portland public schools area,
+                    cleveland high school, franklin high school and ida b wells high school. </p>
+            </div>
+        </div>
+        <div id="aboutBodyLeft">
+            <div class="aboutText">
+                <h1>updating bathrooms</h1>
+                <p>bathrooms are updated by users who have been verified by us. </p>
+                <p>when clicking on a bathroom or its coorisponding square, a button appears in the bottom right corner
+                    of the screen. this will prompt you to enter a password to update the bathrooms you have selected.
+                    if you would like to
+                    be a part of the team of students that update bathroom statuses, please contact us here.<a
+                        style="color: #fff;" href="/contact">here</a>.</p>
+            </div>
+            <img src="../style/images/about/password.png">
+        </div>
+        <div id="aboutBodyRight">
+            <img src="../style/images/about/hallway.png">
+            <div class="aboutText">
+                <h1>a tool to keep students in class</h1>
+                <p>with bathrooms constantly closed due to vandalism or smoking, students spend so much time outside of
+                    class trying to find an open bathroom.</p>
+                <p>ppsbathrooms fixes this issue, providing students with a resource that eliminates the need to go
+                    from floor to floor searching for a bathroom.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="footer"></div>
+
+</body>
+<script src="../js/htmlInsert.js"></script>
+<script src="../js/selectSchool.js"></script>
+<script src="../js/update.js"></script>
+
+</html>
