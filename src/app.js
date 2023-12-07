@@ -250,60 +250,64 @@ app.get('/admin', async (req, res) => {
   }
 
   else {
+    if(req.session.userAccess == 2) {
+      res.render('html/studentDash.html')
+    } else {
 // #region admin data
-    const brData = await db.collection('data').findOne({ _id: 'schoolData'});
+      const brData = await db.collection('data').findOne({ _id: 'schoolData'});
 
-    const brUpdates = await db.collection('bathrooms').find({}).toArray();
-    const formattedBrUpdates = brUpdates
-      .reverse()
-      .map(entry => `${entry.time} ${' | '} ${entry.school} ${entry.numChanged} ${' bathrooms updated'}`)
-      .join('<br>');
+      const brUpdates = await db.collection('bathrooms').find({}).toArray();
+      const formattedBrUpdates = brUpdates
+        .reverse()
+        .map(entry => `${entry.time} ${' | '} ${entry.school} ${entry.numChanged} ${' bathrooms updated'}`)
+        .join('<br>');
 
-    const feedback = await db.collection('feedback').find({}).toArray();
-    const formattedFeedback = feedback
-      .reverse()
-      .map(entry => `${entry.time} ${' | '} ${entry.value}`)
-      .join('<br>');
+      const feedback = await db.collection('feedback').find({}).toArray();
+      const formattedFeedback = feedback
+        .reverse()
+        .map(entry => `${entry.time} ${' | '} ${entry.value}`)
+        .join('<br>');
 
-    const adminData = await db.collection('adminlogins').find({}).toArray();
-    const formattedAdminData = adminData
-      .filter(entry => entry.ip !== '127.0.0.1')
-      .reverse()
-      .map(entry => `${entry.time} ${entry.value ? `| ${entry.value}` : ''} ${' | '} ${entry.ip}`)
-      .join('<br>');
+      const adminData = await db.collection('adminlogins').find({}).toArray();
+      const formattedAdminData = adminData
+        .filter(entry => entry.ip !== '127.0.0.1')
+        .reverse()
+        .map(entry => `${entry.time} ${entry.value ? `| ${entry.value}` : ''} ${' | '} ${entry.ip}`)
+        .join('<br>');
 
-    const users = await db.collection('users').find({}).toArray();
-// #endregion
+      const users = await db.collection('users').find({}).toArray();
+  // #endregion
 
-    let dataToSend = {
-      navItems: ['Logs', 'Schools', 'Dashboard'],
-      feedback: formattedFeedback,
-      brUpdates: formattedBrUpdates,
-      styleData: await readFile('admin/adminStyle.css'),
-      username: req.session.username,
-      schoolData: brData,
-      schoolJs: await readFile('admin/inserts/school.js'),
-      schoolHtml: await readFile('admin/inserts/schools.html'),
-    };
-    if (req.session.userAccess === '0') {
-      dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard']
-      dataToSend.adminData = formattedAdminData;
-      dataToSend.users = users;
+      let dataToSend = {
+        navItems: ['Logs', 'Schools', 'Dashboard'],
+        feedback: formattedFeedback,
+        brUpdates: formattedBrUpdates,
+        styleData: await readFile('admin/adminStyle.css'),
+        username: req.session.username,
+        schoolData: brData,
+        schoolJs: await readFile('admin/inserts/school.js'),
+        schoolHtml: await readFile('admin/inserts/schools.html'),
+      };
+      if (req.session.userAccess === '0') {
+        dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard']
+        dataToSend.adminData = formattedAdminData;
+        dataToSend.users = users;
 
-      dataToSend.adminJs = await readFile('admin/inserts/admin.js');
-      dataToSend.adminHtml = await readFile('admin/inserts/admin.html');
-    }
-    
-    fs.readFile('admin/admindash.html', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading file:', err);
-        res.status(500).send('Internal server error');
-      } else {
-        const modifiedHTML = injectDataIntoHTML(data, dataToSend);
-
-        res.send(modifiedHTML);
+        dataToSend.adminJs = await readFile('admin/inserts/admin.js');
+        dataToSend.adminHtml = await readFile('admin/inserts/admin.html');
       }
-    });
+      
+      fs.readFile('admin/admindash.html', 'utf8', (err, data) => {
+        if (err) {
+          console.error('Error reading file:', err);
+          res.status(500).send('Internal server error');
+        } else {
+          const modifiedHTML = injectDataIntoHTML(data, dataToSend);
+
+          res.send(modifiedHTML);
+        }
+      });
+    }
   }
 });
 
@@ -340,6 +344,72 @@ app.get('*', (req, res) => {
 // #endregion
 
 // #region Posts
+
+app.post('/createAccount', async (req, res) => {
+  const { username, email, password } = req.body;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const existingUser = await userColl.findOne({ username: username });
+  const existingEmail = await userColl.findOne({ email: email });
+  const highestKeyUser = await userColl.findOne({}, { sort: { key: -1 } });
+  let nextKey = '99999';
+
+  if (highestKeyUser && highestKeyUser.key) {
+    const currentKey = parseInt(highestKeyUser.key, 10);
+    nextKey = (currentKey + 1).toString().padStart(5, '0');
+  }
+
+  const newUserInfo = {
+    username: username,
+    password: await hashPassword(password),
+    access: '2',
+    key: nextKey,
+    email: email
+  };
+  
+  usernameHasText = (username != '') 
+  passwordHasText = (password != '') 
+  
+  if((username == '') || (password == '') || (email == '')) {
+    res.json({ status: -1, error: 'all input fields must be filled'});
+  }
+  else if (usernameHasText && username.includes(' ')) {
+    res.json({ status: -1, error: 'username can\'t have spaces'});
+  }
+  else if (usernameHasText && username.replace(/\s/g, '').length < 5) {
+    res.json({ status: -1, error: 'username is too short'});
+  }
+  else if (!emailRegex.test(email)) {
+    res.json({ status: -1, error: 'enter a valid email address'});
+  }
+  else if (password.length < 6) {
+    res.json({ status: -1, error: 'password is too short'});
+  }
+  else if(existingUser) {
+    res.json({ status: 0, error: `username '${username}' is taken`});
+  }
+  else if(existingEmail) {
+    res.json({ status: 0, error: `email is taken`});
+  }
+  else {
+    try {
+      await userColl.insertOne(newUserInfo);
+      console.log(`new user created '${username}'`);
+      res.json({ status: 1});
+    } catch (error) {
+      console.error('Error creating new user:', error);
+    }
+  }
+});
+
+async function hashPassword(password) {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+    return hashedPassword;
+  } catch (error) {
+    console.error('Error occurred while hashing:', error);
+    throw error;
+  }
+}
 
 app.post('/admin', async (req, res) => {
   const { username, password } = req.body;
@@ -523,6 +593,7 @@ function injectDataIntoHTML(htmlContent, data) {
                           <select name="access" class="userAccess" id="access${user._id}">
                               <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
                               <option value="1" ${user.access==1 ? ' selected' : '' }>admin</option>
+                              <option value="2" ${user.access==2 ? ' selected' : '' }>student</option>
                               <option value="-1" ${user.access==-1 ? ' selected' : '' }>blocked</option>
                           </select>
                         </div>

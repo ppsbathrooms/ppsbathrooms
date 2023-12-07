@@ -132,7 +132,7 @@
 </style>
 
 <body>
-    
+
     <div id="loginWindow">
         <h2>LOGIN</h2>
         <form id="loginForm">
@@ -178,7 +178,7 @@
     });
 
     function failedAuth(status) {
-        text = (status == 0) ? 'authentication failed' : 'account banned';
+        text = (status == 0) ? 'authentication failed' : 'account blocked';
         $('#wrongPass').html(text);
 
         $('#loginForm')[0].reset();

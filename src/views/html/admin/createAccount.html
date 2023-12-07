@@ -7,7 +7,6 @@
     <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
 
     <script src="../thirdParty/jquery.min.js"></script>
-    <script src="html/admin/createAccount.js"></script>
     <title>ppsbathrooms | create account</title>
 </head>
 
@@ -21,6 +20,22 @@
         background: #0a0c15;
         font-family: monospace;
         overflow: hidden;
+    }
+
+    .redBorder {
+        animation: redBorderFade .5s ease forwards;
+    }
+
+    @keyframes redBorderFade {
+        0% {
+            border-color: red;
+            color: red;
+        }
+
+        100% {
+            border-color: #fff;
+            color: #fff;
+        }
     }
 
     #createAccountWindow {
@@ -74,8 +89,7 @@
     }
 
     .clearButton:hover {
-        color: #bbb;
-        transition: color .25s;
+        opacity: .9;
     }
 
     #inputBg {
@@ -149,3 +163,4 @@
     </div>
 
 </body>
+<script src="html/admin/createAccount.js"></script>
