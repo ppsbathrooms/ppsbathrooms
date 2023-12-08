@@ -39,7 +39,12 @@
     }
 
     #createAccountWindow {
-        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0;
+        margin: 0;
+        width: 100vw;
         height: 100%;
         position: absolute;
         display: flex;
@@ -128,6 +133,12 @@
         text-align: center;
         color: rgb(150, 65, 65);
         opacity: 0;
+    }
+
+    @media (max-width: 800px) {
+        #createAccount {
+            border: none;
+        }
     }
 </style>
 

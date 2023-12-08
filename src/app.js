@@ -358,8 +358,8 @@ app.get('*', (req, res) => {
 app.post('/createAccount', async (req, res) => {
   const { username, email, password } = req.body;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const existingUser = await userColl.findOne({ username: username });
-  const existingEmail = await userColl.findOne({ email: email });
+  const existingUser = await userColl.findOne({ username: { $regex: new RegExp(username, 'i') } });
+  const existingEmail = await userColl.findOne({ email: { $regex: new RegExp(email, 'i') } });
   const highestKeyUser = await userColl.findOne({}, { sort: { key: -1 } });
   let nextKey = '99999';
 
@@ -395,7 +395,7 @@ app.post('/createAccount', async (req, res) => {
     res.json({ status: -1, error: 'password is too short'});
   }
   else if(existingUser) {
-    res.json({ status: 0, error: `username '${username}' is taken`});
+    res.json({ status: 0, error: `username '${username.toLowerCase()}' is taken`});
   }
   else if(existingEmail) {
     res.json({ status: 0, error: `email is taken`});
@@ -424,7 +424,7 @@ async function hashPassword(password) {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = await userColl.findOne({ username });
+    const user = await userColl.findOne({ username: { $regex: new RegExp(username, 'i') } });
     if (user) {
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {

@@ -68,6 +68,12 @@ function checkInputs() {
   return allHaveText;
 }
 
+$(document).on('keypress',function(e) {
+    if(e.which == 13) {
+        $('#createAccountButton').click();
+    }
+});
+
 $('#createAccountButton').click(e => {
     if(checkInputs() && errors.length == 0) {
         $.ajax({
