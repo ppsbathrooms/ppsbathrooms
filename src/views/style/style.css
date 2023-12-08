@@ -304,6 +304,25 @@ html::-webkit-scrollbar {
     margin-bottom: 15px;
 }
 
+#navbarNewAccount {
+    font-size: 14px;
+    position: sticky;
+    bottom: 100px;
+    display: flex;
+    margin-top: 15px;
+    margin-left: auto;
+    justify-content: center;
+    text-decoration: none;
+    color: #999;
+    width: 100%;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+#navbarNewAccount:hover {
+    opacity: .8;
+}
+
 #navButtonsBottom {
     width: 200px;
     position: sticky;

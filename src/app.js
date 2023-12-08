@@ -224,16 +224,26 @@ app.get('/schools', (req, res) => {
 });
 
 app.get('/createAccount', (req, res) => {
-  res.render('html/admin/createAccount.html');
+  res.render('html/login/createAccount.html');
   pageVisited();
 });
 
-app.get('/admin', async (req, res) => {
+app.get('/login', (req, res) => {
+  if(req.session.authenticated) {
+    res.redirect('/account')
+  }
+  else {
+  res.render('html/login/login.html');
+  }
+  pageVisited();
+});
+
+app.get('/account', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
   
   if(!req.session.authenticated) {
-    res.sendFile(__dirname + '/views/html/admin/login.html');
+    res.sendFile(__dirname + '/views/html/login/login.html');
     return;
   }
   if(!user) {
@@ -251,7 +261,7 @@ app.get('/admin', async (req, res) => {
 
   else {
     if(req.session.userAccess == 2) {
-      res.render('html/studentDash.html')
+      res.render('html/login/studentDash.html')
     } else {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
@@ -331,9 +341,9 @@ app.get('/pageVisits', async (req, res) => {
   }
 });
 
-app.get('/admin/logout', (req, res) => {
+app.get('/logout', (req, res) => {
   req.session.authenticated = false;
-  res.redirect('/admin');
+  res.redirect('/login');
 });
 
 //404 keep at end of redirects
@@ -375,7 +385,7 @@ app.post('/createAccount', async (req, res) => {
   else if (usernameHasText && username.includes(' ')) {
     res.json({ status: -1, error: 'username can\'t have spaces'});
   }
-  else if (usernameHasText && username.replace(/\s/g, '').length < 5) {
+  else if (username.replace(/\s/g, '').length < 5 || username.replace(/\s/g, '').length > 24) {
     res.json({ status: -1, error: 'username is too short'});
   }
   else if (!emailRegex.test(email)) {
@@ -411,7 +421,7 @@ async function hashPassword(password) {
   }
 }
 
-app.post('/admin', async (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await userColl.findOne({ username });
@@ -588,7 +598,7 @@ function injectDataIntoHTML(htmlContent, data) {
                 <div class="user">
                     <div class="userTop">
                         <p class="adminUsername" id="userUsername${user._id}">${user.username}</p>
-                        <div>
+                        <div style="display: flex; justify-content: center;">
                           <h3>access</h3>
                           <select name="access" class="userAccess" id="access${user._id}">
                               <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>

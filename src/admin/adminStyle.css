@@ -196,6 +196,9 @@ body img {
     filter: brightness(80%);
 }
 
+#admin {
+    margin-bottom: 200px;
+}
 
 #dashboard, #schools, #admin {
     display: none;

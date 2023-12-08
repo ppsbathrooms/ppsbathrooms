@@ -84,7 +84,7 @@ $('#createAccountButton').click(e => {
                         showError(response.error); 
                         break;
                     case 1:
-                        window.location.href = '/admin';
+                        window.location.href = '/login';
                         break;
                 }
             },

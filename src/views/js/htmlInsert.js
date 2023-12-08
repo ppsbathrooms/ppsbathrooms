@@ -54,9 +54,10 @@ $('.header').html(
             </div> 
             <div id="navLoginContainer"> 
                 <button id="navbarLoginButton" type="submit">login</button> 
-            </div> 
-          </form> 
+            </div>
+          </form>
         </div> 
+        <a href="/createaccount" id="navbarNewAccount">create account</a>
         <div id="navButtonsBottom"> 
           <a href="/help">help</a> 
           <a href="/contact">contact</a> 
@@ -102,6 +103,8 @@ $('#navbarSignIn').click(function() {
       block: "start"
   });
 
+  $("#navbarNewAccount").animate({opacity: 1}, 400);
+
   if($(window).width() > 800) {
     $('#username').focus();
   }
@@ -111,6 +114,7 @@ $("#navbarButton").click(function(){
   if(!$(this).hasClass('open')) {
     resetSignIn();
     $('#navbarBackground').scrollTop(0);
+    $("#navbarNewAccount").css('opacity', '0');
   }
   var rightValue = $('#navbarBackground').css('right');
   $(this).toggleClass('open');
