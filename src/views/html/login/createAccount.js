@@ -68,6 +68,12 @@ function checkInputs() {
   return allHaveText;
 }
 
+$(document).on('keypress',function(e) {
+    if(e.which == 13) {
+        $('#createAccountButton').click();
+    }
+});
+
 $('#createAccountButton').click(e => {
     if(checkInputs() && errors.length == 0) {
         $.ajax({
@@ -84,7 +90,7 @@ $('#createAccountButton').click(e => {
                         showError(response.error); 
                         break;
                     case 1:
-                        window.location.href = '/admin';
+                        window.location.href = '/login';
                         break;
                 }
             },

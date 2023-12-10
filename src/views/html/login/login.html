@@ -7,7 +7,7 @@
     <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
 
     <script src="../thirdParty/jquery.min.js"></script>
-    <title>ppsbathrooms | admin</title>
+    <title>ppsbathrooms | login</title>
 </head>
 
 <style>
@@ -29,7 +29,7 @@
     #loginWindow {
         margin-top: 20vh;
         width: 300px;
-        height: 215px;
+        height: fit-content;
         background: none;
         border: 1px solid white;
         padding: 5px 15px 5px 15px;
@@ -64,6 +64,7 @@
         cursor: pointer;
         font-size: 16px;
         transition: color .25s;
+        white-space: nowrap;
     }
 
     .clearButton:hover {
@@ -97,15 +98,29 @@
         color: #696E7E;
     }
 
+    .link {
+        display: flex;
+        margin-top: 20px;
+        margin-left: auto;
+        justify-content: right;
+        text-decoration: none;
+        color: #bbb;
+        transition: .2s;
+        margin-bottom: 10px;
+    }
+
+    .link:hover {
+        opacity: .8;
+    }
+
     #wrongPass {
-        color: red;
+        color: rgb(150, 65, 65);
         display: inline-block;
         margin: 0;
         padding: 0;
         opacity: 0;
-        font-size: 12px;
+        font-size: 14px;
         font-family: barlowBold;
-        text-transform: uppercase;
         width: 175px;
         text-align: center;
     }
@@ -132,7 +147,6 @@
 </style>
 
 <body>
-
     <div id="loginWindow">
         <h2>LOGIN</h2>
         <form id="loginForm">
@@ -143,11 +157,11 @@
                 <input type="password" id="password" name="password" placeholder="password" autocomplete="off">
             </div>
             <button class="clearButton" id="submitButton" type="submit">login</button>
-            <p id="wrongPass">authorization failed</p>
+            <p id="wrongPass">authorization failed</p><br>
+            <a class="link" href="/createaccount">create account</a>
         </form>
     </div>
     <a href="/" id="return">return</a>
-
 </body>
 
 <script>
@@ -160,13 +174,13 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: '/admin',
+                    url: '/login',
                     data: formData,
                     success: function (response) {
                         if (response.status < 1) {
                             failedAuth(response.status);
                         } else {
-                            location.href = '/admin';
+                            location.href = '/account';
                         }
                     },
                     error: function (xhr, status, error) {
@@ -178,7 +192,7 @@
     });
 
     function failedAuth(status) {
-        text = (status == 0) ? 'authentication failed' : 'account blocked';
+        text = (status == 0) ? 'incorrect login' : 'account blocked';
         $('#wrongPass').html(text);
 
         $('#loginForm')[0].reset();

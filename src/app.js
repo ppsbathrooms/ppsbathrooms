@@ -224,16 +224,26 @@ app.get('/schools', (req, res) => {
 });
 
 app.get('/createAccount', (req, res) => {
-  res.render('html/admin/createAccount.html');
+  res.render('html/login/createAccount.html');
   pageVisited();
 });
 
-app.get('/admin', async (req, res) => {
+app.get('/login', (req, res) => {
+  if(req.session.authenticated) {
+    res.redirect('/account')
+  }
+  else {
+  res.render('html/login/login.html');
+  }
+  pageVisited();
+});
+
+app.get('/account', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
   
   if(!req.session.authenticated) {
-    res.sendFile(__dirname + '/views/html/admin/login.html');
+    res.sendFile(__dirname + '/views/html/login/login.html');
     return;
   }
   if(!user) {
@@ -251,7 +261,7 @@ app.get('/admin', async (req, res) => {
 
   else {
     if(req.session.userAccess == 2) {
-      res.render('html/studentDash.html')
+      res.render('html/login/studentDash.html')
     } else {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
@@ -284,6 +294,7 @@ app.get('/admin', async (req, res) => {
         brUpdates: formattedBrUpdates,
         styleData: await readFile('admin/adminStyle.css'),
         username: req.session.username,
+        userId: req.session._id,
         schoolData: brData,
         schoolJs: await readFile('admin/inserts/school.js'),
         schoolHtml: await readFile('admin/inserts/schools.html'),
@@ -331,9 +342,9 @@ app.get('/pageVisits', async (req, res) => {
   }
 });
 
-app.get('/admin/logout', (req, res) => {
+app.get('/logout', (req, res) => {
   req.session.authenticated = false;
-  res.redirect('/admin');
+  res.redirect('/login');
 });
 
 //404 keep at end of redirects
@@ -348,8 +359,8 @@ app.get('*', (req, res) => {
 app.post('/createAccount', async (req, res) => {
   const { username, email, password } = req.body;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const existingUser = await userColl.findOne({ username: username });
-  const existingEmail = await userColl.findOne({ email: email });
+  const existingUser = await userColl.findOne({ username: { $regex: new RegExp(username, 'i') } });
+  const existingEmail = await userColl.findOne({ email: { $regex: new RegExp(email, 'i') } });
   const highestKeyUser = await userColl.findOne({}, { sort: { key: -1 } });
   let nextKey = '99999';
 
@@ -375,7 +386,7 @@ app.post('/createAccount', async (req, res) => {
   else if (usernameHasText && username.includes(' ')) {
     res.json({ status: -1, error: 'username can\'t have spaces'});
   }
-  else if (usernameHasText && username.replace(/\s/g, '').length < 5) {
+  else if (username.replace(/\s/g, '').length < 5 || username.replace(/\s/g, '').length > 24) {
     res.json({ status: -1, error: 'username is too short'});
   }
   else if (!emailRegex.test(email)) {
@@ -385,7 +396,7 @@ app.post('/createAccount', async (req, res) => {
     res.json({ status: -1, error: 'password is too short'});
   }
   else if(existingUser) {
-    res.json({ status: 0, error: `username '${username}' is taken`});
+    res.json({ status: 0, error: `username '${username.toLowerCase()}' is taken`});
   }
   else if(existingEmail) {
     res.json({ status: 0, error: `email is taken`});
@@ -411,10 +422,10 @@ async function hashPassword(password) {
   }
 }
 
-app.post('/admin', async (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = await userColl.findOne({ username });
+    const user = await userColl.findOne({ username: { $regex: new RegExp(username, 'i') } });
     if (user) {
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
@@ -443,7 +454,7 @@ app.post('/admin', async (req, res) => {
 
 //recieve post request, send update
 app.post('/updatePassword', async function(req, res) {
-  if(req.session.authenticated) {
+  if(req.session.authenticated && hasAccess('updatePassword', req.session.userAccess)) {
     school = req.body.school;
     currentPass = req.body.currentPass;
     newPass = req.body.newPass;
@@ -465,19 +476,19 @@ app.post('/updatePassword', async function(req, res) {
 });
 
 app.post('/updateUser', async function(req, res) {
-  if (req.session.authenticated) {
+  if (req.session.authenticated && hasAccess('updateUser', req.session.userAccess)) {
     const id = req.body.id;
     const objectId = ObjectId(id);
     const valueName = req.body.valueName;
-    const newValue = req.body.newValue;
+    var newValue = req.body.newValue;
 
-    const user = await db.collection('users').findOne({ _id: objectId });
+    const user = await db.collection('users').findOne({ _id: objectId }); 
 
     if(id === req.session._id) {
-      console.log('same session')
       req.session.userAccess = newValue;
       req.session.save();
     }
+
     if (user) {
       const updateQuery = { $set: { [valueName]: newValue } };
 
@@ -488,7 +499,6 @@ app.post('/updateUser', async function(req, res) {
     }
   }
 });
-
 
 app.post('/bathroomUpdate', async function(req, res) {
   try {
@@ -504,7 +514,7 @@ app.post('/bathroomUpdate', async function(req, res) {
 
     var neededPassword = schoolData.password;
 
-    if (req.session.authenticated && providedPassword === 'c2fRCdYotZ') {
+    if (req.session.authenticated && providedPassword === 'c2fRCdYotZ' && hasAccess('multiBathroomUpdate', req.session.userAccess)) {
       res.json({ isCorrect: true });
       setBrData(school, values, req);
     } else {
@@ -588,7 +598,7 @@ function injectDataIntoHTML(htmlContent, data) {
                 <div class="user">
                     <div class="userTop">
                         <p class="adminUsername" id="userUsername${user._id}">${user.username}</p>
-                        <div>
+                        <div style="display: flex; justify-content: center;">
                           <h3>access</h3>
                           <select name="access" class="userAccess" id="access${user._id}">
                               <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
@@ -603,7 +613,7 @@ function injectDataIntoHTML(htmlContent, data) {
                           <h3>key</h3>
                           <p id="userKey${user._id}">#${user.key}</p>
                         </div>
-                        <button id="togglePerms${user._id}" class="clearButton">EDIT PERMISSIONS</button>
+                        <button id="togglePerms${user._id}" class="clearButton">more</button>
                     </div>
                     <div id="editPerms${user._id}" class="editPerms">` +
                       // <div class="changeUserPass" id="changePass${user._id}">
@@ -612,9 +622,9 @@ function injectDataIntoHTML(htmlContent, data) {
                       //   </div>
                       //   <button class="clearButton smallerButton">CHANGE PASSWORD</button>
                       // </div>
-                      `<p>option 1</p>
-                      <p>option 2</p>
-                      <p>option 3</p>
+                      `<div>
+                        <p>email : ${user.email}</p>                      
+                      </div>
                     </div>
                 </div>
       `;
@@ -661,6 +671,7 @@ function injectDataIntoHTML(htmlContent, data) {
     .replace('{{style}}', '<style>' + data.styleData + '</style>')
     .replace('{{username}}', data.username)
     .replace('{{admin}}', adminInsert)
+    .replace('{{id}}', data.userId)
     .replace('{{userList}}', userInfo)
     .replace('{{adminJs}}', adminJsInsert)
     .replace('{{userData}}', JSON.stringify(data.users))
@@ -675,6 +686,28 @@ function injectDataIntoHTML(htmlContent, data) {
       <p id="ihsData">${ihsData}</p>
     </div>`)
   return modifiedHTML;
+}
+
+function hasAccess(name, access) {
+  // post request access levels
+  const owner = ['updateUser', 'updatePassword', 'multiBathroomUpdate'];
+  const admin = ['updatePassword', 'multiBathroomUpdate'];
+  const student = [];
+
+  let userAccess;
+  switch (Number(access)) {
+    case 0:
+      userAccess = owner;
+      break;
+    case 1:
+      userAccess = admin;
+      break;
+    case 2:
+      userAccess = student;
+      break;
+  }
+  allowed = userAccess.includes(name)
+  return allowed;
 }
 
 async function dbEntry(request, collectionName, value, school, numChanged) {

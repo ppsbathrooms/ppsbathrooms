@@ -314,13 +314,13 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         $.ajax({
         type: 'POST',
-        url: '/admin',
+        url: '/login',
         data: formData,
         success: function(response) {
             if(response.status < 1) {
                 failedAuth()
             } else {
-                location.href = '/admin'
+                location.href = '/account'
             }
         },
         error: function(xhr, status, error) {
