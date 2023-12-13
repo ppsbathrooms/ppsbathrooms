@@ -90,7 +90,8 @@ $('#createAccountButton').click(e => {
                         showError(response.error); 
                         break;
                     case 1:
-                        window.location.href = '/login';
+                        $('#createAccount').hide();
+                        $('#verifyEmail').fadeIn();
                         break;
                 }
             },

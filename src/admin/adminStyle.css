@@ -198,10 +198,10 @@ body img {
 }
 
 #admin {
-    margin-bottom: 200px;
+    margin-bottom: 150px;
 }
 
-#dashboard, #schools, #admin {
+#dashboard, #schools, #admin, #account {
     display: none;
 }
 
@@ -291,7 +291,7 @@ body img {
     padding-top: 20px;
 }
 
-.user h3 {
+.user h4 {
     display: none;
 }
 
@@ -333,7 +333,7 @@ body img {
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid white;
-    width: 1000px;
+    width: 900px;
 }
 
 #adminTopTitle p {
@@ -368,7 +368,6 @@ body img {
 }
 
 .editPerms p, .editPerms button {
-    text-align: center;
     margin: 0;
     margin-bottom: 10px;
 }
@@ -430,7 +429,7 @@ body img {
     }
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1150px) {
     .userTop {
         flex-direction: column;
     }
@@ -440,29 +439,29 @@ body img {
     }
 
     .user {
-        width: calc(100% - 30px);
         align-items: center;
-        /* border: 1px solid white; */
         margin-right: 20px;
         margin-bottom: 20px;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .userTop button {
         margin-top: 10px;
     }
 
-    .user h3, .user p, .userTop select {
+    .user h4, .user p, .userTop select {
         display: block;
         width: 100%;
-        text-align: center;
+        text-align: left;
         margin: 0;
-        margin-top: 5px;
         margin-bottom: 5px;
     }
 
     .user {
         border-bottom: 1px solid white;
         padding-top: 0px;
+        max-width: 211px;
     }
 
     .userTop div {
@@ -471,21 +470,23 @@ body img {
 
     .userAccess {
         display: block;
-        text-align: center;
         align-self: center;
     }
 
     .adminUsername  {
         font-family: barlowBold;
-        text-transform: uppercase;
         font-size: 24px;
     }
 
     .userHolder {
         margin-bottom: 150px;
         margin-top: 15px;
-        width: calc(100% - 240px);
+        width: fit-content;
         justify-content: left;
+    }
+
+    .editPerms p {
+        font-size: 10px;
     }
 }
 

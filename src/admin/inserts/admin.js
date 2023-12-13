@@ -9,10 +9,10 @@ userData.forEach((user) => {
 let currentUserData;
 
 let warnings = {
+  0:'you are blocking your account, if you continue you will no longer be able to log in',
   1:'you are giving yourself owner access', 
-  2:'you are changing your access to admin, you will no longer be an owner', 
-  3:'you are changing your access to student, you will lose all administrative access',
-  0:'you are blocking your account, you will no longer be able to log in',
+  2:'you are changing your access to admin, if you continue you will no longer have owner access', 
+  3:'you are changing your access to student, if you continue you will lose all administrative access',
 }
 
 function updateUser(userId, val, valName) {

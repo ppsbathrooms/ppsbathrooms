@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            background-color: #f6f6f6;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #151515;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        h3,
+        h2 {
+            margin-bottom: 20px;
+            color: #eee;
+        }
+
+        p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto;
+            padding: 10px;
+            text-align: center;
+            background-color: transparent;
+            color: #fff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid white;
+            transition: background-color .2s
+        }
+
+        .btn:hover {
+            background-color: #333;
+        }
+
+        #logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        img {
+            width: 32px;
+            aspect-ratio: 1;
+        }
+
+        #contact {
+            margin: 0;
+            width: 100%;
+            text-align: center;
+            color: #999;
+            font-family: monospace;
+        }
+
+        #contact a {
+            margin: 0;
+            color: #555;
+            text-decoration: none;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a target="_blank" href="https://ppsbathrooms.org">
+            <div id="logo">
+                <img src="https://ppsbathrooms.org/style/images/logo.png">
+            </div>
+        </a>
+        <h2>Welcome to ppsbathrooms, {{username}}!</h2>
+        <h3>please click the button below to verify your email address:</h3>
+        <a href="{{link}}" class="btn">Verify Email</a>
+    </div>
+    <p id="contact">any questions? <a target="_blank" href="https://ppsbathrooms.org/contact">contact us</a></p>
+</body>
+
+</html>

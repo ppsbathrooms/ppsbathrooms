@@ -34,6 +34,23 @@
         border: 1px solid white;
         padding: 5px 15px 5px 15px;
         border-radius: 10px;
+        display: none;
+    }
+
+    #verifyEmail {
+        width: 400px;
+        text-align: center;
+        margin-top: 20vh;
+        color: #fff;
+        font-size: 24px;
+        border: 1px solid white;
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: fit-content;
+        display: none;
     }
 
     h2 {
@@ -122,7 +139,7 @@
         font-size: 14px;
         font-family: barlowBold;
         width: 175px;
-        text-align: center;
+        margin-left: 15px;
     }
 
     .fade {
@@ -143,6 +160,10 @@
         #loginWindow {
             border: none;
         }
+
+        #verifyEmail {
+            border: none;
+        }
     }
 </style>
 
@@ -151,15 +172,21 @@
         <h2>LOGIN</h2>
         <form id="loginForm">
             <div id="inputBg">
-                <input type="text" id="username" name="username" autocomplete="off" placeholder="username" autofocus>
+                <input type="text" id="username" maxlength="24" name="username" autocomplete="off"
+                    placeholder="username" autofocus>
             </div>
             <div id="inputBg">
                 <input type="password" id="password" name="password" placeholder="password" autocomplete="off">
             </div>
             <button class="clearButton" id="submitButton" type="submit">login</button>
-            <p id="wrongPass">authorization failed</p><br>
+            <p id="wrongPass">error</p><br>
             <a class="link" href="/createaccount">create account</a>
         </form>
+    </div>
+    <div id="verifyEmail">
+        <p>your email has been verified!</p>
+        <button class="clearButton"
+            onclick="$('#verifyEmail').hide(); $('#loginWindow').fadeIn(); $('#username').focus();">login</button>
     </div>
     <a href="/" id="return">return</a>
 </body>
@@ -178,7 +205,7 @@
                     data: formData,
                     success: function (response) {
                         if (response.status < 1) {
-                            failedAuth(response.status);
+                            failedAuth(response);
                         } else {
                             location.href = '/account';
                         }
@@ -191,8 +218,11 @@
         });
     });
 
-    function failedAuth(status) {
-        text = (status == 0) ? 'incorrect login' : 'account blocked';
+    function failedAuth(res) {
+        if (res.status != 1) {
+            console.log(res.status, res.error)
+            text = res.error;
+        }
         $('#wrongPass').html(text);
 
         $('#loginForm')[0].reset();
@@ -204,6 +234,25 @@
             $('#wrongPass').removeClass('fade');
         }, 2000);
     }
+
+    function checkVerifiedParameter() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var verified = urlParams.get('verified');
+        history.pushState({}, '', '/login');
+
+        if (verified === 'true') {
+            $("#verifyEmail").fadeIn();
+
+        } else {
+            $("#loginWindow").fadeIn();
+        }
+    }
+
+    window.onload = function () {
+        checkVerifiedParameter();
+    };
+
+
 </script>
 
 </html>

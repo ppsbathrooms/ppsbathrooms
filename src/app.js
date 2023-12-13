@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const fs = require('fs');
+let userConfig = undefined;
 
 if (process.env.URI) {
   uri = process.env.URI;
@@ -12,15 +13,50 @@ if (process.env.URI) {
 else {
   const configData = fs.readFileSync('../config.json', 'utf-8');
   const config = JSON.parse(configData);
+  userConfig = config
   uri = config.uri;
 }
 
 const app = express(); // creates app for server's client
 const chalk = require('chalk'); // console colors
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'); // encryption
 const crypto = require('crypto');
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
+const sgMail = require('@sendgrid/mail');
+
+emailApi = undefined;
+
+if(userConfig) {
+  emailApi = userConfig.emailAPI;
+}
+else {
+  emailApi = process.env.EMAIL_API
+}
+
+sgMail.setApiKey(emailApi);
+
+function verifyEmail(email, name, verificationKey) {
+  fs.readFile('emails/verifyEmailHtml.html', 'utf8', (err, data) => {
+    const unescapedEmail = unescapeRegExp(email)
+    const modifiedHtml = data
+      .replace('{{username}}', name)
+      .replace('{{link}}', `http://localhost:42069/verify/${unescapedEmail}/${verificationKey}`)
+    const msg = {
+      to: unescapedEmail,
+      from: 'verify@ppsbathrooms.org',
+      subject: 'Welcome to ppsbathrooms! Please verify your email. ',
+      html: modifiedHtml
+    };
+
+    sgMail.send(msg)
+      .catch((error) => {
+        console.error('Error sending email:', error);
+      });
+  });
+}
+
 
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -238,11 +274,44 @@ app.get('/login', (req, res) => {
   pageVisited();
 });
 
+app.get('/verify/:email/:key', async (req,res) => {
+  const email = req.params.email;
+  const key = escapeRegExp(req.params.key);
+
+  userColl.findOne({ emailVerificationKey: key }, function(err, user) {
+    if (err) {
+      console.log('Error finding user:', err);
+      return;
+    }
+    
+    if (user) {
+      if((user.email = email) && (user.emailVerificationKey = key)) {
+        userColl.updateOne(
+          { _id: user._id },
+          { 
+            $set: { emailVerified: true },
+            $unset: { emailVerificationKey: "" }
+          },
+          function(err, result) {
+            if (err) {
+              console.log('Error updating user verification:', err);
+              return;
+            }
+          }
+        );
+        res.redirect('/login?verified=true');
+      }
+    } else {
+      res.redirect('/');
+    }
+  });
+});
+
 app.get('/account', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
   
-  if(!req.session.authenticated) {
+  if(!req.session.authenticated || !req.session.verified) {
     res.sendFile(__dirname + '/views/html/login/login.html');
     return;
   }
@@ -289,7 +358,7 @@ app.get('/account', async (req, res) => {
   // #endregion
 
       let dataToSend = {
-        navItems: ['Logs', 'Schools', 'Dashboard'],
+        navItems: ['Logs', 'Schools', 'Dashboard', 'Account'],
         feedback: formattedFeedback,
         brUpdates: formattedBrUpdates,
         styleData: await readFile('admin/adminStyle.css'),
@@ -300,7 +369,7 @@ app.get('/account', async (req, res) => {
         schoolHtml: await readFile('admin/inserts/schools.html'),
       };
       if (req.session.userAccess === '0') {
-        dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard']
+        dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard', 'Account']
         dataToSend.adminData = formattedAdminData;
         dataToSend.users = users;
 
@@ -358,9 +427,11 @@ app.get('*', (req, res) => {
 
 app.post('/createAccount', async (req, res) => {
   const { username, email, password } = req.body;
+  escapedUsername = escapeRegExp(username)
+  escapedEmail = escapeRegExp(email)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const existingUser = await userColl.findOne({ username: { $regex: new RegExp(username, 'i') } });
-  const existingEmail = await userColl.findOne({ email: { $regex: new RegExp(email, 'i') } });
+  const existingUser = await userColl.findOne({ username: { $regex: new RegExp(`^${escapedUsername}$`, 'i') } })
+  const existingEmail = await userColl.findOne({ email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } })
   const highestKeyUser = await userColl.findOne({}, { sort: { key: -1 } });
   let nextKey = '99999';
 
@@ -369,12 +440,16 @@ app.post('/createAccount', async (req, res) => {
     nextKey = (currentKey + 1).toString().padStart(5, '0');
   }
 
+  verificationKey = crypto.randomBytes(64).toString('hex');
+
   const newUserInfo = {
     username: username,
     password: await hashPassword(password),
     access: '2',
     key: nextKey,
-    email: email
+    email: email,
+    emailVerified: false,
+    emailVerificationKey: verificationKey
   };
   
   usernameHasText = (username != '') 
@@ -404,6 +479,8 @@ app.post('/createAccount', async (req, res) => {
   else {
     try {
       await userColl.insertOne(newUserInfo);
+      verifyEmail(escapedEmail, escapedUsername, verificationKey)
+
       console.log(`new user created '${username}'`);
       res.json({ status: 1});
     } catch (error) {
@@ -422,29 +499,49 @@ async function hashPassword(password) {
   }
 }
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function unescapeRegExp(string) {
+  return string.replace(/\\([.*+?^${}()|[\]\\\\])/g, '$1');
+}
+
+
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = await userColl.findOne({ username: { $regex: new RegExp(username, 'i') } });
+    const escapedUsername = escapeRegExp(username);
+    const user = await userColl.findOne({ username: { $regex: new RegExp(`^${escapedUsername}$`, 'i') } });
     if (user) {
-      const passwordMatch = await bcrypt.compare(password, user.password);
-      if (passwordMatch) {
-        if(user.access < 0) {
-          res.json({status: -1});
+      if(user.username.toLowerCase() === username.toLowerCase()) {
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (passwordMatch) {
+          if (user.emailVerified == false) {
+            res.json({status: -1, error: 'email verification required'});
+          }
+          else if(user.access < 0) {
+            res.json({status: -1, error: 'account blocked'});
+          }
+          else {
+            req.session.authenticated = true;
+            req.session.userAccess = user.access;
+            req.session.verified = user.emailVerified;
+            req.session._id = user._id;
+            req.session.username = user.username;
+            dbEntry(req, 'adminlogins', user.username);
+            res.json({ status: 1});
+          }
+        } else {
+            res.json({status: 0, error: 'authorization failed'});
         }
-        else {
-          req.session.authenticated = true;
-          req.session.userAccess = user.access;
-          req.session._id = user._id;
-          req.session.username = user.username;
-          dbEntry(req, 'adminlogins', user.username);
-          res.json({ status: 1});
-        }
-      } else {
-        res.json({ status: 0});
       }
-    } else {
-        res.json({ status: 0});
+      else {          
+        res.json({status: 0, error: 'authorization failed'});
+      }  
+    }
+    else {
+          res.json({status: 0, error: 'authorization failed'});
     }
   } catch (error) {
     console.error('Error:', error);
@@ -454,7 +551,7 @@ app.post('/login', async (req, res) => {
 
 //recieve post request, send update
 app.post('/updatePassword', async function(req, res) {
-  if(req.session.authenticated && hasAccess('updatePassword', req.session.userAccess)) {
+  if(req.session.authenticated && hasAccess('updatePassword', req.session)) {
     school = req.body.school;
     currentPass = req.body.currentPass;
     newPass = req.body.newPass;
@@ -476,7 +573,7 @@ app.post('/updatePassword', async function(req, res) {
 });
 
 app.post('/updateUser', async function(req, res) {
-  if (req.session.authenticated && hasAccess('updateUser', req.session.userAccess)) {
+  if (req.session.authenticated && hasAccess('updateUser', req.session)) {
     const id = req.body.id;
     const objectId = ObjectId(id);
     const valueName = req.body.valueName;
@@ -514,7 +611,7 @@ app.post('/bathroomUpdate', async function(req, res) {
 
     var neededPassword = schoolData.password;
 
-    if (req.session.authenticated && providedPassword === 'c2fRCdYotZ' && hasAccess('multiBathroomUpdate', req.session.userAccess)) {
+    if (req.session.authenticated && providedPassword === 'c2fRCdYotZ' && hasAccess('multiBathroomUpdate', req.session)) {
       res.json({ isCorrect: true });
       setBrData(school, values, req);
     } else {
@@ -599,7 +696,7 @@ function injectDataIntoHTML(htmlContent, data) {
                     <div class="userTop">
                         <p class="adminUsername" id="userUsername${user._id}">${user.username}</p>
                         <div style="display: flex; justify-content: center;">
-                          <h3>access</h3>
+                          <h4>access</h4>
                           <select name="access" class="userAccess" id="access${user._id}">
                               <option value="0" ${user.access==0 ? ' selected' : '' }>owner</option>
                               <option value="1" ${user.access==1 ? ' selected' : '' }>admin</option>
@@ -607,10 +704,10 @@ function injectDataIntoHTML(htmlContent, data) {
                               <option value="-1" ${user.access==-1 ? ' selected' : '' }>blocked</option>
                           </select>
                         </div>
-                        <h3>user id</h3>
+                        <h4>user id</h4>
                         <p id="userId${user._id}">${user._id}</p>
                         <div>
-                          <h3>key</h3>
+                          <h4>key</h4>
                           <p id="userKey${user._id}">#${user.key}</p>
                         </div>
                         <button id="togglePerms${user._id}" class="clearButton">more</button>
@@ -623,7 +720,8 @@ function injectDataIntoHTML(htmlContent, data) {
                       //   <button class="clearButton smallerButton">CHANGE PASSWORD</button>
                       // </div>
                       `<div>
-                        <p>email : ${user.email}</p>                      
+                        <p>email : ${user.email}</p>             
+                        <p>verified : ${user.emailVerified}</p>             
                       </div>
                     </div>
                 </div>
@@ -688,26 +786,32 @@ function injectDataIntoHTML(htmlContent, data) {
   return modifiedHTML;
 }
 
-function hasAccess(name, access) {
-  // post request access levels
-  const owner = ['updateUser', 'updatePassword', 'multiBathroomUpdate'];
-  const admin = ['updatePassword', 'multiBathroomUpdate'];
-  const student = [];
-
-  let userAccess;
-  switch (Number(access)) {
-    case 0:
-      userAccess = owner;
-      break;
-    case 1:
-      userAccess = admin;
-      break;
-    case 2:
-      userAccess = student;
-      break;
+function hasAccess(name, session) {
+  access = session.userAccess;
+  if(session.verified) {
+    // post request access levels
+    const owner = ['updateUser', 'updatePassword', 'multiBathroomUpdate'];
+    const admin = ['updatePassword', 'multiBathroomUpdate'];
+    const student = [];
+  
+    let userAccess;
+    switch (Number(access)) {
+      case 0:
+        userAccess = owner;
+        break;
+      case 1:
+        userAccess = admin;
+        break;
+      case 2:
+        userAccess = student;
+        break;
+    }
+    allowed = userAccess.includes(name)
+    return allowed;
   }
-  allowed = userAccess.includes(name)
-  return allowed;
+  else {
+    return false;
+  }
 }
 
 async function dbEntry(request, collectionName, value, school, numChanged) {
