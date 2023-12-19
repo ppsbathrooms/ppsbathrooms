@@ -88,9 +88,8 @@ function updatePass(school) {
 
 
     if ((currentPassword != '') && (newPassword != '')) {
-        var formData = { currentPass: currentPassword, newPass: newPassword, school: school };
-
         $.post("/updatePassword", {
+            passwordType: 'school',
             school: school,
             newPass: newPassword,
             currentPass: currentPassword

@@ -324,13 +324,33 @@ app.get('/account', async (req, res) => {
   req.session.save();
 
   if (user.access < 0) {
-    res.redirect('/admin/logout')
+    res.redirect('/logout')
     return;
   }
 
   else {
     if(req.session.userAccess == 2) {
-      res.render('html/login/studentDash.html')
+      const accountJs = '<script>' + await readFile('login/inserts/account.js') + '</script>'
+      const studentStyle = '<style>' + await readFile('login/studentStyle.css') + '</style>'
+
+      const objectId = ObjectId(req.session._id);
+      const user = await userColl.findOne({ _id: objectId });
+
+      fs.readFile('login/studentDash.html', 'utf8', (err, data) => {
+        if (err) {
+          console.error('Error reading file:', err);
+          res.status(500).send('Internal server error');
+        } else {
+          const modifiedHTML = data
+            .replace('{{username}}', user.username)
+            .replace('{{accountJs}}', accountJs)
+            .replace('{{studentStyle}}', studentStyle)
+            .replace('{{email}}', user.email)
+            .replace('{{schedule}}', user.schedule)
+
+          res.send(modifiedHTML);
+        }
+      });
     } else {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
@@ -361,23 +381,24 @@ app.get('/account', async (req, res) => {
         navItems: ['Logs', 'Schools', 'Dashboard', 'Account'],
         feedback: formattedFeedback,
         brUpdates: formattedBrUpdates,
-        styleData: await readFile('admin/adminStyle.css'),
+        styleData: await readFile('login/adminStyle.css'),
         username: req.session.username,
         userId: req.session._id,
         schoolData: brData,
-        schoolJs: await readFile('admin/inserts/school.js'),
-        schoolHtml: await readFile('admin/inserts/schools.html'),
+        schoolJs: await readFile('login/inserts/school.js'),
+        schoolHtml: await readFile('login/inserts/schools.html'),
       };
+
       if (req.session.userAccess === '0') {
         dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard', 'Account']
         dataToSend.adminData = formattedAdminData;
         dataToSend.users = users;
 
-        dataToSend.adminJs = await readFile('admin/inserts/admin.js');
-        dataToSend.adminHtml = await readFile('admin/inserts/admin.html');
+        dataToSend.adminJs = await readFile('login/inserts/admin.js');
+        dataToSend.adminHtml = await readFile('login/inserts/admin.html');
       }
       
-      fs.readFile('admin/admindash.html', 'utf8', (err, data) => {
+      fs.readFile('login/admindash.html', 'utf8', (err, data) => {
         if (err) {
           console.error('Error reading file:', err);
           res.status(500).send('Internal server error');
@@ -449,7 +470,8 @@ app.post('/createAccount', async (req, res) => {
     key: nextKey,
     email: email,
     emailVerified: false,
-    emailVerificationKey: verificationKey
+    emailVerificationKey: verificationKey,
+    schedule: {0:'', 1:'', 2:'', 3:'', 4:'', 5:'', 6:'', 7:'', 8:''}
   };
   
   usernameHasText = (username != '') 
@@ -549,25 +571,66 @@ app.post('/login', async (req, res) => {
   }
 });
 
-//recieve post request, send update
 app.post('/updatePassword', async function(req, res) {
-  if(req.session.authenticated && hasAccess('updatePassword', req.session)) {
-    school = req.body.school;
-    currentPass = req.body.currentPass;
-    newPass = req.body.newPass;
+  if(req.session.authenticated) {
+    if(req.body.passwordType == 'school' && hasAccess('updateSchoolPassword', req.session)) {
+      school = req.body.school;
+      currentPass = req.body.currentPass;
+      newPass = req.body.newPass;
+  
+      actualPass = await db.collection('data').findOne({ _id: school + 'Pass'});
+  
+      if(currentPass == actualPass.password) {
+        res.json({ isCorrect: true});
+        await db.collection('data').updateOne(
+          {"_id": school + 'Pass'},
+          {$set : {'password': newPass}}
+          );
+      }
+      else {
+        res.json({ isCorrect: false});
+      }
+    }
 
-    actualPass = await db.collection('data').findOne({ _id: school + 'Pass'});
+    else if(req.body.passwordType = 'self' && hasAccess('updateSelfPassword', req.session)) {
+      const objectId = ObjectId(req.session._id)
+      
+      const currentPass = req.body.currentPass;
+      const newPass = req.body.newPass;
+      const user = await userColl.findOne({ _id: objectId});
+      
+      const passwordMatch = await bcrypt.compare(currentPass, user.password);
+  
+      if(passwordMatch) {
+        const hashedPass = await hashPassword(newPass)
+        res.json({ isCorrect: true});
+        await userColl.updateOne(
+          {"_id": objectId},
+          {$set : {'password': hashedPass}}
+          );
+      }
+      else {
+        res.json({ isCorrect: false});
+      }
+    }
+  }
+});
 
-    if(currentPass == actualPass.password) {
-      res.json({ isCorrect: true});
-      await db.collection('data').updateOne(
-        {"_id": school + 'Pass'},
-        {$set : {'password': newPass}}
-        );
-        console.log(chalk.white(`${school} password changed: ${currentPass} => ${newPass}`))
+app.post('/updateSelf', async function(req, res) {
+  if(req.session.authenticated && hasAccess('updateSelf', req.session)) {
+    toUpdate = req.body.toUpdate;
+    newValue = req.body.newValue;
+    const objectId = ObjectId(req.session._id);
+    const user = await userColl.findOne({ _id: objectId });
+
+    if(user) {
+      const updateQuery = { $set: { [toUpdate]: newValue } };
+
+      await db.collection('users').updateOne({ _id: objectId }, updateQuery);
+      console.log(chalk.white(`${user.username} ${toUpdate} changed to ${newValue}`));
     }
     else {
-      res.json({ isCorrect: false});
+      console.log(chalk.red('user not found'))
     }
   }
 });
@@ -790,9 +853,9 @@ function hasAccess(name, session) {
   access = session.userAccess;
   if(session.verified) {
     // post request access levels
-    const owner = ['updateUser', 'updatePassword', 'multiBathroomUpdate'];
-    const admin = ['updatePassword', 'multiBathroomUpdate'];
-    const student = [];
+    const owner = ['updateUser', 'updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
+    const admin = ['updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
+    const student = ['updateSelf', 'updateSelfPassword'];
   
     let userAccess;
     switch (Number(access)) {

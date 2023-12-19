@@ -32,7 +32,7 @@ $('.header').html(
                 <img src="../style/images/logos/franklinLogo.png"></img> 
             </div> 
             <div id="ihsNavbar"> 
-                <p>ida</p> 
+                <p>wells</p> 
                 <img src="../style/images/logos/idaLogo.png"></img> 
             </div>
 
@@ -41,7 +41,7 @@ $('.header').html(
                 <p id="aboutRedirect">about</> 
             </div>
             <div id="ihsNavbar"> 
-                <p id="navbarSignIn">sign in</p> 
+                <p id="navbarSignIn">login</p> 
             </div> 
         </div> 
         <div id="navbarLogin"> 

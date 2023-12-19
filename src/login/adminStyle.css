@@ -321,6 +321,7 @@ body img {
     background: none;
     border: none;
     font-family: monospace;
+    outline: none;
 }
 
 .userAccess option {

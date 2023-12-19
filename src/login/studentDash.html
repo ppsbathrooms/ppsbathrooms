@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+
+    <script src="../thirdParty/jquery.min.js"></script>
+    <title>ppsbathrooms | student</title>
+</head>
+
+{{studentStyle}}
+
+<body>
+    <img id='topLogo' src="/style/images/logo.png">
+    <div id="top">
+        <button class="clearButton" style="margin-left: 20px; margin-right: auto;"
+            onclick="location.href='/logout';">LOGOUT</button>
+        <p>{{username}}</p>
+    </div>
+    <div id="navbar">
+        <button id="navbarAccount">
+            <img id="icon16" src="style/icons/account.svg">
+            <p>Account</p>
+        </button>
+        <button id="navbarSettings">
+            <img id="icon16" src="style/icons/settings.svg">
+            <p>Settings</p>
+        </button>
+    </div>
+
+    <div id="pannels">
+        <div id="account">
+            <!-- <h2>school</h2>
+            <div class="dropdownHolder">
+                <select name="school" class="clearDropdown" id="schoolSelect">
+                    <option value="chs">cleveland</option>
+                    <option value="fhs">franklin</option>
+                    <option value="ihs">wells</option>
+                </select>
+            </div> -->
+            <h2>class schedule</h2>
+            <div style="width: 60vw;">
+                <p>enter the room number of each class period you have. room numbers for you classes can be found in
+                    synergy under class schedule. </p>
+                <p>your class schedule will be used to find the closest bathroom to your current class throughout the
+                    day. <br>this feature is still in development and is not yet complete. </p>
+                <p>Powered by Trivory</p>
+            </div>
+            <!-- <p>Powered by Trivory</p> -->
+            <p id="schedule" style="display: none">{{schedule}}</p>
+            <div id="scheduleHolder">
+                <p style="text-align: center;">room #</p>
+                <div style="flex-wrap: wrap; display: flex; width: fit-content; height: 175px; flex-direction: column;">
+                    <div class="scheduleContainer" id="period1">
+                        <p>1</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period2">
+                        <p>2</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period3">
+                        <p>3</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period4">
+                        <p>4</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period5">
+                        <p>5</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period6">
+                        <p>6</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period7">
+                        <p>7</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                    <div class="scheduleContainer" id="period8">
+                        <p>8</p>
+                        <div class="inputBg">
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <button id="updateSchedule" class="clearButton">update schedule</button>
+            <p id="scheduleError">error updating your schedule</p>
+            <div id="changePassword">
+                <h2>change your password</h2>
+                <div class="inputBg">
+                    <input id="currentPass" type="password" placeholder="current password">
+                </div>
+                <div class="inputBg">
+                    <input id="newPass" type="password" placeholder="new password">
+                </div>
+                <button id="updatePassword" class="clearButton">change password</button>
+                <br></br>
+                <p>your email address is <b>{{email}}</b></p>
+                <div class="flex">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div id="settings">
+            <h3>more coming soon :)</h3>
+        </div>
+    </div>
+</body>
+
+{{accountJs}}
