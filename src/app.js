@@ -14,13 +14,17 @@ else {
   const configData = fs.readFileSync('../config.json', 'utf-8');
   const config = JSON.parse(configData);
   userConfig = config
-  uri = config.uri;
+  uri = config.URI;
 }
 
 const app = express(); // creates app for server's client
 const chalk = require('chalk'); // console colors
 const bcrypt = require('bcrypt'); // encryption
-const crypto = require('crypto');
+const crypto = require('crypto'); // generate strings
+
+const CronJob = require('cron').CronJob; // schedule functions
+const updateSchedulesJob = new CronJob('0 * * * *', updateAllPeriods);
+updateSchedulesJob.start();
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -29,13 +33,68 @@ const sgMail = require('@sendgrid/mail');
 emailApi = undefined;
 
 if(userConfig) {
-  emailApi = userConfig.emailAPI;
+  emailApi = userConfig.EMAIL_API;
+  trivoryApi = userConfig.TRIVORY_API;
 }
 else {
-  emailApi = process.env.EMAIL_API
+  emailApi = process.env.EMAIL_API;
+  trivoryApi = process.env.TRIVORY_API;
 }
 
+
 sgMail.setApiKey(emailApi);
+
+updateAllPeriods(); // update schedules on server start
+
+function updateAllPeriods() {
+  ['cleveland', 'franklin', 'ibw'].forEach(school => {
+    getPeriodData(school)
+  })  
+}
+
+async function getPeriodData(school) {
+  fetch("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi, { method: "Get" })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return res.text();
+    })
+    .then(async (text) => {
+      const json = JSON.parse(text)
+      const bellSchedule = json.bell_schedule[0].sched;
+
+      const allPeriods = {};
+
+      bellSchedule.forEach((period) => {
+        const periodInfo = {
+          start: new Date(period[0].start),
+          startTime: period[0].start_time,
+          end: new Date(period[0].end),
+          endTime: period[0].end_time,
+        };
+        allPeriods[period[0].period] = periodInfo;
+      });
+
+      allPeriods['day_subtitle'] = json.day_subtitle_short
+
+      try {
+        await dataColl.findOneAndUpdate(
+          { schedule: school },
+          { $set: { value: allPeriods } },
+        );
+
+        console.log(chalk.green.dim(dateTime() + ' | ' + school + ' schedule updated'))
+
+      } catch (error) {
+        console.error('Error updating document:', error);
+      }
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+}
+
 
 function verifyEmail(email, name, verificationKey) {
   fs.readFile('emails/verifyEmailHtml.html', 'utf8', (err, data) => {
@@ -619,6 +678,7 @@ app.post('/updatePassword', async function(req, res) {
 app.post('/updateSelf', async function(req, res) {
   if(req.session.authenticated && hasAccess('updateSelf', req.session)) {
     toUpdate = req.body.toUpdate;
+    console.log(escapeRegExp(toUpdate))
     newValue = req.body.newValue;
     const objectId = ObjectId(req.session._id);
     const user = await userColl.findOne({ _id: objectId });
@@ -853,8 +913,8 @@ function hasAccess(name, session) {
   access = session.userAccess;
   if(session.verified) {
     // post request access levels
-    const owner = ['updateUser', 'updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
-    const admin = ['updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
+    const owner = ['updateSelf', 'updateUser', 'updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
+    const admin = ['updateSelf', 'updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
     const student = ['updateSelf', 'updateSelfPassword'];
   
     let userAccess;

@@ -307,4 +307,8 @@ body {
     :root {
         --topHeight: 50px;
     }
+
+    #changePassword .inputBg {
+        width: 250px;
+    }
 }
