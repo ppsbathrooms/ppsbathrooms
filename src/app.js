@@ -17,10 +17,13 @@ else {
   uri = config.URI;
 }
 
+
 const app = express(); // creates app for server's client
 const chalk = require('chalk'); // console colors
 const bcrypt = require('bcrypt'); // encryption
 const crypto = require('crypto'); // generate strings
+
+const axios = require('axios');
 
 const CronJob = require('cron').CronJob; // schedule functions
 const updateSchedulesJob = new CronJob('0 * * * *', updateAllPeriods);
@@ -52,48 +55,44 @@ function updateAllPeriods() {
   })  
 }
 
+// getPeriodData('cleveland')
 async function getPeriodData(school) {
-  fetch("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi, { method: "Get" })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return res.text();
-    })
-    .then(async (text) => {
-      const json = JSON.parse(text)
-      const bellSchedule = json.bell_schedule[0].sched;
+  try {
+    const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
+    const json = response.data;
+    const bellSchedule = json.bell_schedule[0].sched;
 
-      const allPeriods = {};
+    const allPeriods = {};
 
-      bellSchedule.forEach((period) => {
-        const periodInfo = {
-          start: new Date(period[0].start),
-          startTime: period[0].start_time,
-          end: new Date(period[0].end),
-          endTime: period[0].end_time,
-        };
-        allPeriods[period[0].period] = periodInfo;
-      });
-
-      allPeriods['day_subtitle'] = json.day_subtitle_short
-
-      try {
-        await dataColl.findOneAndUpdate(
-          { schedule: school },
-          { $set: { value: allPeriods } },
-        );
-
-        console.log(chalk.green.dim(dateTime() + ' | ' + school + ' schedule updated'))
-
-      } catch (error) {
-        console.error('Error updating document:', error);
-      }
-    })
-    .catch((error) => {
-      console.error('Error fetching data:', error);
+    bellSchedule.forEach((period) => {
+      const periodInfo = {
+        start: new Date(period[0].start),
+        startTime: period[0].start_time,
+        end: new Date(period[0].end),
+        endTime: period[0].end_time,
+      };
+      allPeriods[period[0].period] = periodInfo;
     });
+
+    allPeriods['day_subtitle'] = json.day_subtitle_short;
+    allPeriods['time_updated'] = dateTime(true);
+
+    try {
+      await dataColl.findOneAndUpdate(
+        { schedule: school },
+        { $set: { value: allPeriods } },
+      );
+
+      console.log(chalk.green.dim(dateTime(true) + ' | ' + school + ' schedule updated'));
+
+    } catch (error) {
+      console.error('Error updating document:', error);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 }
+
 
 
 function verifyEmail(email, name, verificationKey) {
@@ -942,7 +941,7 @@ async function dbEntry(request, collectionName, value, school, numChanged) {
         await client.connect();
         const collection = db.collection(collectionName);
         const dbentry = {
-            time: dateTime(),
+            time: dateTime(true),
             ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress
         };
         if (school) {
@@ -974,17 +973,9 @@ function readFile(filePath) {
 
 async function pageVisited() {
   try {
-    const currentdate = new Date();
-    const pst = new Date(currentdate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
-
-    const month = pst.getMonth() + 1;
-    const day = pst.getDate();
-    const year = pst.getFullYear();
-    const date = `${year}-${month}-${day}`;
-
     await client.connect();
     const collection = db.collection('pageVisits');
-    const filter = { date: date };
+    const filter = { date: dateTime(false) };
 
     const existingDocument = await collection.findOne(filter);
 
@@ -1039,7 +1030,7 @@ async function writeToFile(filename, newText, includeDate, other) {
   filename = 'txt/' + filename;
   fs.readFile(filename + '.txt', function(err, buf) {
     var previousText = String(buf);
-    date = includeDate ? dateTime() : '';
+    date = includeDate ? dateTime(true) : '';
 
     var txt = date + " | " + String(newText) + '\n' + previousText;
 
@@ -1048,20 +1039,22 @@ async function writeToFile(filename, newText, includeDate, other) {
     });
   });
 }
-
+``
 
 // Gets the current datetime
-function dateTime() {
+function dateTime(time) {
     var currentdate = new Date();
     var pst = new Date(currentdate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
 
     var month = pst.getMonth() + 1;
     var day = pst.getDate();
-    var year = pst.getFullYear().toString().slice(-2);
+    year = time ? pst.getFullYear().toString().slice(-2) : pst.getFullYear();
     var hours = pst.getHours();
     var minutes = pst.getMinutes();
     var seconds = pst.getSeconds();
     var ampm = hours >= 12 ? 'PM' : 'AM';
+
+    const date = `${year}-${month}-${day}`;
 
     hours = hours % 12;
     hours = hours ? hours : 12; // handle midnight (12 AM)
@@ -1070,7 +1063,12 @@ function dateTime() {
     seconds = seconds < 10 ? '0' + seconds : seconds;
 
     var formattedDate = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ' ' + ampm;
-    return formattedDate;
+    if(time) {
+      return formattedDate;
+    }
+    else {
+      return date;
+    }
 }
 
 app.route('/reqtypes')
