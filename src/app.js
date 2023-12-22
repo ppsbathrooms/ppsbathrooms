@@ -1018,7 +1018,7 @@ async function pageVisited() {
     } else {
       // If the document doesn't exist, insert a new one with 'visits' set to 1
       await collection.insertOne({
-        date: date,
+        date: dateTime(false),
         visits: 1
       });
     }
