@@ -37,9 +37,7 @@
             <h2>school</h2>
             <div class="dropdownHolder">
                 <select name="school" class="clearDropdown" id="schoolSelect">
-                    <option value="chs">cleveland</option>
-                    <option value="fhs">franklin</option>
-                    <option value="ihs">wells</option>
+                    {{school_options}}
                 </select>
             </div>
             <h2>class schedule</h2>
@@ -50,7 +48,6 @@
                     day. <br>this feature is still in development and is not yet complete. </p>
                 <p>Powered by Trivory</p>
             </div>
-            <!-- <p>Powered by Trivory</p> -->
             <p id="schedule" style="display: none">{{schedule}}</p>
             <div id="scheduleHolder">
                 <p style="text-align: center;">room #</p>

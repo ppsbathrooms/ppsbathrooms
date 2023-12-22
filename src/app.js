@@ -55,7 +55,6 @@ function updateAllPeriods() {
   })  
 }
 
-// getPeriodData('cleveland')
 async function getPeriodData(school) {
   try {
     const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
@@ -380,6 +379,10 @@ function getCurrentPeriod(periodData) {
   return -1;
 }
 
+function isVowel(char) {
+    return ['a', 'e', 'i', 'o', 'u'].indexOf(char.toLowerCase()) !== -1;
+}
+
 app.get('/account', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
@@ -408,14 +411,19 @@ app.get('/account', async (req, res) => {
 
       const objectId = ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
-      const schedule = await dataColl.findOne({ schedule: 'cleveland'})
+      const schedule = await dataColl.findOne({ schedule: user.school})
+
+      let dropdownOptions = `
+          <option value="chs"${user.school === 'chs' ? ' selected' : ''}>cleveland</option>
+          <option value="fhs"${user.school === 'fhs' ? ' selected' : ''}>franklin</option>
+          <option value="ihs"${user.school === 'ihs' ? ' selected' : ''}>wells</option>`;
 
       currentPeriod = getCurrentPeriod(schedule);
 
       if(currentPeriod == -1) {
         currentClass = classDescription = 'No current class';
       }
-      else if (user.schedule[Number(currentPeriod)-1] == undefined) {
+      else if ((user.schedule[Number(currentPeriod)-1] == undefined) && currentPeriod != 'Lunch') {
         currentClass = classDescription = 'Enter your schedule to use see current period'
       }
       else {
@@ -423,7 +431,16 @@ app.get('/account', async (req, res) => {
         classDescription = (currentClass == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass;
       }
 
-      currentDay = (schedule.value.day_subtitle == 'A') ? 'Today is an A day' : 'Today is a ' + schedule.value.day_subtitle + ' day';
+      let words = schedule.value.day_subtitle.split(' ');
+      let adjustedWords = words.map(word => (word.length > 1 ? word.toLowerCase() : word));
+
+      let adjustedDescription = adjustedWords.join(' ');
+
+      if (isVowel(schedule.value.day_subtitle.charAt(0))) {
+          currentDay = `Today is an ${adjustedDescription} day`;
+      } else {
+          currentDay = `Today is a ${adjustedDescription} day`;
+      }
 
       fs.readFile('login/studentDash.html', 'utf8', (err, data) => {
         if (err) {
@@ -438,6 +455,8 @@ app.get('/account', async (req, res) => {
             .replace('{{day_subtitle}}', currentDay)
             .replace('{{current_class}}', classDescription)
             .replace('{{schedule}}', user.schedule)
+            .replace('{{school_options}}', dropdownOptions)
+
 
           res.send(modifiedHTML);
         }
@@ -709,20 +728,27 @@ app.post('/updatePassword', async function(req, res) {
 
 app.post('/updateSelf', async function(req, res) {
   if(req.session.authenticated && hasAccess('updateSelf', req.session)) {
+
+    canUpdate = ['school', 'schedule']
     toUpdate = req.body.toUpdate;
-    console.log(escapeRegExp(toUpdate))
+
     newValue = req.body.newValue;
     const objectId = ObjectId(req.session._id);
     const user = await userColl.findOne({ _id: objectId });
 
-    if(user) {
-      const updateQuery = { $set: { [toUpdate]: newValue } };
-
-      await db.collection('users').updateOne({ _id: objectId }, updateQuery);
-      console.log(chalk.white(`${user.username} ${toUpdate} changed to ${newValue}`));
+    if(canUpdate.includes(escapeRegExp(toUpdate))) {  
+      if(user) {
+        const updateQuery = { $set: { [toUpdate]: newValue } };
+  
+        await db.collection('users').updateOne({ _id: objectId }, updateQuery);
+        console.log(chalk.white(`${user.username} ${toUpdate} changed to ${newValue}`));
+      }
+      else {
+        console.log(chalk.red('user not found'))
+      }
     }
     else {
-      console.log(chalk.red('user not found'))
+      console.log(chalk.red(user.username + ' tried to update ' + toUpdate + ' -> ' + newValue))
     }
   }
 });

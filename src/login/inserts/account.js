@@ -1,7 +1,3 @@
-$('#scheduleHolder input').on('input', function () {
-
-})
-
 function allBoxesFilled() {
     var allLengthThree = true;
 
@@ -146,4 +142,16 @@ $('.scheduleContainer input').keypress(function (event) {
     if (event.which === 13) {
         $('#updateSchedule').click();
     }
+});
+
+$('#schoolSelect').on('input', function() {
+    $.ajax({
+        type: 'POST',
+        url: '/updateSelf',
+        data: { toUpdate: 'school', newValue: $(this).val() },
+        success: function (response) {},
+        error: function (xhr, status, error) {
+            console.error('AJAX request error:', status, error);
+        }
+    });
 });
