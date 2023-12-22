@@ -32,7 +32,6 @@ updateSchedulesJob.start();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const sgMail = require('@sendgrid/mail');
-const { isAsyncFunction } = require('util/types');
 
 emailApi = undefined;
 
