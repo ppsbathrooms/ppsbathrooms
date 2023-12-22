@@ -32,6 +32,7 @@ updateSchedulesJob.start();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const sgMail = require('@sendgrid/mail');
+const { isAsyncFunction } = require('util/types');
 
 emailApi = undefined;
 
@@ -47,7 +48,7 @@ else {
 
 sgMail.setApiKey(emailApi);
 
-updateAllPeriods(); // update schedules on server start
+// updateAllPeriods(); // update schedules on server start
 
 function updateAllPeriods() {
   ['cleveland', 'franklin', 'ibw'].forEach(school => {
@@ -365,6 +366,21 @@ app.get('/verify/:email/:key', async (req,res) => {
   });
 });
 
+function getCurrentPeriod(periodData) {
+  const currentTime = new Date();
+  const schedule = periodData.value;
+  for (const period in schedule) {
+    const start = new Date(schedule[period].start);
+    const end = new Date(schedule[period].end);
+
+    if (currentTime >= start && currentTime <= end) {
+      return period; 
+    }
+  }
+
+  return -1;
+}
+
 app.get('/account', async (req, res) => {
   const userId = ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
@@ -393,6 +409,22 @@ app.get('/account', async (req, res) => {
 
       const objectId = ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
+      const schedule = await dataColl.findOne({ schedule: 'cleveland'})
+
+      currentPeriod = getCurrentPeriod(schedule);
+
+      if(currentPeriod == -1) {
+        currentClass = classDescription = 'No current class';
+      }
+      else if (user.schedule[Number(currentPeriod)-1] == undefined) {
+        currentClass = classDescription = 'Enter your schedule to use see current period'
+      }
+      else {
+        currentClass = (currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch';
+        classDescription = (currentClass == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass;
+      }
+
+      currentDay = (schedule.value.day_subtitle == 'A') ? 'Today is an A day' : 'Today is a ' + schedule.value.day_subtitle + ' day';
 
       fs.readFile('login/studentDash.html', 'utf8', (err, data) => {
         if (err) {
@@ -404,6 +436,8 @@ app.get('/account', async (req, res) => {
             .replace('{{accountJs}}', accountJs)
             .replace('{{studentStyle}}', studentStyle)
             .replace('{{email}}', user.email)
+            .replace('{{day_subtitle}}', currentDay)
+            .replace('{{current_class}}', classDescription)
             .replace('{{schedule}}', user.schedule)
 
           res.send(modifiedHTML);
