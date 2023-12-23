@@ -1,0 +1,133 @@
+.clearDropdown {
+    color: #fff;
+    margin: 0;
+    margin-right: 5px;
+    padding: 3px 5px;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    font-family: monospace;
+    outline: none;
+}
+
+.clearDropdown option:focus {
+    outline: none;
+    border: none;
+}
+
+.clearDropdown option {
+    color: #000;
+}
+
+.dropdownHolder {
+    border-radius: 10px;
+    border: 1px solid white;
+    padding: 3px;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+#scheduleHolder {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.inputBg input {
+    all: unset;
+    padding: 7px;
+    border-radius: 5px;
+    background: transparent;
+    color: #fff;
+    height: 15px;
+    font-size: 16px;
+}
+
+.inputBg {
+    background: transparent;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    border: 1px solid #fff;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+
+#scheduleHolder .inputBg {
+    width: 60px;
+    text-align: center;
+}
+
+#scheduleHolder input {
+    width: 50px;
+}
+
+.scheduleContainer p {
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+}
+
+.scheduleContainer {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#changePassword input {
+    width: 300px;
+}
+
+#changePassword .inputBg {
+    width: 300px;
+    margin-bottom: 15px;
+}
+
+#scheduleError {
+    color: #f00;
+    opacity: 0;
+}
+
+@media (max-width: 800px) {
+    #changePassword .inputBg {
+        width: 250px;
+    }
+}
+
+.greenButton {
+    animation: greenButton 1.5s ease forwards;
+}
+
+.redButton {
+    animation: redButton .5s ease forwards;
+}
+
+@keyframes greenButton {
+    0% {
+        border-color: green;
+        color: green;
+    }
+
+    100% {
+        border-color: #fff;
+        color: #fff;
+    }
+}
+
+@keyframes redButton {
+    0% {
+        border-color: red;
+        color: red;
+    }
+
+    100% {
+        border-color: #fff;
+        color: #fff;
+    }
+}

@@ -145,7 +145,6 @@
     }
 
     #errorText {
-        margin-left: 20px;
         text-align: center;
         color: rgb(150, 65, 65);
         opacity: 0;
@@ -158,11 +157,19 @@
     @media (max-width: 800px) {
         #createAccount {
             border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         #verifyEmail {
             border: none;
         }
+
+        #inputBg {
+            width: 80vw;
+        }
+
     }
 </style>
 
@@ -192,9 +199,9 @@
             </div>
             <div id="bottomBar">
                 <button class="clearButton" id="createAccountButton" type="submit">create account</button>
-                <p id="errorText">error</p>
             </div>
         </div>
+        <p id="errorText">error</p>
         <div id="verifyEmail">
             <p>please check your email to verify your account. after doing so you can log in. </p>
             <button class="clearButton" onclick="window.location.href='/login'">login</button>

@@ -12,6 +12,7 @@
 </head>
 
 {{style}}
+{{scheduleStyle}}
 
 <body>
     <!-- 
@@ -52,7 +53,15 @@
         {{schools}}
         {{admin}}
         <div id="account">
-            <p>coming soon</p>
+            <h2>{{day_subtitle}}</h2>
+            <h3 id="currentPeriod">{{current_class}}</h3>
+            <div class="dropdownHolder">
+                <select name="school" class="clearDropdown" id="schoolSelect">
+                    {{school_options}}
+                </select>
+            </div>
+            {{update_schedule}}
+            {{change_password}}
         </div>
         <h3 id=" brUpdateText">
         </h3>
@@ -130,6 +139,10 @@
 {{schoolJs}}
 
 {{adminJs}}
+
+{{passwordJs}}
+
+{{scheduleJs}}
 
 <script>
     function scrollHandler(event) {

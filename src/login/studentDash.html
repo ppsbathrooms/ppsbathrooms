@@ -11,6 +11,7 @@
 </head>
 
 {{studentStyle}}
+{{scheduleStyle}}
 
 <body>
     <img id='topLogo' src="/style/images/logo.png">
@@ -48,74 +49,8 @@
                     day. <br>this feature is still in development and is not yet complete. </p>
                 <p>Powered by Trivory</p>
             </div>
-            <p id="schedule" style="display: none">{{schedule}}</p>
-            <div id="scheduleHolder">
-                <p style="text-align: center;">room #</p>
-                <div style="flex-wrap: wrap; display: flex; width: fit-content; height: 175px; flex-direction: column;">
-                    <div class="scheduleContainer" id="period1">
-                        <p>1</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period2">
-                        <p>2</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period3">
-                        <p>3</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period4">
-                        <p>4</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period5">
-                        <p>5</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period6">
-                        <p>6</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period7">
-                        <p>7</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="scheduleContainer" id="period8">
-                        <p>8</p>
-                        <div class="inputBg">
-                            <input type="text">
-                        </div>
-                    </div>
-                </div>
-            </div><br>
-            <button id="updateSchedule" class="clearButton">update schedule</button>
-            <p id="scheduleError">error updating your schedule</p>
-            <div id="changePassword">
-                <h2>change your password</h2>
-                <div class="inputBg">
-                    <input id="currentPass" type="password" placeholder="current password">
-                </div>
-                <div class="inputBg">
-                    <input id="newPass" type="password" placeholder="new password">
-                </div>
-                <button id="updatePassword" class="clearButton">change password</button>
-                <br></br>
-                <p>your email address is <b>{{email}}</b></p>
-            </div>
+            {{update_schedule}}
+            {{change_password}}
         </div>
         <div id="settings">
             <h3>more coming soon :)</h3>
@@ -124,3 +59,5 @@
 </body>
 
 {{accountJs}}
+{{passwordJs}}
+{{scheduleJs}}

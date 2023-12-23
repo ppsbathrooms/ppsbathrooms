@@ -375,8 +375,32 @@ function getCurrentPeriod(periodData) {
       return period; 
     }
   }
-
   return -1;
+}
+
+function getCurrentDay(schedule) {
+  let words = schedule.value.day_subtitle.split(' ');
+  let adjustedWords = words.map(word => (word.length > 1 ? word.toLowerCase() : word));
+  
+  let adjustedDescription = adjustedWords.join(' ');
+  
+  if (isVowel(schedule.value.day_subtitle.charAt(0))) {
+      return `Today is an ${adjustedDescription} day`;
+  } else {
+      return `Today is a ${adjustedDescription} day`;
+  }
+}
+
+function getCurrentData(currentPeriod) {
+  if(currentPeriod == -1) {
+    return {currentClass:'No current class', classDescription:'No current class'}
+  }
+  else if ((user.schedule[Number(currentPeriod)-1] == undefined) && currentPeriod != 'Lunch') {
+    return {currentClass:'Enter your schedule to use see current period', classDescription:'Enter your schedule to use see current period'}
+  }
+  else {
+    return {currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch', classDescription:(currentClass == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass}
+  }
 }
 
 function isVowel(char) {
@@ -406,12 +430,18 @@ app.get('/account', async (req, res) => {
 
   else {
     if(req.session.userAccess == 2) {
-      const accountJs = '<script>' + await readFile('login/inserts/account.js') + '</script>'
-      const studentStyle = '<style>' + await readFile('login/studentStyle.css') + '</style>'
+      const accountJs = '<script>' + await readFile('login/inserts/account.js') + '</script>';
+      const studentStyle = '<style>' + await readFile('login/studentStyle.css') + '</style>';
+      const scheduleStyle = '<style>' + await readFile('login/inserts/schedule.css') + '</style>';
+      const updateSchedule = await readFile('login/inserts/updateSchedule.html');
+      const changePassword = await readFile('login/inserts/changePassword.html');
+
+      const scheduleJs = '<script>' + await readFile('login/inserts/schedule.js') + '</script>';
+      const passwordJs = '<script>' + await readFile('login/inserts/updatePassword.js') + '</script>';
 
       const objectId = ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
-      const schedule = await dataColl.findOne({ schedule: user.school})
+      const schedule = await dataColl.findOne({ schedule: user.school});
 
       let dropdownOptions = `
           <option value="chs"${user.school === 'chs' ? ' selected' : ''}>cleveland</option>
@@ -419,28 +449,12 @@ app.get('/account', async (req, res) => {
           <option value="ihs"${user.school === 'ihs' ? ' selected' : ''}>wells</option>`;
 
       currentPeriod = getCurrentPeriod(schedule);
+    
+      currentData = getCurrentData(currentPeriod)
+      classDescription = currentData.classDescription;
+      currentClass = currentData.currentClass;
 
-      if(currentPeriod == -1) {
-        currentClass = classDescription = 'No current class';
-      }
-      else if ((user.schedule[Number(currentPeriod)-1] == undefined) && currentPeriod != 'Lunch') {
-        currentClass = classDescription = 'Enter your schedule to use see current period'
-      }
-      else {
-        currentClass = (currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch';
-        classDescription = (currentClass == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass;
-      }
-
-      let words = schedule.value.day_subtitle.split(' ');
-      let adjustedWords = words.map(word => (word.length > 1 ? word.toLowerCase() : word));
-
-      let adjustedDescription = adjustedWords.join(' ');
-
-      if (isVowel(schedule.value.day_subtitle.charAt(0))) {
-          currentDay = `Today is an ${adjustedDescription} day`;
-      } else {
-          currentDay = `Today is a ${adjustedDescription} day`;
-      }
+      currentDay = getCurrentDay(schedule);
 
       fs.readFile('login/studentDash.html', 'utf8', (err, data) => {
         if (err) {
@@ -449,21 +463,45 @@ app.get('/account', async (req, res) => {
         } else {
           const modifiedHTML = data
             .replace('{{username}}', user.username)
+
             .replace('{{accountJs}}', accountJs)
+            
+            .replace('{{passwordJs}}', passwordJs)
+            .replace('{{scheduleJs}}', scheduleJs)
+
             .replace('{{studentStyle}}', studentStyle)
-            .replace('{{email}}', user.email)
+            .replace('{{scheduleStyle}}', scheduleStyle)
+            
+            
             .replace('{{day_subtitle}}', currentDay)
             .replace('{{current_class}}', classDescription)
-            .replace('{{schedule}}', user.schedule)
             .replace('{{school_options}}', dropdownOptions)
-
-
+            
+            .replace('{{update_schedule}}', updateSchedule)
+            .replace('{{schedule}}', user.schedule)
+            
+            .replace('{{change_password}}', changePassword)
+            
+            .replace('{{email}}', user.email)
+            
           res.send(modifiedHTML);
         }
       });
     } else {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
+
+      const objectId = ObjectId(req.session._id);
+      const user = await userColl.findOne({ _id: objectId });
+      const schedule = await dataColl.findOne({ schedule: user.school});
+
+      const updateSchedule = await readFile('login/inserts/updateSchedule.html');
+      const changePassword = await readFile('login/inserts/changePassword.html');
+
+      const scheduleJs = '<script>' + await readFile('login/inserts/schedule.js') + '</script>';
+      const passwordJs = '<script>' + await readFile('login/inserts/updatePassword.js') + '</script>';
+
+      const scheduleStyle = '<style>' + await readFile('login/inserts/schedule.css') + '</style>';
 
       const brUpdates = await db.collection('bathrooms').find({}).toArray();
       const formattedBrUpdates = brUpdates
@@ -507,15 +545,32 @@ app.get('/account', async (req, res) => {
         dataToSend.adminJs = await readFile('login/inserts/admin.js');
         dataToSend.adminHtml = await readFile('login/inserts/admin.html');
       }
+      const currentPeriod = getCurrentPeriod(schedule)
+      const currentData = getCurrentData(currentPeriod)
+      const currentDay = getCurrentDay(schedule);
+
+      const moreData = {
+        updateSchedule:updateSchedule,
+        changePassword:changePassword,
+        user:user,
+        schedule:schedule,
+        scheduleStyle:scheduleStyle,
+        passwordJs:passwordJs,
+        scheduleJs:scheduleJs,
+        currentPeriod: currentPeriod,
+        classDescription: currentData.classDescription,
+        currentClass: currentData.currentClass,
+        currentDay: currentDay
+      }
       
       fs.readFile('login/admindash.html', 'utf8', (err, data) => {
         if (err) {
           console.error('Error reading file:', err);
           res.status(500).send('Internal server error');
         } else {
-          const modifiedHTML = injectDataIntoHTML(data, dataToSend);
-
-          res.send(modifiedHTML);
+          modifiedHtml = injectDataIntoHTML(data, dataToSend, moreData);
+          
+          res.send(modifiedHtml);
         }
       });
     }
@@ -814,7 +869,7 @@ app.post('/sendFeedback', function(req, res) {
   dbEntry(req, 'feedback', req.body.feedback)
 });
 
-function injectDataIntoHTML(htmlContent, data) {
+function injectDataIntoHTML(htmlContent, data, moreData) {
   const defaultDir = 'Logs'
   let adminLogins;
   let navbar = '';
@@ -911,7 +966,6 @@ function injectDataIntoHTML(htmlContent, data) {
     });
   }
 
-
   chsData = data.schoolData.value[0]
   fhsData = data.schoolData.value[1]
   ihsData = data.schoolData.value[2]
@@ -957,7 +1011,30 @@ function injectDataIntoHTML(htmlContent, data) {
     .replace('{{navbar}}', navbar)
     .replace('{{navbarJs}}', '<script>' + navbarJs + '</script>')
     .replace('{{schoolJs}}', '<script>' + schoolJsInsert + '</script>')
+
+    .replace('{{passwordJs}}', moreData.passwordJs)
+    .replace('{{scheduleJs}}', moreData.scheduleJs)
+
     .replace('{{schools}}', schoolsInsert)
+
+    .replace('{{scheduleStyle}}', moreData.scheduleStyle)
+
+    .replace('{{update_schedule}}', moreData.updateSchedule)
+    .replace('{{schedule}}', moreData.user.schedule)
+
+    .replace('{{change_password}}', moreData.changePassword)
+
+    .replace('{{email}}', moreData.user.email)
+    
+    
+    .replace('{{day_subtitle}}', moreData.currentDay)
+    .replace('{{current_class}}', moreData.classDescription)
+    
+    .replace('{{school_options}}', 
+     `<option value="chs"${moreData.user.school === 'chs' ? ' selected' : ''}>cleveland</option>
+      <option value="fhs"${moreData.user.school === 'fhs' ? ' selected' : ''}>franklin</option>
+      <option value="ihs"${moreData.user.school === 'ihs' ? ' selected' : ''}>wells</option>`)
+
     .replace('{{brData}}', 
     `<div style="display: none">
       <p id="chsData">${chsData}</p>
