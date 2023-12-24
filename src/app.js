@@ -54,28 +54,27 @@ function updateAllPeriods() {
     getPeriodData(school)
   })  
 }
-
 async function getPeriodData(school) {
   try {
     const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
     const json = response.data;
-    const bellSchedule = json.bell_schedule[0].sched;
-
     const allPeriods = {};
-
-    bellSchedule.forEach((period) => {
-      const periodInfo = {
-        start: new Date(period[0].start),
-        startTime: period[0].start_time,
-        end: new Date(period[0].end),
-        endTime: period[0].end_time,
-      };
-      allPeriods[period[0].period] = periodInfo;
-    });
+    if(json.bellSchedule != undefined) {
+      const bellSchedule = json.bell_schedule[0].sched;      
+      bellSchedule.forEach((period) => {
+        const periodInfo = {
+          start: new Date(period[0].start),
+          startTime: period[0].start_time,
+          end: new Date(period[0].end),
+          endTime: period[0].end_time,
+        };
+        allPeriods[period[0].period] = periodInfo;
+      });
+    }
 
     allPeriods['day_subtitle'] = json.day_subtitle_short;
     allPeriods['time_updated'] = dateTime(true);
-
+    console.log(allPeriods)
     try {
       await dataColl.findOneAndUpdate(
         { schedule: school },
@@ -444,9 +443,9 @@ app.get('/account', async (req, res) => {
       const schedule = await dataColl.findOne({ schedule: user.school});
 
       let dropdownOptions = `
-          <option value="chs"${user.school === 'chs' ? ' selected' : ''}>cleveland</option>
-          <option value="fhs"${user.school === 'fhs' ? ' selected' : ''}>franklin</option>
-          <option value="ihs"${user.school === 'ihs' ? ' selected' : ''}>wells</option>`;
+          <option value="cleveland"${user.school === 'cleveland' ? ' selected' : ''}>cleveland</option>
+          <option value="franklin"${user.school === 'franklin' ? ' selected' : ''}>franklin</option>
+          <option value="ibw"${user.school === 'ibw' ? ' selected' : ''}>wells</option>`;
 
       currentPeriod = getCurrentPeriod(schedule);
     
@@ -784,10 +783,16 @@ app.post('/updatePassword', async function(req, res) {
 app.post('/updateSelf', async function(req, res) {
   if(req.session.authenticated && hasAccess('updateSelf', req.session)) {
 
-    canUpdate = ['school', 'schedule']
+    schools = ['cleveland', 'franklin', 'ibw'];
+    canUpdate = ['school', 'schedule'];
     toUpdate = req.body.toUpdate;
-
     newValue = req.body.newValue;
+
+    if(toUpdate == 'school' && !schools.includes(newValue)) {
+      console.log(chalk.red(req.session.username + ' attempted to change their school to ' + newValue))
+      return;
+    }
+
     const objectId = ObjectId(req.session._id);
     const user = await userColl.findOne({ _id: objectId });
 
@@ -1031,9 +1036,9 @@ function injectDataIntoHTML(htmlContent, data, moreData) {
     .replace('{{current_class}}', moreData.classDescription)
     
     .replace('{{school_options}}', 
-     `<option value="chs"${moreData.user.school === 'chs' ? ' selected' : ''}>cleveland</option>
-      <option value="fhs"${moreData.user.school === 'fhs' ? ' selected' : ''}>franklin</option>
-      <option value="ihs"${moreData.user.school === 'ihs' ? ' selected' : ''}>wells</option>`)
+     `<option value="cleveland"${moreData.user.school === 'cleveland' ? ' selected' : ''}>cleveland</option>
+      <option value="franklin"${moreData.user.school === 'franklin' ? ' selected' : ''}>franklin</option>
+      <option value="ibw"${moreData.user.school === 'ibw' ? ' selected' : ''}>wells</option>`)
 
     .replace('{{brData}}', 
     `<div style="display: none">
