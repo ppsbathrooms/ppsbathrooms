@@ -1132,7 +1132,8 @@ async function pageVisited() {
     await client.connect();
     const collection = db.collection('pageVisits');
     dt = dateTime();
-    const filter = { date: `${dt.date.year}/${dt.date.month}`};
+    const reqDate = `${dt.date.year}/${dt.date.month}`;
+    const filter = { date: reqDate};
 
     const existingDocument = await collection.findOne(filter);
 
@@ -1142,7 +1143,7 @@ async function pageVisited() {
     } else {
       // If the document doesn't exist, insert a new one with 'visits' set to 1
       await collection.insertOne({
-        date: filter,
+        date: reqDate,
         visits: 1
       });
     }
