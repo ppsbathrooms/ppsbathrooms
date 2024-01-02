@@ -58,16 +58,16 @@ async function getPeriodData(school) {
     const json = response.data;
     const schedule = {};
     // if(json.bellSchedule[0] != undefined) {
-      const bellSchedule = json.bell_schedule[0].sched;      
-      bellSchedule.forEach((period) => {
-        const periodInfo = {
-          start: new Date(period[0].start),
-          startTime: period[0].start_time,
-          end: new Date(period[0].end),
-          endTime: period[0].end_time,
-        };
-        schedule[period[0].period] = periodInfo;
-      });
+    const bellSchedule = json.bell_schedule[0].sched;      
+    bellSchedule.forEach((period) => {
+      const periodInfo = {
+        start: new Date(period[0].start),
+        startTime: period[0].start_time,
+        end: new Date(period[0].end),
+        endTime: period[0].end_time,
+      };
+      schedule[period[0].period] = periodInfo;
+    });
     // }
 
     schedule['day_subtitle'] = json.day_subtitle_short;
@@ -400,7 +400,8 @@ function getCurrentData(currentPeriod, user) {
   else {
     return {
       currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch',
-      classDescription:(currentPeriod == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass}
+      classDescription:(currentPeriod == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentPeriod
+    }
   }
 }
 
