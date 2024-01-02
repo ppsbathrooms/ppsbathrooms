@@ -58,7 +58,7 @@ async function getPeriodData(school) {
   try {
     const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
     const json = response.data;
-    const allPeriods = {};
+    const schedule = {};
     if(json.bellSchedule != undefined) {
       const bellSchedule = json.bell_schedule[0].sched;      
       bellSchedule.forEach((period) => {
@@ -68,17 +68,18 @@ async function getPeriodData(school) {
           end: new Date(period[0].end),
           endTime: period[0].end_time,
         };
-        allPeriods[period[0].period] = periodInfo;
+        schedule[period[0].period] = periodInfo;
       });
     }
 
-    allPeriods['day_subtitle'] = json.day_subtitle_short;
-    allPeriods['time_updated'] = dateTime(true);
-    console.log(allPeriods)
+    schedule['day_subtitle'] = json.day_subtitle_short;
+    dt = dateTime();
+    schedule['time_updated'] = `${dt.date.year.toString().slice(-2)}-${dt.date.month}-${dt.date.day} ${dt.time.hours}:${dt.time.minutes} ${dt.time.ampm}`;
+
     try {
       await dataColl.findOneAndUpdate(
         { schedule: school },
-        { $set: { value: allPeriods } },
+        { $set: { value: schedule } },
       );
 
       console.log(chalk.green.dim(dateTime(true) + ' | ' + school + ' schedule updated'));
@@ -441,7 +442,6 @@ app.get('/account', async (req, res) => {
       const objectId = ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
-
       let dropdownOptions = `
           <option value="cleveland"${user.school === 'cleveland' ? ' selected' : ''}>cleveland</option>
           <option value="franklin"${user.school === 'franklin' ? ' selected' : ''}>franklin</option>
@@ -454,6 +454,7 @@ app.get('/account', async (req, res) => {
       currentClass = currentData.currentClass;
 
       currentDay = getCurrentDay(schedule);
+      console.log(currentDay);
 
       fs.readFile('login/studentDash.html', 'utf8', (err, data) => {
         if (err) {
@@ -627,6 +628,10 @@ app.post('/createAccount', async (req, res) => {
 
   verificationKey = crypto.randomBytes(64).toString('hex');
 
+  const dt = dateTime(false);
+
+  const joinTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
+
   const newUserInfo = {
     username: username,
     password: await hashPassword(password),
@@ -635,7 +640,9 @@ app.post('/createAccount', async (req, res) => {
     email: email,
     emailVerified: false,
     emailVerificationKey: verificationKey,
-    schedule: {0:'', 1:'', 2:'', 3:'', 4:'', 5:'', 6:'', 7:'', 8:''}
+    schedule: ['','','','','','','','',''],
+    joined: joinTime,
+    school: "cleveland"
   };
   
   usernameHasText = (username != '') 
@@ -961,8 +968,13 @@ function injectDataIntoHTML(htmlContent, data, moreData) {
                       //   <button class="clearButton smallerButton">CHANGE PASSWORD</button>
                       // </div>
                       `<div>
-                        <p>email : ${user.email}</p>             
-                        <p>verified : ${user.emailVerified}</p>             
+                        <div style="display:flex;align-items:center;margin-bottom:10px">
+                          <p style="margin-bottom:0px;margin-right: 10px;">email : ${user.email + ' '}</p>
+                          <img id="verificationImg" ${user.emailVerified ? 'src="/style/icons/check.svg" title="email verified"' : 'src="/style/icons/x.svg" title="email not verified"'}></img>
+                        </div>
+                        <p>school : ${user.school}</p>
+                        <p>schedule : ${(user.schedule == ",,,,,,,") ? 'no schedule' : user.schedule}</p>   
+                        <p id="idFull">id : ${user._id}</p>                     
                       </div>
                     </div>
                 </div>
@@ -1183,19 +1195,19 @@ async function writeToFile(filename, newText, includeDate, other) {
 ``
 
 // Gets the current datetime
-function dateTime(time) {
+function dateTime() {
     var currentdate = new Date();
     var pst = new Date(currentdate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
 
     var month = pst.getMonth() + 1;
     var day = pst.getDate();
-    year = time ? pst.getFullYear().toString().slice(-2) : pst.getFullYear();
+    year = pst.getFullYear();
     var hours = pst.getHours();
     var minutes = pst.getMinutes();
     var seconds = pst.getSeconds();
     var ampm = hours >= 12 ? 'PM' : 'AM';
 
-    const date = `${year}-${month}-${day}`;
+    const date = {year:year, month:month, day:day};
 
     hours = hours % 12;
     hours = hours ? hours : 12; // handle midnight (12 AM)
@@ -1203,13 +1215,8 @@ function dateTime(time) {
     minutes = minutes < 10 ? '0' + minutes : minutes;
     seconds = seconds < 10 ? '0' + seconds : seconds;
 
-    var formattedDate = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ' ' + ampm;
-    if(time) {
-      return formattedDate;
-    }
-    else {
-      return date;
-    }
+    // var formattedDate = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ' ' + ampm;
+    return {date: date, time: {hours: hours, minutes: minutes, seconds: seconds, ampm: ampm}}
 }
 
 app.route('/reqtypes')

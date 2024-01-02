@@ -23,6 +23,11 @@ body img {
     user-select: none;
 }
 
+#verificationImg {
+    width: 16px;
+    aspect-ratio: 1;
+}
+
 #top {
     position: fixed;
     top: 0;
@@ -431,6 +436,10 @@ body img {
 }
 
 @media (max-width: 1150px) {
+    #verificationImg {
+        width: 10px;
+    }
+
     .userTop {
         flex-direction: column;
     }
@@ -488,6 +497,10 @@ body img {
 
     .editPerms p {
         font-size: 10px;
+        width: fit-content;
+    }
+    #idFull {
+        display: none;
     }
 }
 
