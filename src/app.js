@@ -1132,7 +1132,7 @@ async function pageVisited() {
     await client.connect();
     const collection = db.collection('pageVisits');
     dt = dateTime();
-    const reqDate = `${dt.date.year}/${dt.date.month}`;
+    const reqDate = `${dt.date.year}/${dt.date.month}/${dt.date.day}`;
     const filter = { date: reqDate};
 
     const existingDocument = await collection.findOne(filter);
