@@ -47,8 +47,6 @@ else {
 
 sgMail.setApiKey(emailApi);
 
-// updateAllPeriods(); // update schedules on server start
-
 function updateAllPeriods() {
   ['cleveland', 'franklin', 'ibw'].forEach(school => {
     getPeriodData(school)
@@ -59,7 +57,7 @@ async function getPeriodData(school) {
     const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
     const json = response.data;
     const schedule = {};
-    if(json.bellSchedule != undefined) {
+    // if(json.bellSchedule[0] != undefined) {
       const bellSchedule = json.bell_schedule[0].sched;      
       bellSchedule.forEach((period) => {
         const periodInfo = {
@@ -70,7 +68,7 @@ async function getPeriodData(school) {
         };
         schedule[period[0].period] = periodInfo;
       });
-    }
+    // }
 
     schedule['day_subtitle'] = json.day_subtitle_short;
     dt = dateTime();
@@ -153,6 +151,7 @@ client.connect()
   .then(() => {
     console.error(chalk.green('connected to database'));
     updateExtensionData();
+    updateAllPeriods(); // update schedules on server start
   })
   .catch(err => {
     console.error('Failed to connect to the database:', err);
@@ -399,7 +398,9 @@ function getCurrentData(currentPeriod) {
     return {currentClass:'Enter your schedule to use see current period', classDescription:'Enter your schedule to use see current period'}
   }
   else {
-    return {currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch', classDescription:(currentClass == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass}
+    return {
+      currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch',
+      classDescription:(currentPeriod == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass}
   }
 }
 
