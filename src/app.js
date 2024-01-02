@@ -80,7 +80,7 @@ async function getPeriodData(school) {
         { $set: { value: schedule } },
       );
 
-      console.log(chalk.green.dim(dateTime(true) + ' | ' + school + ' schedule updated'));
+      console.log(chalk.green.dim(`${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}` + ' | ' + school + ' schedule updated'));
 
     } catch (error) {
       console.error('Error updating document:', error);
@@ -629,7 +629,7 @@ app.post('/createAccount', async (req, res) => {
 
   verificationKey = crypto.randomBytes(64).toString('hex');
 
-  const dt = dateTime(false);
+  const dt = dateTime();
 
   const joinTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
 
@@ -1094,8 +1094,10 @@ async function dbEntry(request, collectionName, value, school, numChanged) {
     try {
         await client.connect();
         const collection = db.collection(collectionName);
+        const dt = dateTime();
+        const reqTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
         const dbentry = {
-            time: dateTime(true),
+            time: reqTime,
             ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress
         };
         if (school) {
@@ -1129,7 +1131,8 @@ async function pageVisited() {
   try {
     await client.connect();
     const collection = db.collection('pageVisits');
-    const filter = { date: dateTime(false) };
+    dt = dateTime();
+    const filter = { date: `${dt.date.year}/${dt.date.month}`};
 
     const existingDocument = await collection.findOne(filter);
 
@@ -1139,7 +1142,7 @@ async function pageVisited() {
     } else {
       // If the document doesn't exist, insert a new one with 'visits' set to 1
       await collection.insertOne({
-        date: dateTime(false),
+        date: filter,
         visits: 1
       });
     }
@@ -1179,21 +1182,6 @@ function numDiffCharacters(arr1, arr2) {
   }
   return differentCharacters;
 }
-// Writes text to a file
-async function writeToFile(filename, newText, includeDate, other) {
-  filename = 'txt/' + filename;
-  fs.readFile(filename + '.txt', function(err, buf) {
-    var previousText = String(buf);
-    date = includeDate ? dateTime(true) : '';
-
-    var txt = date + " | " + String(newText) + '\n' + previousText;
-
-    fs.writeFile(filename + '.txt', txt, err => {
-      if (err) throw err;
-    });
-  });
-}
-``
 
 // Gets the current datetime
 function dateTime() {
