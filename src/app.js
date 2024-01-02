@@ -400,7 +400,7 @@ function getCurrentData(currentPeriod, user) {
   else {
     return {
       currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch',
-      classDescription:(currentPeriod == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentPeriod
+      classDescription:(currentPeriod == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + user.schedule[currentPeriod -1]
     }
   }
 }
