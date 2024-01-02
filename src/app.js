@@ -390,7 +390,7 @@ function getCurrentDay(schedule) {
   }
 }
 
-function getCurrentData(currentPeriod) {
+function getCurrentData(currentPeriod, user) {
   if(currentPeriod == -1) {
     return {currentClass:'No current class', classDescription:'No current class'}
   }
@@ -450,7 +450,7 @@ app.get('/account', async (req, res) => {
 
       currentPeriod = getCurrentPeriod(schedule);
     
-      currentData = getCurrentData(currentPeriod)
+      currentData = getCurrentData(currentPeriod, user)
       classDescription = currentData.classDescription;
       currentClass = currentData.currentClass;
 
@@ -546,7 +546,7 @@ app.get('/account', async (req, res) => {
         dataToSend.adminHtml = await readFile('login/inserts/admin.html');
       }
       const currentPeriod = getCurrentPeriod(schedule)
-      const currentData = getCurrentData(currentPeriod)
+      const currentData = getCurrentData(currentPeriod, user)
       const currentDay = getCurrentDay(schedule);
 
       const moreData = {
