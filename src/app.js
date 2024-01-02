@@ -640,7 +640,7 @@ app.post('/createAccount', async (req, res) => {
     email: email,
     emailVerified: false,
     emailVerificationKey: verificationKey,
-    schedule: ['','','','','','','','',''],
+    schedule: ['','','','','','','',''],
     joined: joinTime,
     school: "cleveland"
   };
