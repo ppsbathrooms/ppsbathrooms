@@ -454,7 +454,6 @@ app.get('/account', async (req, res) => {
       currentClass = currentData.currentClass;
 
       currentDay = getCurrentDay(schedule);
-      console.log(currentDay);
 
       fs.readFile('login/studentDash.html', 'utf8', (err, data) => {
         if (err) {
