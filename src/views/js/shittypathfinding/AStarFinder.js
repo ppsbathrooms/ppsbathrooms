@@ -1,7 +1,7 @@
 var Heap       = require('heap');
-var Util       = require('../core/Util');
-var Heuristic  = require('../core/Heuristic');
-var DiagonalMovement = require('../core/DiagonalMovement');
+var Util       = require('Util');
+var Heuristic  = require('Heuristic');
+var DiagonalMovement = require('DiagonalMovement');
 
 /**
  * A* path-finder. Based upon https://github.com/bgrins/javascript-astar
@@ -82,7 +82,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
             return Util.backtrace(endNode);
         }
 
-        // get neigbours of the current node
+        // get neighbors of the current node
         neighbors = grid.getNeighbors(node, diagonalMovement);
         for (i = 0, l = neighbors.length; i < l; ++i) {
             neighbor = neighbors[i];
