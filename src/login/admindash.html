@@ -57,16 +57,21 @@
         <div id="account">
             <h2>{{day_subtitle}}</h2>
             <h3 id="currentPeriod">{{current_class}}</h3>
-            <p>Powered by Trivory</p>
+            <p>Powered by Trivory</p><br>
+            <h2>select your school</h2>
             <div class="dropdownHolder">
                 <select name="school" class="clearDropdown" id="schoolSelect">
                     {{school_options}}
                 </select>
-            </div>
+            </div><br>
+            {{br_prefs}}
+            <br>
+            <h2 style="margin-bottom: 0">set your class schedule</h2>
             {{update_schedule}}
             {{change_password}}
+            <div style="height: 150px;"></div>
         </div>
-        <h3 id=" brUpdateText">
+        <h3 id="brUpdateText">
         </h3>
         <h3 id="visitsText"></h3>
     </div>

@@ -101,3 +101,24 @@ $('#schoolSelect').on('input', function() {
         }
     });
 });
+
+$('#br_prefs input').on('change', function () {
+    const maleChecked = $('input[name="male"]').is(':checked');
+    const femaleChecked = $('input[name="female"]').is(':checked');
+    const allChecked = $('input[name="all"]').is(':checked');
+    const brPrefs = {
+        male: maleChecked,
+        female: femaleChecked,
+        all: allChecked
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: '/updateSelf',
+        data: { toUpdate: 'br_prefs', newValue: brPrefs },
+        success: function (response) { },
+        error: function (xhr, status, error) {
+            console.error('AJAX request error:', status, error);
+        }
+    });
+});

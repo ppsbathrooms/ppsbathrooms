@@ -94,6 +94,18 @@
     opacity: 0;
 }
 
+#br_prefs input {
+    width: 15px;
+    aspect-ratio: 1;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.flex_horizontal {
+    display: flex;
+    align-items: center;
+}
+
 @media (max-width: 800px) {
     #changePassword .inputBg {
         width: 250px;

@@ -37,13 +37,14 @@
         <h2>{{day_subtitle}}</h2>
         <h3 id="currentPeriod">{{current_class}}</h3>
         <div id="account">
-            <h2>school</h2>
+            <h2>select your school</h2>
             <div class="dropdownHolder">
                 <select name="school" class="clearDropdown" id="schoolSelect">
                     {{school_options}}
                 </select>
             </div>
-            <h2>class schedule</h2>
+            {{br_prefs}}
+            <h2>set your class schedule</h2>
             <div style="width: 60vw;">
                 <p>enter the room number of each class period you have. room numbers for you classes can be found in
                     synergy under class schedule. </p>

@@ -47,8 +47,6 @@ else {
 
 sgMail.setApiKey(emailApi);
 
-// updateAllPeriods(); // update schedules on server start
-
 function updateAllPeriods() {
   ['cleveland', 'franklin', 'ibw'].forEach(school => {
     getPeriodData(school)
@@ -59,18 +57,18 @@ async function getPeriodData(school) {
     const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
     const json = response.data;
     const schedule = {};
-    if(json.bellSchedule != undefined) {
-      const bellSchedule = json.bell_schedule[0].sched;      
-      bellSchedule.forEach((period) => {
-        const periodInfo = {
-          start: new Date(period[0].start),
-          startTime: period[0].start_time,
-          end: new Date(period[0].end),
-          endTime: period[0].end_time,
-        };
-        schedule[period[0].period] = periodInfo;
-      });
-    }
+    // if(json.bellSchedule[0] != undefined) {
+    const bellSchedule = json.bell_schedule[0].sched;      
+    bellSchedule.forEach((period) => {
+      const periodInfo = {
+        start: new Date(period[0].start),
+        startTime: period[0].start_time,
+        end: new Date(period[0].end),
+        endTime: period[0].end_time,
+      };
+      schedule[period[0].period] = periodInfo;
+    });
+    // }
 
     schedule['day_subtitle'] = json.day_subtitle_short;
     dt = dateTime();
@@ -82,7 +80,7 @@ async function getPeriodData(school) {
         { $set: { value: schedule } },
       );
 
-      console.log(chalk.green.dim(dateTime(true) + ' | ' + school + ' schedule updated'));
+      console.log(chalk.green.dim(`${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}` + ' | ' + school + ' schedule updated'));
 
     } catch (error) {
       console.error('Error updating document:', error);
@@ -153,6 +151,7 @@ client.connect()
   .then(() => {
     console.error(chalk.green('connected to database'));
     updateExtensionData();
+    // updateAllPeriods(); // update schedules on server start
   })
   .catch(err => {
     console.error('Failed to connect to the database:', err);
@@ -391,7 +390,7 @@ function getCurrentDay(schedule) {
   }
 }
 
-function getCurrentData(currentPeriod) {
+function getCurrentData(currentPeriod, user) {
   if(currentPeriod == -1) {
     return {currentClass:'No current class', classDescription:'No current class'}
   }
@@ -399,7 +398,10 @@ function getCurrentData(currentPeriod) {
     return {currentClass:'Enter your schedule to use see current period', classDescription:'Enter your schedule to use see current period'}
   }
   else {
-    return {currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch', classDescription:(currentClass == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + currentClass}
+    return {
+      currentClass:(currentPeriod != 'Lunch') ? user.schedule[Number(currentPeriod)-1] : 'Lunch',
+      classDescription:(currentPeriod == 'Lunch') ? 'Your current class is Lunch' : 'Your current class is in room ' + user.schedule[currentPeriod -1]
+    }
   }
 }
 
@@ -447,9 +449,26 @@ app.get('/account', async (req, res) => {
           <option value="franklin"${user.school === 'franklin' ? ' selected' : ''}>franklin</option>
           <option value="ibw"${user.school === 'ibw' ? ' selected' : ''}>wells</option>`;
 
+      let brPrefsSelect = `
+      <div id="br_prefs">
+        <h2>select your prefered bathroom type/s</h2>
+        <div class="flex_horizontal">
+            <input type="checkbox" name="male" value="male" ${user.br_prefs.male == "true" ? 'checked': ''}>
+            <label for="male">male</label><br>
+        </div>
+        <div class="flex_horizontal">
+            <input type="checkbox" name="female" value="female" ${user.br_prefs.female == "true" ? 'checked': ''}>
+            <label for="female">female</label><br>
+        </div>
+        <div class="flex_horizontal">
+            <input type="checkbox" name="all" value="all" ${user.br_prefs.all == "true" ? 'checked': ''}>
+            <label for="all">all gender</label><br>
+        </div><br>
+      </div>`
+
       currentPeriod = getCurrentPeriod(schedule);
     
-      currentData = getCurrentData(currentPeriod)
+      currentData = getCurrentData(currentPeriod, user)
       classDescription = currentData.classDescription;
       currentClass = currentData.currentClass;
 
@@ -475,6 +494,7 @@ app.get('/account', async (req, res) => {
             .replace('{{day_subtitle}}', currentDay)
             .replace('{{current_class}}', classDescription)
             .replace('{{school_options}}', dropdownOptions)
+            .replace('{{br_prefs}}', brPrefsSelect)
             
             .replace('{{update_schedule}}', updateSchedule)
             .replace('{{schedule}}', user.schedule)
@@ -545,8 +565,25 @@ app.get('/account', async (req, res) => {
         dataToSend.adminHtml = await readFile('login/inserts/admin.html');
       }
       const currentPeriod = getCurrentPeriod(schedule)
-      const currentData = getCurrentData(currentPeriod)
+      const currentData = getCurrentData(currentPeriod, user)
       const currentDay = getCurrentDay(schedule);
+
+      let brPrefsSelect = `
+      <div id="br_prefs">
+        <h2>select your prefered bathroom type/s</h2>
+        <div class="flex_horizontal">
+            <input type="checkbox" name="male" value="male" ${user.br_prefs.male == "true" ? 'checked': ''}>
+            <label for="male">male</label><br>
+        </div>
+        <div class="flex_horizontal">
+            <input type="checkbox" name="female" value="female" ${user.br_prefs.female == "true" ? 'checked': ''}>
+            <label for="female">female</label><br>
+        </div>
+        <div class="flex_horizontal">
+            <input type="checkbox" name="all" value="all" ${user.br_prefs.all == "true" ? 'checked': ''}>
+            <label for="all">all gender</label><br>
+        </div><br>
+      </div>`
 
       const moreData = {
         updateSchedule:updateSchedule,
@@ -559,7 +596,8 @@ app.get('/account', async (req, res) => {
         currentPeriod: currentPeriod,
         classDescription: currentData.classDescription,
         currentClass: currentData.currentClass,
-        currentDay: currentDay
+        currentDay: currentDay,
+        br_prefs: brPrefsSelect
       }
       
       fs.readFile('login/admindash.html', 'utf8', (err, data) => {
@@ -627,7 +665,7 @@ app.post('/createAccount', async (req, res) => {
 
   verificationKey = crypto.randomBytes(64).toString('hex');
 
-  const dt = dateTime(false);
+  const dt = dateTime();
 
   const joinTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
 
@@ -641,7 +679,8 @@ app.post('/createAccount', async (req, res) => {
     emailVerificationKey: verificationKey,
     schedule: ['','','','','','','',''],
     joined: joinTime,
-    school: "cleveland"
+    school: "cleveland",
+    br_prefs: {'male':"false", 'female':"false", 'all':"true"}
   };
   
   usernameHasText = (username != '') 
@@ -790,7 +829,7 @@ app.post('/updateSelf', async function(req, res) {
   if(req.session.authenticated && hasAccess('updateSelf', req.session)) {
 
     schools = ['cleveland', 'franklin', 'ibw'];
-    canUpdate = ['school', 'schedule'];
+    canUpdate = ['school', 'schedule', 'br_prefs'];
     toUpdate = req.body.toUpdate;
     newValue = req.body.newValue;
 
@@ -807,7 +846,7 @@ app.post('/updateSelf', async function(req, res) {
         const updateQuery = { $set: { [toUpdate]: newValue } };
   
         await db.collection('users').updateOne({ _id: objectId }, updateQuery);
-        console.log(chalk.white(`${user.username} ${toUpdate} changed to ${newValue}`));
+        console.log(chalk.white(`${user.username} ${toUpdate} changed to ${JSON.stringify(newValue)}`));
       }
       else {
         console.log(chalk.red('user not found'))
@@ -1045,6 +1084,8 @@ function injectDataIntoHTML(htmlContent, data, moreData) {
     
     .replace('{{day_subtitle}}', moreData.currentDay)
     .replace('{{current_class}}', moreData.classDescription)
+
+    .replace('{{br_prefs}}', moreData.br_prefs)
     
     .replace('{{school_options}}', 
      `<option value="cleveland"${moreData.user.school === 'cleveland' ? ' selected' : ''}>cleveland</option>
@@ -1092,8 +1133,10 @@ async function dbEntry(request, collectionName, value, school, numChanged) {
     try {
         await client.connect();
         const collection = db.collection(collectionName);
+        const dt = dateTime();
+        const reqTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
         const dbentry = {
-            time: dateTime(true),
+            time: reqTime,
             ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress
         };
         if (school) {
@@ -1127,7 +1170,9 @@ async function pageVisited() {
   try {
     await client.connect();
     const collection = db.collection('pageVisits');
-    const filter = { date: dateTime(false) };
+    dt = dateTime();
+    const reqDate = `${dt.date.year}/${dt.date.month}/${dt.date.day}`;
+    const filter = { date: reqDate};
 
     const existingDocument = await collection.findOne(filter);
 
@@ -1137,7 +1182,7 @@ async function pageVisited() {
     } else {
       // If the document doesn't exist, insert a new one with 'visits' set to 1
       await collection.insertOne({
-        date: dateTime(false),
+        date: reqDate,
         visits: 1
       });
     }
@@ -1177,21 +1222,6 @@ function numDiffCharacters(arr1, arr2) {
   }
   return differentCharacters;
 }
-// Writes text to a file
-async function writeToFile(filename, newText, includeDate, other) {
-  filename = 'txt/' + filename;
-  fs.readFile(filename + '.txt', function(err, buf) {
-    var previousText = String(buf);
-    date = includeDate ? dateTime(true) : '';
-
-    var txt = date + " | " + String(newText) + '\n' + previousText;
-
-    fs.writeFile(filename + '.txt', txt, err => {
-      if (err) throw err;
-    });
-  });
-}
-``
 
 // Gets the current datetime
 function dateTime() {
