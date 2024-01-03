@@ -89,36 +89,40 @@ function setupPathfinder() {
 
 
     //yoink node locations from svg
-    var textElements = $("#svgNodes text");
-    var globalTransform = spliceTransform($("#svgNodes").attr('transform'));
+    // var textElements = $("#svgNodes text");
+    // var globalTransform = spliceTransform($("#svgNodes").attr('transform'));
 
-    textElements.each(function () {
-        var element = $(this);
-        var id = element.text();
+    // textElements.each(function () {
+    //     var element = $(this);
+    //     var id = element.text();
 
-        var localTransform = spliceTransform(element.attr('transform'));
+    //     var localTransform = spliceTransform(element.attr('transform'));
 
-        var xPos = parseFloat(element.attr('x')) + globalTransform[0] + localTransform[0];
-        var yPos = parseFloat(element.attr('y')) + globalTransform[1] + localTransform[1];
+    //     var xPos = parseFloat(element.attr('x')) + globalTransform[0] + localTransform[0];
+    //     var yPos = parseFloat(element.attr('y')) + globalTransform[1] + localTransform[1];
         
-        console.log(id + " " + xPos + " " + yPos);
-        new PathNode(xPos, yPos, id.toString());
-    });
+    //     console.log(id + " " + xPos + " " + yPos);
+    //     new PathNode(xPos, yPos, id.toString());
+    // });
 
-    new Connection("109", "115");
-    new Connection("115", "117");
-    new Connection("117", "c-0");
-    new Connection("c-0", "br-g");
-    new Connection("br-g", "127");
-    new Connection("127", "br-b");
-    new Connection("br-b", "c-1");
+    // new Connection("109", "115");
+    // new Connection("115", "117");
+    // new Connection("117", "c-0");
+    // new Connection("c-0", "br-g");
+    // new Connection("br-g", "127");
+    // new Connection("127", "br-b");
+    // new Connection("br-b", "c-1");
 
-    var path = findPath("109", "br-g");
+    // var path = findPath("109", "br-g");
 
-    console.log("printing path");
-    for (var i = 0; i < path.length; i++) {
-        console.log(path[i].id);
-    }
+    // console.log("printing path");
+    // for (var i = 0; i < path.length; i++) {
+    //     console.log(path[i].id);
+    //     if (i == 0)
+    //     continue;
+
+    //     //drawLine(path[i].xPos, -path[i].yPos, path[i-1].xPos, -path[i-1].yPos);
+    // }
 
     // $(document).ready(function () {
     //     var textElements = $("#svgNodes text");
@@ -131,6 +135,33 @@ function setupPathfinder() {
     // });
 
 }
+
+function drawLine(x1, y1, x2, y2) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    
+    // Calculate the SVG dimensions based on line coordinates
+    const minX = Math.min(x1, x2);
+    const minY = Math.min(y1, y2);
+    const maxX = Math.max(x1, x2);
+    const maxY = Math.max(y1, y2);
+    
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", maxX - minX + 10); // Add some padding for visibility
+    svg.setAttribute("height", maxY - minY + 10);
+  
+    const line = document.createElementNS(svgNS, "line");
+    line.setAttribute("x1", (x1 - minX + 5).toString()); // Offset x coordinates
+    line.setAttribute("y1", (y1 - minY + 5).toString()); // Offset y coordinates
+    line.setAttribute("x2", (x2 - minX + 5).toString()); // Offset x coordinates
+    line.setAttribute("y2", (y2 - minY + 5).toString()); // Offset y coordinates
+    line.setAttribute("stroke", "white");
+    line.setAttribute("stroke-width", "5");
+  
+    svg.appendChild(line);
+  
+    const lineHolder = document.getElementById("lineHolder");
+    lineHolder.appendChild(svg);
+  }
 
 function spliceTransform(transform) {
     const matches = transform.match(/-?\d+/g);
