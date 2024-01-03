@@ -6,18 +6,21 @@ class Connection {
     walkTime;
 
     // if no custom walk time it added, it used the distance between nodes
-    constructor(nodeA, nodeB, walkTime) {
-        this.nodeA = nodeA;
-        this.nodeB = nodeB;
+    constructor(nodeIdA, nodeIdB, walkTime) {
+        this.nodeA = findNode(nodeIdA);
+        this.nodeB = findNode(nodeIdB);
+
+        console.log(this.nodeA);
+        console.log(this.nodeB);
 
         if (walkTime) {
             this.walkTime = walkTime;
         }else {
-            this.walkTime = getDirectDistance(nodeA, nodeB) * distanceToTimeConversion;
+            this.walkTime = getDirectDistance(this.nodeA, this.nodeB) * distanceToTimeConversion;
         }
 
-        nodeA.addConnection(this);
-        nodeB.addConnection(this);
+        this.nodeA.addConnection(this);
+        this.nodeB.addConnection(this);
 
         allConnections.push(this);
     }
@@ -27,11 +30,13 @@ class Connection {
 class PathNode {
     xPos;
     yPos;
+    id;
     connections;
 
-    constructor(xPos, yPos) {
+    constructor(xPos, yPos, id) {
         this.xPos = xPos;
         this.yPos = yPos;
+        this.id = id;
         this.connections = [];
 
         this.gCost = 0;
@@ -54,27 +59,89 @@ class PathNode {
 var allNodes = [];
 var allConnections = [];
 
-function testPathfinder() {
-    var node1 = new PathNode(1, 0);
-    var node2 = new PathNode(2, 5);
-    var node3 = new PathNode(2, -10);
-    var node4 = new PathNode(3, -6);
+function findNode(id) {
+    for (var i = 0; i < allNodes.length; i++) {
+        if (allNodes[i].id === id) {
+            return allNodes[i];
+        }
+    }
+    console.log("failed to find node");
+}
 
-    new Connection(node1, node2);
-    new Connection(node1, node3);
-    new Connection(node4, node3);
-    new Connection(node2, node4);
+function setupPathfinder() {
+    // var node1 = new PathNode(1, 0);
+    // var node2 = new PathNode(2, 5);
+    // var node3 = new PathNode(2, -10);
+    // var node4 = new PathNode(3, -6);
 
-    var path = findPath(node1, node4);
+    // new Connection(node1, node2);
+    // new Connection(node1, node3);
+    // new Connection(node4, node3);
+    // new Connection(node2, node4);
+
+    // var path = findPath(node1, node4);
+
+    // console.log("printing path");
+    // for (var i = 0; i < path.length; i++) {
+    //     console.log(path[i].xPos + " " + path[i].yPos);
+    // }
+
+
+
+    //yoink node locations from svg
+    var textElements = $("#svgNodes text");
+    var globalTransform = spliceTransform($("#svgNodes").attr('transform'));
+
+    textElements.each(function () {
+        var element = $(this);
+        var id = element.text();
+
+        var localTransform = spliceTransform(element.attr('transform'));
+
+        var xPos = parseFloat(element.attr('x')) + globalTransform[0] + localTransform[0];
+        var yPos = parseFloat(element.attr('y')) + globalTransform[1] + localTransform[1];
+        
+        console.log(id + " " + xPos + " " + yPos);
+        new PathNode(xPos, yPos, id.toString());
+    });
+
+    new Connection("109", "115");
+    new Connection("115", "117");
+    new Connection("117", "c-0");
+    new Connection("c-0", "br-g");
+    new Connection("br-g", "127");
+    new Connection("127", "br-b");
+    new Connection("br-b", "c-1");
+
+    var path = findPath("109", "br-g");
 
     console.log("printing path");
     for (var i = 0; i < path.length; i++) {
-        console.log(path[i].xPos + " " + path[i].yPos);
+        console.log(path[i].id);
     }
+
+    // $(document).ready(function () {
+    //     var textElements = $("#svgNodes text");
+    
+    //     textElements.each(function () {
+    //         var element = $(this);
+    //         console.log(element.attr('x'));
+    //         console.log(element.attr('y'));
+    //     });
+    // });
+
+}
+
+function spliceTransform(transform) {
+    const matches = transform.match(/-?\d+/g);
+    return matches ? matches.map(Number) : [];
 }
 
 // based off thing i made a long time ago in cs https://github.com/LucaHaverty/hexgrid-game/blob/main/Assets/Scrips/Static/Pathfinding.cs
-function findPath(startNode, endNode) {
+function findPath(startNodeId, endNodeId) {
+    startNode = findNode(startNodeId);
+    endNode = findNode(endNodeId);
+
     // final path 
     path = [];
 
