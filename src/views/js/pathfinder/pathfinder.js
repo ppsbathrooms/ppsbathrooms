@@ -2,6 +2,7 @@ const distanceToTimeConversion = 1.0;
 
 // technically not needed, but nice to store these somewhere in case they need to be accessed for something else
 var bathroomNodes = [];
+
 var cornerNodes = [];
 var roomNodes = [];
 
@@ -119,7 +120,7 @@ function setupPathfinder() {
     new Connection("br-b", "c-1");
 
 
-    var path = pathfindToNearestBathroom("109");
+    var path = pathfindToNearestBathroom("109", ["br-b", "br-g"]);
 
     drawPath(path);
     //drawAllConnections();
@@ -134,9 +135,12 @@ function spliceTransform(transform) {
 
 // #region Pathfinder
 
-function pathfindToNearestBathroom(roomId) {
+function pathfindToNearestBathroom(roomId, brPrefs) {
     var paths = [];
     bathroomNodes.forEach((brNode) => {
+        if (brPrefs != undefined && !brPrefs.includes(brNode.id))
+            return;
+
         var p = findPath(roomId, brNode.id); 
         paths.push(p);
     })
