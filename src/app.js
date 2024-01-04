@@ -421,7 +421,7 @@ function isVowel(char) {
 }
 
 app.get('/account', async (req, res) => {
-  const userId = ObjectId(req.session._id);
+  const userId = new ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
   
   if(!req.session.authenticated || !req.session.verified) {
@@ -452,7 +452,7 @@ app.get('/account', async (req, res) => {
       const scheduleJs = '<script>' + await readFile('login/inserts/schedule.js') + '</script>';
       const passwordJs = '<script>' + await readFile('login/inserts/updatePassword.js') + '</script>';
 
-      const objectId = ObjectId(req.session._id);
+      const objectId = new ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
       let dropdownOptions = `
@@ -521,7 +521,7 @@ app.get('/account', async (req, res) => {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
 
-      const objectId = ObjectId(req.session._id);
+      const objectId = new ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
 
@@ -813,7 +813,7 @@ app.post('/updatePassword', async function(req, res) {
     }
 
     else if(req.body.passwordType = 'self' && hasAccess('updateSelfPassword', req.session)) {
-      const objectId = ObjectId(req.session._id)
+      const objectId = new ObjectId(req.session._id)
       
       const currentPass = req.body.currentPass;
       const newPass = req.body.newPass;
@@ -849,7 +849,7 @@ app.post('/updateSelf', async function(req, res) {
       return;
     }
 
-    const objectId = ObjectId(req.session._id);
+    const objectId = new ObjectId(req.session._id);
     const user = await userColl.findOne({ _id: objectId });
 
     if(canUpdate.includes(escapeRegExp(toUpdate))) {  
@@ -872,7 +872,7 @@ app.post('/updateSelf', async function(req, res) {
 app.post('/updateUser', async function(req, res) {
   if (req.session.authenticated && hasAccess('updateUser', req.session)) {
     const id = req.body.id;
-    const objectId = ObjectId(id);
+    const objectId = new ObjectId(id);
     const valueName = req.body.valueName;
     var newValue = req.body.newValue;
 
