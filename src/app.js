@@ -377,7 +377,7 @@ app.get('/verify/:email/:key', async (req,res) => {
             }
           }
           );
-          bot.botSendMessage(discordChannels.bot_testing, `${user.username} created an account`, true);
+          bot.botSendMessage(discordChannels.bot_testing, `${user.username} created an account`, true, false);
         res.redirect('/login?verified=true');
       }
     } else {
