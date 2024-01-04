@@ -1,31 +1,15 @@
 const distanceToTimeConversion = 1.0;
 
-class Connection {
-    nodeA;
-    nodeB;
-    walkTime;
+// technically not needed, but nice to store these somewhere in case they need to be accessed for something else
+var bathroomNodes = [];
 
-    // if no custom walk time it added, it used the distance between nodes
-    constructor(nodeIdA, nodeIdB, walkTime) {
-        this.nodeA = findNode(nodeIdA);
-        this.nodeB = findNode(nodeIdB);
+var cornerNodes = [];
+var roomNodes = [];
 
-        console.log(this.nodeA);
-        console.log(this.nodeB);
+var allNodes = [];
+var allConnections = [];
 
-        if (walkTime) {
-            this.walkTime = walkTime;
-        }else {
-            this.walkTime = getDirectDistance(this.nodeA, this.nodeB) * distanceToTimeConversion;
-        }
-
-        this.nodeA.addConnection(this);
-        this.nodeB.addConnection(this);
-
-        allConnections.push(this);
-    }
-
-}
+// #region Structs
 
 class PathNode {
     xPos;
@@ -44,6 +28,16 @@ class PathNode {
         this.fCost = 0;
 
         allNodes.push(this);
+
+        if (id.startsWith("br-")) {
+            bathroomNodes.push(this);
+        }
+        else if (id.startsWith("c-")){
+            cornerNodes.push(this);
+        }
+        else {
+            roomNodes.push(this);
+        }
     }
 
     addConnection(connection) {
@@ -55,9 +49,35 @@ class PathNode {
     }
 }
 
-// technically not needed, but nice to store these somewhere in case they need to be accessed for something else
-var allNodes = [];
-var allConnections = [];
+class Connection {
+    nodeA;
+    nodeB;
+    walkTime;
+
+    // if no custom walk time it added, it used the distance between nodes
+    constructor(nodeIdA, nodeIdB, walkTime) {
+        this.nodeA = findNode(nodeIdA);
+        this.nodeB = findNode(nodeIdB);
+
+        if (walkTime) {
+            this.walkTime = walkTime;
+        }else {
+            this.walkTime = getDirectDistance(this.nodeA, this.nodeB) * distanceToTimeConversion;
+        }
+
+        this.nodeA.addConnection(this);
+        this.nodeB.addConnection(this);
+
+        allConnections.push(this);
+    }
+}
+
+class Path {
+    constructor(nodes, walkTime) {
+        this.nodes = nodes;
+        this.walkTime = walkTime;
+    }
+}
 
 function findNode(id) {
     for (var i = 0; i < allNodes.length; i++) {
@@ -68,108 +88,85 @@ function findNode(id) {
     console.log("failed to find node");
 }
 
+// #endregion
+
+// #region Setup
+
 function setupPathfinder() {
-    // var node1 = new PathNode(1, 0);
-    // var node2 = new PathNode(2, 5);
-    // var node3 = new PathNode(2, -10);
-    // var node4 = new PathNode(3, -6);
+    // yoink node locations from svg
+    var textElements = $("#svgNodes text");
+    var globalTransform = spliceTransform($("#svgNodes").attr('transform'));
 
-    // new Connection(node1, node2);
-    // new Connection(node1, node3);
-    // new Connection(node4, node3);
-    // new Connection(node2, node4);
+    textElements.each(function () {
+        var element = $(this);
+        var id = element.text();
 
-    // var path = findPath(node1, node4);
+        var localTransform = spliceTransform(element.attr('transform'));
 
-    // console.log("printing path");
-    // for (var i = 0; i < path.length; i++) {
-    //     console.log(path[i].xPos + " " + path[i].yPos);
-    // }
-
-
-
-    //yoink node locations from svg
-    // var textElements = $("#svgNodes text");
-    // var globalTransform = spliceTransform($("#svgNodes").attr('transform'));
-
-    // textElements.each(function () {
-    //     var element = $(this);
-    //     var id = element.text();
-
-    //     var localTransform = spliceTransform(element.attr('transform'));
-
-    //     var xPos = parseFloat(element.attr('x')) + globalTransform[0] + localTransform[0];
-    //     var yPos = parseFloat(element.attr('y')) + globalTransform[1] + localTransform[1];
+        var xPos = parseFloat(element.attr('x')) + globalTransform[0] + localTransform[0];
+        var yPos = parseFloat(element.attr('y')) + globalTransform[1] + localTransform[1];
         
-    //     console.log(id + " " + xPos + " " + yPos);
-    //     new PathNode(xPos, yPos, id.toString());
-    // });
+        //console.log(id + " " + xPos + " " + yPos);
+        new PathNode(xPos, yPos, id.toString());
+    });
 
-    // new Connection("109", "115");
-    // new Connection("115", "117");
-    // new Connection("117", "c-0");
-    // new Connection("c-0", "br-g");
-    // new Connection("br-g", "127");
-    // new Connection("127", "br-b");
-    // new Connection("br-b", "c-1");
+    // connections (TODO: store in json file somewhere)
+    new Connection("109", "115");
+    new Connection("115", "117");
+    new Connection("117", "c-0");
+    new Connection("c-0", "br-g");
+    new Connection("br-g", "127");
+    new Connection("127", "br-b");
+    new Connection("br-b", "c-1");
 
-    // var path = findPath("109", "br-g");
 
-    // console.log("printing path");
-    // for (var i = 0; i < path.length; i++) {
-    //     console.log(path[i].id);
-    //     if (i == 0)
-    //     continue;
+    var path = pathfindToNearestBathroom("109", ["br-b", "br-g"]);
 
-    //     //drawLine(path[i].xPos, -path[i].yPos, path[i-1].xPos, -path[i-1].yPos);
-    // }
-
-    // $(document).ready(function () {
-    //     var textElements = $("#svgNodes text");
-    
-    //     textElements.each(function () {
-    //         var element = $(this);
-    //         console.log(element.attr('x'));
-    //         console.log(element.attr('y'));
-    //     });
-    // });
-
+    drawPath(path);
+    //drawAllConnections();
 }
-
-function drawLine(x1, y1, x2, y2) {
-    const svgNS = "http://www.w3.org/2000/svg";
-    
-    // Calculate the SVG dimensions based on line coordinates
-    const minX = Math.min(x1, x2);
-    const minY = Math.min(y1, y2);
-    const maxX = Math.max(x1, x2);
-    const maxY = Math.max(y1, y2);
-    
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", maxX - minX + 10); // Add some padding for visibility
-    svg.setAttribute("height", maxY - minY + 10);
-  
-    const line = document.createElementNS(svgNS, "line");
-    line.setAttribute("x1", (x1 - minX + 5).toString()); // Offset x coordinates
-    line.setAttribute("y1", (y1 - minY + 5).toString()); // Offset y coordinates
-    line.setAttribute("x2", (x2 - minX + 5).toString()); // Offset x coordinates
-    line.setAttribute("y2", (y2 - minY + 5).toString()); // Offset y coordinates
-    line.setAttribute("stroke", "white");
-    line.setAttribute("stroke-width", "5");
-  
-    svg.appendChild(line);
-  
-    const lineHolder = document.getElementById("lineHolder");
-    lineHolder.appendChild(svg);
-  }
 
 function spliceTransform(transform) {
     const matches = transform.match(/-?\d+/g);
     return matches ? matches.map(Number) : [];
 }
 
+// #endregion
+
+// #region Pathfinder
+
+function pathfindToNearestBathroom(roomId, brPrefs) {
+    var paths = [];
+    bathroomNodes.forEach((brNode) => {
+        if (brPrefs != undefined && !brPrefs.includes(brNode.id))
+            return;
+
+        var p = findPath(roomId, brNode.id); 
+        paths.push(p);
+    })
+
+    return selectShortestPath(paths);
+}
+
+// returns the shortest path from a list of paths
+function selectShortestPath(paths) {
+    var shortestTime = Infinity + 1;
+    var shortestPath;
+
+    paths.forEach(p => {
+        if (p.walkTime < shortestTime) {
+            shortestTime = p.walkTime;
+            shortestPath = p;
+        }
+    });
+
+    return shortestPath;
+}
+
 // based off thing i made a long time ago in cs https://github.com/LucaHaverty/hexgrid-game/blob/main/Assets/Scrips/Static/Pathfinding.cs
 function findPath(startNodeId, endNodeId) {
+    console.log("finding path between " + startNodeId + " and " + endNodeId);
+
     startNode = findNode(startNodeId);
     endNode = findNode(endNodeId);
 
@@ -206,7 +203,7 @@ function findPath(startNodeId, endNodeId) {
 
         // final node reached (yay!)
         if (currentNode == endNode) {
-            return retracePath(startNode, endNode);
+            return new Path(retracePath(startNode, endNode), endNode.gCost);
         }
 
         // look at all connected nodes
@@ -260,3 +257,80 @@ function retracePath(startNode, endNode) {
 function getDirectDistance(nodeA, nodeB) {
     return  Math.sqrt(Math.pow(nodeB.xPos - nodeA.xPos, 2) + Math.pow(nodeB.yPos - nodeA.yPos, 2));
 }
+
+// #endregion
+
+// #region Path Visuals & Debugging
+
+// draws all the connections on the map for debugging
+function drawAllConnections() {
+    allConnections.forEach(c => {
+        drawConnection(c);
+    });
+} 
+
+function drawPath(path) {
+    console.log("Path between " + path.nodes[0].id + " and " + path.nodes[path.nodes.length-1].id + ":");
+
+    for (var i = 0; i < path.nodes.length; i++) {
+        console.log(path.nodes[i].id);
+        
+        if (i == 0) 
+            continue;
+
+        drawLineBetweenNodes(path.nodes[i-1], path.nodes[i]);
+    }
+    path.nodes.forEach(node => {
+        
+    })
+
+    // TODO: draw path
+
+    // for (var i = 0; i < path.length; i++) {
+    //     console.log(path[i].id);
+    //     if (i == 0)
+    //     continue;
+
+    //     //drawLine(path[i].xPos, -path[i].yPos, path[i-1].xPos, -path[i-1].yPos);
+    // }
+}
+
+// draws a connection for debugging
+function drawConnection(connection) {
+    drawLineBetweenNodes(connection.nodeA, connection.nodeB);
+}
+
+// draws a line connecting two nodes
+function drawLineBetweenNodes(nodeA, nodeB) {
+    drawLine(nodeA.xPos, nodeA.yPos, nodeB.xPos, nodeB.yPos);
+}
+
+// draws a line on the map connecting two points
+function drawLine(x1, y1, x2, y2) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    
+    // Calculate the SVG dimensions based on line coordinates
+    const minX = Math.min(x1, x2);
+    const minY = Math.min(y1, y2);
+    const maxX = Math.max(x1, x2);
+    const maxY = Math.max(y1, y2);
+    
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", maxX - minX + 10); // Add some padding for visibility
+    svg.setAttribute("height", maxY - minY + 10);
+  
+    const line = document.createElementNS(svgNS, "line");
+    line.setAttribute("x1", (x1 - minX + 5).toString()); // Offset x coordinates
+    line.setAttribute("y1", (y1 - minY + 5).toString()); // Offset y coordinates
+    line.setAttribute("x2", (x2 - minX + 5).toString()); // Offset x coordinates
+    line.setAttribute("y2", (y2 - minY + 5).toString()); // Offset y coordinates
+    line.setAttribute("stroke", "red");
+    line.setAttribute("stroke-width", "5");
+  
+    svg.appendChild(line);
+  
+    const lineHolder = document.getElementById("lineHolder");
+    lineHolder.appendChild(svg);
+}
+
+// #endregion
