@@ -1,5 +1,5 @@
 pageId = $('#pageID').html();
-
+accountData = JSON.parse($('#accountData').html());
 //append navbar
 $('.header').html(
 `<svg width="540.20508mm" height="65.529312mm" viewBox="0 0 540.20507 65.529313" id="logo" xml:space="preserve">
@@ -40,8 +40,11 @@ $('.header').html(
             <div>
                 <p id="aboutRedirect">about</> 
             </div>
-            <div id="ihsNavbar"> 
-                <p id="navbarSignIn">login</p> 
+            <div ${accountData.loggedIn ? 'style="display:none";' : ''}id="ihsNavbar"> 
+                <p id="navbarSignIn">login</p> <br>
+            </div> 
+            <div ${!accountData.loggedIn ? 'style="display:none";' : ''} id="ihsNavbar"> 
+                <p id="navbarAccount">account</p> <br>
             </div> 
         </div> 
         <div id="navbarLogin"> 
@@ -90,7 +93,9 @@ $('#footer').html(
     <a href="/help">help</a>
   </div>`
 );
-
+$('#navbarAccount').click(function() {
+  window.location.href = '/account'; 
+});
 $('#navbarSignIn').click(function() {
   $(this).fadeOut(100)
 

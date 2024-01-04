@@ -229,13 +229,16 @@ app.get('/', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: null
+      school: null,
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
-    res.render('html/home', { data: dataToSendToClient });
+    res.render('html/home.html', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'An error occurred' });
@@ -247,10 +250,13 @@ app.get('/cleveland', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: 'chs'
+      school: 'chs',
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
     res.render('html/home', { data: dataToSendToClient });
@@ -264,10 +270,13 @@ app.get('/franklin', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-    
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: 'fhs'
+      school: 'fhs',
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
     res.render('html/home', { data: dataToSendToClient });
@@ -281,10 +290,13 @@ app.get('/ida', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-    
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: 'ihs'
+      school: 'ihs',
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
     res.render('html/home', { data: dataToSendToClient });
