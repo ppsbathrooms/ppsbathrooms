@@ -4,6 +4,8 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const bot = require('./bot');
+
 const fs = require('fs');
 let userConfig = undefined;
 
@@ -97,7 +99,7 @@ function verifyEmail(email, name, verificationKey) {
     const unescapedEmail = unescapeRegExp(email)
     const modifiedHtml = data
       .replace('{{username}}', name)
-      .replace('{{link}}', `http://ppsbathrooms.org/verify/${unescapedEmail}/${verificationKey}`)
+      .replace('{{link}}', `http://localhost:42069/verify/${unescapedEmail}/${verificationKey}`)
     const msg = {
       to: unescapedEmail,
       from: 'verify@ppsbathrooms.org',
@@ -158,6 +160,13 @@ client.connect()
   });
 
 //updates bathroom data
+
+const discordChannels = {
+  'admin':'965728549728309269',
+  'general':'934859916903067702',
+  'info':'961690424924323991',
+  'bot_testing':'968269586648662086'
+}
 
 async function updateExtensionData() {
   data = await db.collection('data').findOne({ _id: 'schoolData'});
@@ -333,6 +342,7 @@ app.get('/login', (req, res) => {
 app.get('/verify/:email/:key', async (req,res) => {
   const email = req.params.email;
   const key = escapeRegExp(req.params.key);
+  console.log('')
 
   userColl.findOne({ emailVerificationKey: key }, function(err, user) {
     if (err) {
@@ -354,7 +364,8 @@ app.get('/verify/:email/:key', async (req,res) => {
               return;
             }
           }
-        );
+          );
+          bot.botSendMessage(discordChannels.bot_testing, `${user.username} created an account`, true);
         res.redirect('/login?verified=true');
       }
     } else {
