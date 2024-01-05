@@ -295,13 +295,13 @@ app.get('/franklin', async (req, res) => {
       currentClass = user.schedule[currentPeriod - 1]
     }
     else {
-      currentPeriod = -1;
+      currentClass = -1;
     }
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentPeriod
+      currentClass: currentClass
     }
     const dataToSendToClient = {
       brData: doc,
@@ -325,13 +325,13 @@ app.get('/ida', async (req, res) => {
       currentClass = user.schedule[currentPeriod - 1]
     }
     else {
-      currentPeriod = -1;
+      currentClass = -1;
     }
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentPeriod
+      currentClass: currentClass
     }
     const dataToSendToClient = {
       brData: doc,
