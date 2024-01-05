@@ -224,26 +224,30 @@ async function updateBrs(newValue) {
 // #endregion
 
 // #region Pages
+async function getCurrentClass(req) {
+  currentClass = -1;
+  if(req.session.authenticated) {
+    const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
+    const schedule = await dataColl.findOne({ schedule: user.school});
+    currentPeriod = getCurrentPeriod(schedule)
+    if(!isNaN(currentPeriod)) {
+      currentClass = user.schedule[currentPeriod - 1]
+      currentClass = currentClass ? currentClass : -1;
+    }
+  }
+  return currentClass;
+}
+
 // Bathrooms
 app.get('/', async (req, res) => {
   try {
-    if(req.session.authenticated) {
-      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      const schedule = await dataColl.findOne({ schedule: user.school});
-      currentPeriod = getCurrentPeriod(schedule)
-      currentClass = user.schedule[currentPeriod - 1]
-    }
-    else {
-      currentClass = -1;
-    }
-    doc = await dataColl.findOne({ _id: 'schoolData' });
-    doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentClass
+      currentClass: await getCurrentClass(req)
     }
+    const bathroomData = await dataColl.findOne({ _id: 'schoolData' })
     const dataToSendToClient = {
-      brData: doc,
+      brData: bathroomData.value,
       school: null,
       accountData: JSON.stringify(accountData)
     };
@@ -255,26 +259,15 @@ app.get('/', async (req, res) => {
   }
 });
 
-
 app.get('/cleveland', async (req, res) => {
   try {
-    if(req.session.authenticated) {
-      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      const schedule = await dataColl.findOne({ schedule: user.school});
-      currentPeriod = getCurrentPeriod(schedule)
-      currentClass = user.schedule[currentPeriod - 1]
-    }
-    else {
-      currentPeriod = -1;
-    }
-    doc = await dataColl.findOne({ _id: 'schoolData' });
-    doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentClass
+      currentClass: await getCurrentClass(req)
     }
+    const bathroomData = await dataColl.findOne({ _id: 'schoolData' })
     const dataToSendToClient = {
-      brData: doc,
+      brData: bathroomData.value,
       school: 'chs',
       accountData: JSON.stringify(accountData)
     };
@@ -288,23 +281,13 @@ app.get('/cleveland', async (req, res) => {
 
 app.get('/franklin', async (req, res) => {
   try {
-    if(req.session.authenticated) {
-      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      const schedule = await dataColl.findOne({ schedule: user.school});
-      currentPeriod = getCurrentPeriod(schedule)
-      currentClass = user.schedule[currentPeriod - 1]
-    }
-    else {
-      currentClass = -1;
-    }
-    doc = await dataColl.findOne({ _id: 'schoolData' });
-    doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentClass
+      currentClass: await getCurrentClass(req)
     }
+    const bathroomData = await dataColl.findOne({ _id: 'schoolData' })
     const dataToSendToClient = {
-      brData: doc,
+      brData: bathroomData.value,
       school: 'fhs',
       accountData: JSON.stringify(accountData)
     };
@@ -318,23 +301,13 @@ app.get('/franklin', async (req, res) => {
 
 app.get('/ida', async (req, res) => {
   try {
-    if(req.session.authenticated) {
-      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      const schedule = await dataColl.findOne({ schedule: user.school});
-      currentPeriod = getCurrentPeriod(schedule)
-      currentClass = user.schedule[currentPeriod - 1]
-    }
-    else {
-      currentClass = -1;
-    }
-    doc = await dataColl.findOne({ _id: 'schoolData' });
-    doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentClass
+      currentClass: await getCurrentClass(req)
     }
+    const bathroomData = await dataColl.findOne({ _id: 'schoolData' })
     const dataToSendToClient = {
-      brData: doc,
+      brData: bathroomData.value,
       school: 'ihs',
       accountData: JSON.stringify(accountData)
     };

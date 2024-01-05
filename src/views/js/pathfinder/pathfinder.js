@@ -111,11 +111,11 @@ async function setupPathfinder() {
     // create correct connections
     if (schoolRedirect == "fhs") {
         fhsConnections();
-        lineWidth = 1;
+        lineWidth = 12;
     }
     else if (schoolRedirect == "chs") {
         chsConnections();
-        lineWidth = 8;
+        lineWidth = 12;
     }
     else idaConnections();
 
@@ -775,6 +775,8 @@ function drawConnection(connection) {
 }
 
 function drawPath(path) {
+    bathroom = path.nodes[path.nodes.length - 1];
+    drawCircle(bathroom.xPos, bathroom.yPos)
     console.log("Path between " + path.nodes[0].id + " and " + path.nodes[path.nodes.length-1].id + ":");
 
     for (var i = 0; i < path.nodes.length; i++) {        
@@ -793,17 +795,12 @@ function drawLineBetweenNodes(nodeA, nodeB) {
 // draws a line on the map connecting two points
 function drawLine(x1, y1, x2, y2) {
     const svgNS = "http://www.w3.org/2000/svg";
+    const lineHolder = document.getElementById("lineHolder");
     
-    // Calculate the SVG dimensions based on line coordinates
-    const minX = Math.min(x1, x2);
-    const minY = Math.min(y1, y2);
-    const maxX = Math.max(x1, x2);
-    const maxY = Math.max(y1, y2);
+    const newLine = document.createElementNS(svgNS, "svg");
+    newLine.setAttribute("width", 10000); // Add some padding for visibility
+    newLine.setAttribute("height", 10000);
     
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", 10000); // Add some padding for visibility
-    svg.setAttribute("height", 10000);
-  
     const line = document.createElementNS(svgNS, "line");
     line.setAttribute("x1", x1.toString()); // Offset x coordinates
     line.setAttribute("y1", y1.toString()); // Offset y coordinates
@@ -811,11 +808,21 @@ function drawLine(x1, y1, x2, y2) {
     line.setAttribute("y2", y2.toString()); // Offset y coordinates
     line.setAttribute("stroke", "red");
     line.setAttribute("stroke-width", lineWidth.toString());
-  
-    svg.appendChild(line);
-  
+    
+    newLine.appendChild(line);
+    lineHolder.appendChild(newLine);
+}
+
+function drawCircle(x, y) {
+    const svgNS = "http://www.w3.org/2000/svg";
     const lineHolder = document.getElementById("lineHolder");
-    lineHolder.appendChild(svg);
+
+    var circle = document.createElementNS(svgNS, 'circle');
+    circle.setAttributeNS(null, 'cx', x);
+    circle.setAttributeNS(null, 'cy', y);
+    circle.setAttributeNS(null, 'r', 20);
+    circle.setAttributeNS(null, 'style', 'fill: red; stroke: none; stroke-width: 2px;' );
+    lineHolder.appendChild(circle);
 }
 
 // #endregion

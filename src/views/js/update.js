@@ -308,8 +308,6 @@ $(document).ready(function() {
     
     allInputsHaveText = ($('#username').val() != '') && ($('#password').val() != '');
 
-
-    console.log(allInputsHaveText)
     if(allInputsHaveText) {
         var formData = $(this).serialize();
         $.ajax({
