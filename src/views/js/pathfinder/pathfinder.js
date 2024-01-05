@@ -127,7 +127,7 @@ async function setupPathfinder() {
         drawPath(path);
     }
 
-    drawAllConnections();
+    //drawAllConnections();
 }
 
 function idaConnections() { }
