@@ -276,6 +276,11 @@ html::-webkit-scrollbar {
     animation: redBorderFade .5s ease forwards;
 }
 
+svg text {
+    user-select: none;
+    pointer-events: none;
+}
+
 @keyframes redBorderFade {
     0% {
         border-color: red;

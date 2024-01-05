@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../style/style.css" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="../style/style.css">
+    <script src="../thirdParty/jquery.min.js"></script>
+    <script src="../thirdParty/confetti.min.js"></script>
+    <title>ppsbathrooms</title>
+  </head>
 
-  <script src="../thirdParty/jquery.min.js"></script>
-  <script src="../thirdParty/confetti.min.js"></script>
-  <title>ppsbathrooms</title>
-</head>
+  <!-- google analytics -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-NW69GDC37E"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-<!-- google analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NW69GDC37E"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { dataLayer.push(arguments); }
-  gtag('js', new Date());
+    gtag("config", "G-NW69GDC37E");
+  </script>
 
-  gtag('config', 'G-NW69GDC37E');
-</script>
-
-<body>
-  <!-- 
+  <body>
+    <!-- 
   ......
   .    .
   .    .
@@ -36,84 +43,83 @@
      ..   ..
      ......-
   -->
-  <div class="schoolData">
-    <p id="chsData">
-      <%= data.brData[0] %>
-    </p>
-    <p id="fhsData">
-      <%= data.brData[1] %>
-    </p>
-    <p id="ihsData">
-      <%= data.brData[2] %>
-    </p>
-    <p id="school">
-      <%= data.school %>
-    </p>
-  </div>
+    <div class="schoolData">
+      <p id="chsData"><%= data.brData[0] %></p>
+      <p id="fhsData"><%= data.brData[1] %></p>
+      <p id="ihsData"><%= data.brData[2] %></p>
+      <p id="school"><%= data.school %></p>
+    </div>
 
-  <div class="schoolChoice">
-    <img id="menuBgImage" src="../style/images/bathroomBg.png">
-    <img id="menuBgImageMobile" src="../style/images/bathroomBgMobile.png">
-    <div id="mainTitle">
-      <div id="menuSchoolButtons">
-        <div class="cleveland">
-          <a onClick="selectSchool('chs',true);hideNavbar();"><img src="/style/images/logos/clevelandLogo.png"></a>
-        </div>
-        <div class="franklin">
-          <a onClick="selectSchool('fhs',true);hideNavbar();"><img src="/style/images/logos/franklinLogo.png"></a>
-        </div>
-        <div class="ihs">
-          <a onClick="selectSchool('ihs',true);hideNavbar();"><img src="/style/images/logos/idaLogo.png"></a>
+    <div class="schoolChoice">
+      <img id="menuBgImage" src="../style/images/bathroomBg.png" />
+      <img id="menuBgImageMobile" src="../style/images/bathroomBgMobile.png" />
+      <div id="mainTitle">
+        <div id="menuSchoolButtons">
+          <div class="cleveland">
+            <a onClick="selectSchool('chs',true);hideNavbar();"
+              ><img src="/style/images/logos/clevelandLogo.png"
+            /></a>
+          </div>
+          <div class="franklin">
+            <a onClick="selectSchool('fhs',true);hideNavbar();"
+              ><img src="/style/images/logos/franklinLogo.png"
+            /></a>
+          </div>
+          <div class="ihs">
+            <a onClick="selectSchool('ihs',true);hideNavbar();"
+              ><img src="/style/images/logos/idaLogo.png"
+            /></a>
+          </div>
         </div>
       </div>
+      <div id="menuLabels">
+        <p>cleveland</p>
+        <p>franklin</p>
+        <p>wells</p>
+      </div>
+
+      <p id="titleLower">Improving student's lives since 1996<span>.</span></p>
     </div>
-    <div id="menuLabels">
-      <p>cleveland</p>
-      <p>franklin</p>
-      <p>wells</p>
-    </div>
 
-    <p id="titleLower">Improving student's lives since 1996<span>.</span></p>
+    <p id="pageID">schools</p>
+    <div class="header"></div>
 
-  </div>
+    <div style="height: 50px"></div>
 
-  <p id="pageID">schools</p>
-  <div class="header"></div>
+    <!-- <div id="lineHolder"></div> -->
 
-  <div style="height: 50px"></div>
+    <div class="map"></div>
 
-  <div class="map"></div>
+    <div id="buttons"></div>
 
-  <div id="buttons"></div>
-
-  <div id="popup">
-    <p id="popupId"></p>
-    <p id="popupButtons"></p>
-    <div id="popupBackground">
-      <div id="pBackdrop"></div>
-      <button id="px">
-        <img src="../style/icons/x.svg">
-      </button>
-      <a id="popupHelp" href="/help">help</a>
-      <p id="popupTitle">popup title</p>
-      <div id="pInputBg">
-        <input id="pInput" autofocus autocomplete="off" type="text">
-        <button id="popupSubmit">
-          <img id="icon16" src="../style/icons/arrowRight.svg">
+    <div id="popup">
+      <p id="popupId"></p>
+      <p id="popupButtons"></p>
+      <div id="popupBackground">
+        <div id="pBackdrop"></div>
+        <button id="px">
+          <img src="../style/icons/x.svg" />
         </button>
+        <a id="popupHelp" href="/help">help</a>
+        <p id="popupTitle">popup title</p>
+        <div id="pInputBg">
+          <input id="pInput" autofocus autocomplete="off" type="text" />
+          <button id="popupSubmit">
+            <img id="icon16" src="../style/icons/arrowRight.svg" />
+          </button>
+        </div>
+        <p id="popupError"></p>
       </div>
-      <p id="popupError"></p>
     </div>
-  </div>
+    <p style="display: none" id="accountData"><%= data.accountData %></p>
+    <div id="footer"></div>
+  </body>
 
-  <div id="footer"></div>
+  <script type="text/javascript" src="../js/update.js"></script>
+  <script type="text/javascript" src="../js/roomData.js"></script>
+  <script type="text/javascript" src="../js/getdata.js"></script>
+  <script type="text/javascript" src="../js/htmlInsert.js"></script>
+  <script type="text/javascript" src="../js/selectSchool.js"></script>
 
-</body>
-
-<script type="text/javascript" src="../js/update.js"></script>
-<script type="text/javascript" src="../js/roomData.js"></script>
-<script type="text/javascript" src="../js/getdata.js"></script>
-<script type="text/javascript" src="../js/htmlInsert.js"></script>
-<script type="text/javascript" src="../js/selectSchool.js"></script>
-
+  <script type="text/javascript" src="../js/pathfinder/pathfinder.js"></script>
 </html>

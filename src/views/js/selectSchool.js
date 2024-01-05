@@ -52,6 +52,7 @@ function selectSchool(school, redirect) {
         getData();
         getDataForUpdate();
         setupButtons();
+        setupPathfinder();
     })
     .catch(error => {
       console.error('there was a problem fetching the document:', error);

@@ -1,17 +1,10 @@
 const schedule = $('#schedule').html().split(',');
 
+var currentSchool = $('#schoolSelect').val();
+
 $(document).ready(function () {
     for (var i = 0; i < schedule.length; i++) {
         $('#period' + (i + 1) + ' input').val(schedule[i]);
-    }
-
-    for (let i = 1; i <= 8; i++) {
-        $(`#period${i}`).find('input').on('input', function () {
-            $(this).val(function (_, value) {
-                let numericValue = value.replace(/\D/g, '');
-                return numericValue.substring(0, 3);
-            });
-        });
     }
 });
 
@@ -23,46 +16,87 @@ $('.scheduleContainer input').keypress(function (event) {
 });
 
 $('#updateSchedule').click(e => {
-    if (allBoxesFilled()) {
-        $('#scheduleError').css('opacity', '0').html('error updating schedule');
-        buttonHighlight('#updateSchedule', true)
+    $.getJSON('/data/rooms.json', function(data) {            
+        switch(currentSchool) {
+            case 'cleveland': 
+                roomNums = data.cleveland;
+                break;
+            case 'franklin': 
+                roomNums = data.franklin;
+                break;
+            case 'ibw': 
+                roomNums = data.ibw;
+                break;
+        }
 
-        const schedule = {
-            1: $('#period1 input').val(),
-            2: $('#period2 input').val(),
-            3: $('#period3 input').val(),
-            4: $('#period4 input').val(),
-            5: $('#period5 input').val(),
-            6: $('#period6 input').val(),
-            7: $('#period7 input').val(),
-            8: $('#period8 input').val()
-        };
+        const enteredRooms = [
+            $('#period1 input'),
+            $('#period2 input'),
+            $('#period3 input'),
+            $('#period4 input'),
+            $('#period5 input'),
+            $('#period6 input'),
+            $('#period7 input'),
+            $('#period8 input')
+        ];
 
-        $.ajax({
-            type: 'POST',
-            url: '/updateSelf',
-            data: { toUpdate: 'schedule', newValue: schedule },
-            success: function (response) {
-                if (response.status < 1) {
-                    failedAuth()
-                } else {
-                    location.href = '/account'
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('AJAX request error:', status, error);
+        var isValid = true;
+
+        for (var i = 0; i < enteredRooms.length; i++) {
+            if (roomNums.indexOf(enteredRooms[i].val()) === -1) {
+                var inputBg = enteredRooms[i].closest('.inputBg');
+                inputBg.addClass('redButton');
+
+                setTimeout(function (element) {
+                    element.removeClass('redButton');
+                }, 1500, inputBg);
+
+                isValid = false;
+            } else {
+                enteredRooms[i].closest('.inputBg').removeClass('redButton');
             }
-        });
-    }
-    else {
-        $('#scheduleError').css('opacity', '1').html('please enter valid room numbers');
-        buttonHighlight('#updateSchedule', false)
-    }
+        }
+
+        if (isValid) {
+            $('#scheduleError').css('opacity', '0');
+            buttonHighlight('#updateSchedule', true);
+
+            const schedule = {
+                1: enteredRooms[0].val(),
+                2: enteredRooms[1].val(),
+                3: enteredRooms[2].val(),
+                4: enteredRooms[3].val(),
+                5: enteredRooms[4].val(),
+                6: enteredRooms[5].val(),
+                7: enteredRooms[6].val(),
+                8: enteredRooms[7].val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/updateSelf',
+                data: { toUpdate: 'schedule', newValue: schedule },
+                success: function (response) {
+                    if (response.status < 1) {
+                        failedAuth();
+                    } else {
+                        location.href = '/account';
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX request error:', status, error);
+                }
+            });
+        } else {
+            $('#scheduleError').css('opacity', '1');
+            buttonHighlight('#updateSchedule', false);
+        }
+    });
 });
 
 function allBoxesFilled() {
     var allLengthThree = true;
-
+  
     $('#scheduleHolder input').each(function () {
         let isnum = /^\d+$/.test($(this).val());
         var inputValue = $(this).val();
@@ -91,6 +125,8 @@ function buttonHighlight(element, green) {
 }
 
 $('#schoolSelect').on('input', function() {
+    currentSchool = $(this).val();
+    setupAutocomplete();
     $.ajax({
         type: 'POST',
         url: '/updateSelf',
@@ -122,3 +158,27 @@ $('#br_prefs input').on('change', function () {
         }
     });
 });
+ 
+$(document).ready(function() {
+    setupAutocomplete();
+});
+
+function setupAutocomplete() {
+    $.getJSON('/data/rooms.json', function(data) {            
+        switch(currentSchool) {
+            case 'cleveland': 
+                roomNums = data.cleveland;
+                break;
+            case 'franklin': 
+                roomNums = data.franklin;
+                break;
+            case 'ibw': 
+                roomNums = data.ibw;
+                break;
+        }
+        $(".roomInput").autocomplete({
+            source: roomNums,
+            minLength: 0
+        });
+    });
+}

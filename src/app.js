@@ -4,6 +4,8 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const bot = require('./bot');
+
 const fs = require('fs');
 let userConfig = undefined;
 
@@ -97,7 +99,7 @@ function verifyEmail(email, name, verificationKey) {
     const unescapedEmail = unescapeRegExp(email)
     const modifiedHtml = data
       .replace('{{username}}', name)
-      .replace('{{link}}', `http://ppsbathrooms.org/verify/${unescapedEmail}/${verificationKey}`)
+      .replace('{{link}}', `http://localhost:42069/verify/${unescapedEmail}/${verificationKey}`)
     const msg = {
       to: unescapedEmail,
       from: 'verify@ppsbathrooms.org',
@@ -158,6 +160,13 @@ client.connect()
   });
 
 //updates bathroom data
+
+const discordChannels = {
+  'admin':'965728549728309269',
+  'general':'934859916903067702',
+  'info':'961690424924323991',
+  'bot_testing':'968269586648662086'
+}
 
 async function updateExtensionData() {
   data = await db.collection('data').findOne({ _id: 'schoolData'});
@@ -220,13 +229,16 @@ app.get('/', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: null
+      school: null,
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
-    res.render('html/home', { data: dataToSendToClient });
+    res.render('html/home.html', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'An error occurred' });
@@ -238,10 +250,13 @@ app.get('/cleveland', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: 'chs'
+      school: 'chs',
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
     res.render('html/home', { data: dataToSendToClient });
@@ -255,10 +270,13 @@ app.get('/franklin', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-    
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: 'fhs'
+      school: 'fhs',
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
     res.render('html/home', { data: dataToSendToClient });
@@ -272,10 +290,13 @@ app.get('/ida', async (req, res) => {
   try {
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
-    
+    accountData = {
+      loggedIn: req.session.authenticated ? true:false
+    }
     const dataToSendToClient = {
       brData: doc,
-      school: 'ihs'
+      school: 'ihs',
+      accountData: JSON.stringify(accountData)
     };
     pageVisited();
     res.render('html/home', { data: dataToSendToClient });
@@ -333,6 +354,7 @@ app.get('/login', (req, res) => {
 app.get('/verify/:email/:key', async (req,res) => {
   const email = req.params.email;
   const key = escapeRegExp(req.params.key);
+  console.log('')
 
   userColl.findOne({ emailVerificationKey: key }, function(err, user) {
     if (err) {
@@ -354,7 +376,8 @@ app.get('/verify/:email/:key', async (req,res) => {
               return;
             }
           }
-        );
+          );
+          bot.botSendMessage(discordChannels.bot_testing, `${user.username} created an account`, true, false);
         res.redirect('/login?verified=true');
       }
     } else {
@@ -410,7 +433,7 @@ function isVowel(char) {
 }
 
 app.get('/account', async (req, res) => {
-  const userId = ObjectId(req.session._id);
+  const userId = new ObjectId(req.session._id);
   const user = await db.collection('users').findOne({ _id: userId });
   
   if(!req.session.authenticated || !req.session.verified) {
@@ -441,7 +464,7 @@ app.get('/account', async (req, res) => {
       const scheduleJs = '<script>' + await readFile('login/inserts/schedule.js') + '</script>';
       const passwordJs = '<script>' + await readFile('login/inserts/updatePassword.js') + '</script>';
 
-      const objectId = ObjectId(req.session._id);
+      const objectId = new ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
       let dropdownOptions = `
@@ -510,7 +533,7 @@ app.get('/account', async (req, res) => {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
 
-      const objectId = ObjectId(req.session._id);
+      const objectId = new ObjectId(req.session._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
 
@@ -802,7 +825,7 @@ app.post('/updatePassword', async function(req, res) {
     }
 
     else if(req.body.passwordType = 'self' && hasAccess('updateSelfPassword', req.session)) {
-      const objectId = ObjectId(req.session._id)
+      const objectId = new ObjectId(req.session._id)
       
       const currentPass = req.body.currentPass;
       const newPass = req.body.newPass;
@@ -838,7 +861,7 @@ app.post('/updateSelf', async function(req, res) {
       return;
     }
 
-    const objectId = ObjectId(req.session._id);
+    const objectId = new ObjectId(req.session._id);
     const user = await userColl.findOne({ _id: objectId });
 
     if(canUpdate.includes(escapeRegExp(toUpdate))) {  
@@ -861,7 +884,7 @@ app.post('/updateSelf', async function(req, res) {
 app.post('/updateUser', async function(req, res) {
   if (req.session.authenticated && hasAccess('updateUser', req.session)) {
     const id = req.body.id;
-    const objectId = ObjectId(id);
+    const objectId = new ObjectId(id);
     const valueName = req.body.valueName;
     var newValue = req.body.newValue;
 

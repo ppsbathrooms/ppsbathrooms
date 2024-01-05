@@ -59,12 +59,12 @@
 }
 
 #scheduleHolder .inputBg {
-    width: 60px;
+    width: 100px;
     text-align: center;
 }
 
 #scheduleHolder input {
-    width: 50px;
+    width: 90px;
 }
 
 .scheduleContainer p {
@@ -122,12 +122,12 @@
 
 @keyframes greenButton {
     0% {
-        border-color: green;
+        border-color: green !important;
         color: green;
     }
 
     100% {
-        border-color: #fff;
+        border-color: #fff !important;
         color: #fff;
     }
 }

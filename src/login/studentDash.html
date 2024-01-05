@@ -7,11 +7,24 @@
     <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
 
     <script src="../thirdParty/jquery.min.js"></script>
+    <script src="../thirdParty/jqueryUi.min.js"></script>
     <title>ppsbathrooms | student</title>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
 </head>
 
 {{studentStyle}}
 {{scheduleStyle}}
+
+
+<style>
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: none;
+    }
+</style>
 
 <body>
     <a href="/">
