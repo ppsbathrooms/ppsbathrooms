@@ -389,8 +389,8 @@ function chsConnections() {
     new Connection("382", "383");
     new Connection("382", "381");
     new Connection("380", "381");
-    new Connection("380", "BG4");
-    new Connection("BB4", "BG4");
+    new Connection("380", "BG3");
+    new Connection("BB4", "BG3");
     new Connection("BB4", "378");
     new Connection("372", "378");
     new Connection("372", "356");
@@ -433,7 +433,7 @@ function chsConnections() {
     new Connection("320", "C33");
     new Connection("T31", "C33");
     new Connection("326", "C33");
-    new Connection("326", "C33");
+    new Connection("326", "C30");
     new Connection("330", "C30");
     new Connection("330", "328");
     new Connection("332", "328");
