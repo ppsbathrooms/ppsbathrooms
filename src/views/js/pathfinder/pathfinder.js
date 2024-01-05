@@ -105,6 +105,11 @@ function setupPathfinder() {
 
         var xPos = parseFloat(element.attr('x')) + globalTransform[0] + localTransform[0];
         var yPos = parseFloat(element.attr('y')) + globalTransform[1] + localTransform[1];
+
+        // console.log("Created Node " + id);
+        // console.log("Pos " + element.attr('x') + " " + element.attr('y'));
+        // console.log("Global " + globalTransform[0].toString() + " " + globalTransform[1].toString());
+        // console.log("Local " + localTransform[0].toString() + " " + localTransform[1].toString());
         
         //console.log(id + " " + xPos + " " + yPos);
         new PathNode(xPos, yPos, id.toString());
@@ -122,12 +127,20 @@ function setupPathfinder() {
 
     var path = pathfindToNearestBathroom("109", ["br-b", "br-g"]);
 
-    drawPath(path);
+    //drawPath(path);
+    //drawAllConnections();
+    // console.log(findNode("109").xPos + " " + findNode("109").yPos);
+    // console.log(findNode("115").xPos + " " + findNode("115").yPos);
+    // console.log(findNode("117").xPos + " " + findNode("117").yPos);
+    // drawLine(findNode("109").xPos,findNode("109").yPos,findNode("115").xPos,findNode("115").yPos);
+    // drawLine(findNode("115").xPos,findNode("115").yPos,findNode("117").xPos,findNode("117").yPos);
+
+    //drawLine(200,100,200,200);
     //drawAllConnections();
 }
 
 function spliceTransform(transform) {
-    const matches = transform.match(/-?\d+/g);
+    const matches = transform.match(/-?\d+(\.\d+)?/g);
     return matches ? matches.map(Number) : [];
 }
 
@@ -269,6 +282,11 @@ function drawAllConnections() {
     });
 } 
 
+// draws a connection for debugging
+function drawConnection(connection) {
+    drawLineBetweenNodes(connection.nodeA, connection.nodeB);
+}
+
 function drawPath(path) {
     console.log("Path between " + path.nodes[0].id + " and " + path.nodes[path.nodes.length-1].id + ":");
 
@@ -280,9 +298,6 @@ function drawPath(path) {
 
         drawLineBetweenNodes(path.nodes[i-1], path.nodes[i]);
     }
-    path.nodes.forEach(node => {
-        
-    })
 
     // TODO: draw path
 
@@ -295,11 +310,6 @@ function drawPath(path) {
     // }
 }
 
-// draws a connection for debugging
-function drawConnection(connection) {
-    drawLineBetweenNodes(connection.nodeA, connection.nodeB);
-}
-
 // draws a line connecting two nodes
 function drawLineBetweenNodes(nodeA, nodeB) {
     drawLine(nodeA.xPos, nodeA.yPos, nodeB.xPos, nodeB.yPos);
@@ -308,6 +318,12 @@ function drawLineBetweenNodes(nodeA, nodeB) {
 // draws a line on the map connecting two points
 function drawLine(x1, y1, x2, y2) {
     const svgNS = "http://www.w3.org/2000/svg";
+
+    // offset to center
+    x1 += 12;
+    x2 += 12;
+    y1 -= 5;
+    y2 -= 5;
     
     // Calculate the SVG dimensions based on line coordinates
     const minX = Math.min(x1, x2);
@@ -316,14 +332,14 @@ function drawLine(x1, y1, x2, y2) {
     const maxY = Math.max(y1, y2);
     
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", maxX - minX + 10); // Add some padding for visibility
-    svg.setAttribute("height", maxY - minY + 10);
+    svg.setAttribute("width", 10000); // Add some padding for visibility
+    svg.setAttribute("height", 10000);
   
     const line = document.createElementNS(svgNS, "line");
-    line.setAttribute("x1", (x1 - minX + 5).toString()); // Offset x coordinates
-    line.setAttribute("y1", (y1 - minY + 5).toString()); // Offset y coordinates
-    line.setAttribute("x2", (x2 - minX + 5).toString()); // Offset x coordinates
-    line.setAttribute("y2", (y2 - minY + 5).toString()); // Offset y coordinates
+    line.setAttribute("x1", x1.toString()); // Offset x coordinates
+    line.setAttribute("y1", y1.toString()); // Offset y coordinates
+    line.setAttribute("x2", x2.toString()); // Offset x coordinates
+    line.setAttribute("y2", y2.toString()); // Offset y coordinates
     line.setAttribute("stroke", "red");
     line.setAttribute("stroke-width", "5");
   
