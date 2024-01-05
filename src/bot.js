@@ -20,11 +20,17 @@ const channels = {
 }
 
 if (process.env.URI) {
-    config = process.env;
+  config = {
+    "URI":process.env.URI,
+    "EMAIL_API":process.env.EMAIL_API,
+    "TRIVORY_API":process.env.TRIVORY_API,
+    "DISCORD_TOKEN":process.env.DISCORD_TOKEN,
+    "DISCORD_ID":process.env.DISCORD_ID
+  }
 }
 else {
-    const configData = fs.readFileSync('../config.json', 'utf-8');
-    config = JSON.parse(configData);
+  const configData = fs.readFileSync('../config.json', 'utf-8');
+  config = JSON.parse(configData);
 }
 
 const dbclient = new MongoClient(config.URI, {
@@ -60,7 +66,7 @@ const commands = [
     .setDescription('report a bug with ppsbathrooms')
     .addStringOption(option =>
       option.setName('bug')
-        .setDescription('the bug that you\'re experiencing')
+        .setDescription('the bug you\'re experiencing')
         .setRequired(true)),
   new SlashCommandBuilder()
     .setName('password')
@@ -73,6 +79,13 @@ const commands = [
 
 const rest = new REST({ version: '10' }).setToken(config.DISCORD_TOKEN);
 
+//try to stop bot from becoming ded
+setInterval(function() {
+    if (!client.user) {
+        connectToClient();
+    }
+}, 30000);
+
 async function connectToClient() {
     try {
         await rest.put(Routes.applicationCommands(config.DISCORD_ID), { body: commands });
@@ -81,6 +94,7 @@ async function connectToClient() {
         console.error(error);
     }
 }
+
 
 const client = new Client({
 	intents: [
