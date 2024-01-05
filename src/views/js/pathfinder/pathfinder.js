@@ -120,14 +120,16 @@ async function setupPathfinder() {
     else idaConnections();
 
     // pathfind to closest bathroom to current class
-    var currentClass = JSON.parse($('#accountData').html()).currentClass;
+    accountData = $('#accountData').html()
+    var currentClass = JSON.parse(accountData).currentClass;
+    console.log(currentClass)
 
     if (currentClass != -1) {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPath(path);
     }
 
-    //drawAllConnections();
+    // drawAllConnections();
 }
 
 function idaConnections() { }

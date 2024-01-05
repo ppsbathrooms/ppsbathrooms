@@ -227,10 +227,20 @@ async function updateBrs(newValue) {
 // Bathrooms
 app.get('/', async (req, res) => {
   try {
+    if(req.session.authenticated) {
+      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
+      const schedule = await dataColl.findOne({ schedule: user.school});
+      currentPeriod = getCurrentPeriod(schedule)
+      currentClass = user.schedule[currentPeriod - 1]
+    }
+    else {
+      currentClass = -1;
+    }
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     accountData = {
-      loggedIn: req.session.authenticated ? true:false
+      loggedIn: req.session.authenticated ? true:false,
+      currentClass: currentClass
     }
     const dataToSendToClient = {
       brData: doc,
@@ -238,7 +248,7 @@ app.get('/', async (req, res) => {
       accountData: JSON.stringify(accountData)
     };
     pageVisited();
-    res.render('html/home.html', { data: dataToSendToClient });
+    res.render('html/home', { data: dataToSendToClient });
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'An error occurred' });
@@ -250,7 +260,9 @@ app.get('/cleveland', async (req, res) => {
   try {
     if(req.session.authenticated) {
       const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      currentPeriod = getCurrentPeriod(user.schedule)
+      const schedule = await dataColl.findOne({ schedule: user.school});
+      currentPeriod = getCurrentPeriod(schedule)
+      currentClass = user.schedule[currentPeriod - 1]
     }
     else {
       currentPeriod = -1;
@@ -259,7 +271,7 @@ app.get('/cleveland', async (req, res) => {
     doc = doc.value;
     accountData = {
       loggedIn: req.session.authenticated ? true:false,
-      currentClass: currentPeriod
+      currentClass: currentClass
     }
     const dataToSendToClient = {
       brData: doc,
@@ -278,7 +290,9 @@ app.get('/franklin', async (req, res) => {
   try {
     if(req.session.authenticated) {
       const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      currentPeriod = getCurrentPeriod(user.schedule)
+      const schedule = await dataColl.findOne({ schedule: user.school});
+      currentPeriod = getCurrentPeriod(schedule)
+      currentClass = user.schedule[currentPeriod - 1]
     }
     else {
       currentPeriod = -1;
@@ -306,7 +320,9 @@ app.get('/ida', async (req, res) => {
   try {
     if(req.session.authenticated) {
       const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
-      currentPeriod = getCurrentPeriod(user.schedule)
+      const schedule = await dataColl.findOne({ schedule: user.school});
+      currentPeriod = getCurrentPeriod(schedule)
+      currentClass = user.schedule[currentPeriod - 1]
     }
     else {
       currentPeriod = -1;
