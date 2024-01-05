@@ -61,6 +61,13 @@ const commands = [
     .addStringOption(option =>
       option.setName('bug')
         .setDescription('the bug that you\'re experiencing')
+        .setRequired(true)),
+  new SlashCommandBuilder()
+    .setName('password')
+    .setDescription('get the password for a school')
+    .addStringOption(option =>
+      option.setName('school')
+        .setDescription('chs/fhs/ihs')
         .setRequired(true))
   ];
 
@@ -69,7 +76,7 @@ const rest = new REST({ version: '10' }).setToken(config.DISCORD_TOKEN);
 async function connectToClient() {
     try {
         await rest.put(Routes.applicationCommands(config.DISCORD_ID), { body: commands });
-        client.user.setStatus('🚽');
+        // client.user.setStatus('🚽');
     } catch (error) {
         console.error(error);
     }
@@ -109,30 +116,52 @@ client.on('interactionCreate', async (interaction) => {
       await interaction.reply('you do not have the required role to use this command.');
       return;
     }
+    try {
+      const users = await userColl.find({}).toArray();
 
-    userColl.find({}, { projection: { _id: 0, username: 1, key: 1 } }).toArray(async function(err, result) {
-      if (err) {
-          console.error('Error occurred while fetching data:', err);
-          return;
-      }
-
-      usernames = result.map(user => ({ name: '#' + user.key, value: user.username, inline: true}));
-
+      usernames = users.map(user => ({ name: '#' + user.key, value: user.username, inline: true}));
       const embed = new EmbedBuilder()
-          .setColor(0x0099FF)
-          .setTitle('users')
-          .addFields(usernames)
-          .setTimestamp()
+        .setColor(0x0099FF)
+        .setTitle('users')
+        .addFields(usernames)
+        .setTimestamp()
       await interaction.reply({embeds: [embed]});
-    });
+    } catch (error) {
+      console.error('Error fetching usernames:', error);
+    }
+  }
+
+  else if (interaction.commandName === 'password') {
+    if (!member.roles.cache.some(role => role.id === userRoles.developer)) {
+      await interaction.reply('you do not have the required role to use this command.');
+      return;
+    }
+    try {
+      const message = interaction.options.getString('school').toString();
+      schools = ['chs', 'fhs', 'ihs'];
+      if(!schools.includes(message)) {
+        const embedResponse = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setDescription(`please use one of the following:\nfor cleveland use 'chs' \nfor franklin use 'fhs'\nfor ida b wells use 'ihs'`)
+        await interaction.reply({
+          embeds: [embedResponse],
+          ephemeral: true
+        });
+        return;
+      }
+      const passwordData = await dataColl.findOne({ _id: message + 'Pass'});
+        await interaction.reply({
+          embeds: [ephemeralResponse(`the password for ${message} is: ${passwordData.password}`, 0x0099FF)],
+          ephemeral: true
+      });
+    } catch (error) {
+      console.error('Error fetching usernames:', error);
+    }
   }
 
   else if (interaction.commandName === 'bug') {
-    const embedResponse = new EmbedBuilder()
-        .setColor(0x0099FF)
-        .setDescription(`thank you for the bug report, the developers have been notified.`)
     await interaction.reply({
-      embeds: [embedResponse],
+      embeds: [ephemeralResponse(`thank you for the bug report, the developers have been notified.`, 0x0099FF)],
       ephemeral: true
     });
 
@@ -170,6 +199,13 @@ async function botSendMessage(channelId, message, embed, ephemeral) {
 } catch (error) {
     console.error('Error sending message to channel:', error);
   }
+}
+
+function ephemeralResponse(description, color) {
+  const embedResponse = new EmbedBuilder()
+      .setColor(color)
+      .setDescription(description)
+    return embedResponse;
 }
 
 module.exports = { botSendMessage };
