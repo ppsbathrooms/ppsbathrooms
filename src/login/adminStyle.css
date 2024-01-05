@@ -395,6 +395,13 @@ body img {
     animation: wrongPass .5s ease forwards;
 }
 
+#br_prefs input {
+    width: 15px;
+    aspect-ratio: 1;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
 @keyframes correctPass {
     0% {
         border-color: green;
