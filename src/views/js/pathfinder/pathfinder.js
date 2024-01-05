@@ -1,6 +1,5 @@
 const distanceToTimeConversion = 1.0;
 
-// technically not needed, but nice to store these somewhere in case they need to be accessed for something else
 var bathroomNodes = [];
 
 var cornerNodes = [];
@@ -8,6 +7,8 @@ var roomNodes = [];
 
 var allNodes = [];
 var allConnections = [];
+
+var lineWidth = 3;
 
 // #region Structs
 
@@ -29,7 +30,7 @@ class PathNode {
 
         allNodes.push(this);
 
-        if (id.startsWith("br-")) {
+        if (id.startsWith("B")) {
             bathroomNodes.push(this);
         }
         else if (id.startsWith("c-")){
@@ -92,7 +93,7 @@ function findNode(id) {
 
 // #region Setup
 
-function setupPathfinder() {
+async function setupPathfinder() {
     // yoink node locations from svg
     var textElements = $("#svgNodes text");
     //if ()
@@ -116,16 +117,30 @@ function setupPathfinder() {
         new PathNode(xPos, yPos, id.toString());
     });
 
-    //var path = pathfindToNearestBathroom("109", ["br-b", "br-g"]);
+    console.log(schoolRedirect);
+    if (schoolRedirect == "fhs") {
+        fhsConnections();
+        lineWidth = 1;
+    }
+    else if (schoolRedirect == "chs") {
+        chsConnections();
+        lineWidth = 8;
+    }
+    else idaConnections();
 
-    //drawPath(path);
+    var path = pathfindToNearestBathroom("SS012");
+    //var path = findPath("SS019", "BG3");
+
+    drawPath(path);
     //drawAllConnections();
     
     //drawLine(200,100,200,200);
     //chsConnections();
-    fhsConnections();
-    drawAllConnections();
+    //drawAllConnections();
+
 }
+
+function idaConnections() { }
 
 function fhsConnections() {
     // top map left
@@ -613,6 +628,12 @@ function pathfindToNearestBathroom(roomId, brPrefs) {
             return;
 
         var p = findPath(roomId, brNode.id); 
+
+        if (p == undefined) {
+            console.log("path not found");
+            return;
+        }
+
         paths.push(p);
     })
 
@@ -625,7 +646,10 @@ function selectShortestPath(paths) {
     var shortestPath;
 
     paths.forEach(p => {
-        if (p.walkTime < shortestTime) {
+        if (p == undefined)
+            return;
+
+            if (p.walkTime < shortestTime) {
             shortestTime = p.walkTime;
             shortestPath = p;
         }
@@ -636,10 +660,12 @@ function selectShortestPath(paths) {
 
 // based off thing i made a long time ago in cs https://github.com/LucaHaverty/hexgrid-game/blob/main/Assets/Scrips/Static/Pathfinding.cs
 function findPath(startNodeId, endNodeId) {
-    console.log("finding path between " + startNodeId + " and " + endNodeId);
-
+    console.log("Finding path between " + startNodeId + " and " + endNodeId);
     startNode = findNode(startNodeId);
     endNode = findNode(endNodeId);
+
+    if (startNode == undefined || endNode == undefined)
+        return;
 
     // final path 
     path = [];
@@ -706,7 +732,7 @@ function findPath(startNodeId, endNodeId) {
         }
     }
 
-    console.error("NO PATH FOUND BETWEEN " + startNode + " AND " + endNode);
+    // reaches here if no path found
 }
 
 // retrace the path backwards using parent nodes
@@ -789,7 +815,7 @@ function drawLine(x1, y1, x2, y2) {
     line.setAttribute("x2", x2.toString()); // Offset x coordinates
     line.setAttribute("y2", y2.toString()); // Offset y coordinates
     line.setAttribute("stroke", "red");
-    line.setAttribute("stroke-width", "1");
+    line.setAttribute("stroke-width", lineWidth.toString());
   
     svg.appendChild(line);
   
