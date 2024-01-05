@@ -135,7 +135,7 @@ async function setupPathfinder() {
 function idaConnections() { }
 
 function fhsConnections() {
-    // top map left
+    // S basement
     new Connection("BN7", "S028");
     new Connection("S028", "CS01");  
     new Connection("S027", "CS01");  
@@ -150,11 +150,13 @@ function fhsConnections() {
     new Connection("S017", "S016");  
     new Connection("S017", "S016");  
     new Connection("S016", "CS02");  
-    new Connection("CS02", "T001");  
+    new Connection("CS02", "T001");
 
-    // top map right
+
+    // SS basement
     new Connection("SS019", "SS017");
-    new Connection("SS016", "SS017");
+    new Connection("CSS1", "SS017");
+    new Connection("CSS1", "SS016");
     new Connection("SS016", "SS014");
     new Connection("SS015", "SS014");
     new Connection("SS015", "SS013");
@@ -171,8 +173,20 @@ function fhsConnections() {
     new Connection("SS008", "T013");
     new Connection("SS008", "BN6");
     new Connection("BB3", "BN6");
-    new Connection("SS001", "BB3");
+    new Connection("BB3", "CSS0");
+    new Connection("SS001", "CSS0");
     new Connection("BG3", "BB3");
+    new Connection("SS019", "CSS2");
+    new Connection("CSS2", "CSS3");
+    new Connection("CSS3", "CSS6");
+    new Connection("CSS6", "T014");
+    new Connection("CSS6", "SS025");
+    new Connection("SS025", "SS024");
+    new Connection("BB3", "BN6");
+    new Connection("CSS1", "CSS4");
+    new Connection("CSS4", "CSS5");
+    new Connection("CSS5", "SS024");
+    new Connection("CSS5", "T015");
 
     // floor 1 
     new Connection("T100", "S159");
