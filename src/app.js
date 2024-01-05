@@ -248,10 +248,18 @@ app.get('/', async (req, res) => {
 
 app.get('/cleveland', async (req, res) => {
   try {
+    if(req.session.authenticated) {
+      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
+      currentPeriod = getCurrentPeriod(user.schedule)
+    }
+    else {
+      currentPeriod = -1;
+    }
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     accountData = {
-      loggedIn: req.session.authenticated ? true:false
+      loggedIn: req.session.authenticated ? true:false,
+      currentClass: currentPeriod
     }
     const dataToSendToClient = {
       brData: doc,
@@ -268,10 +276,18 @@ app.get('/cleveland', async (req, res) => {
 
 app.get('/franklin', async (req, res) => {
   try {
+    if(req.session.authenticated) {
+      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
+      currentPeriod = getCurrentPeriod(user.schedule)
+    }
+    else {
+      currentPeriod = -1;
+    }
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     accountData = {
-      loggedIn: req.session.authenticated ? true:false
+      loggedIn: req.session.authenticated ? true:false,
+      currentClass: currentPeriod
     }
     const dataToSendToClient = {
       brData: doc,
@@ -288,10 +304,18 @@ app.get('/franklin', async (req, res) => {
 
 app.get('/ida', async (req, res) => {
   try {
+    if(req.session.authenticated) {
+      const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
+      currentPeriod = getCurrentPeriod(user.schedule)
+    }
+    else {
+      currentPeriod = -1;
+    }
     doc = await dataColl.findOne({ _id: 'schoolData' });
     doc = doc.value;
     accountData = {
-      loggedIn: req.session.authenticated ? true:false
+      loggedIn: req.session.authenticated ? true:false,
+      currentClass: currentPeriod
     }
     const dataToSendToClient = {
       brData: doc,

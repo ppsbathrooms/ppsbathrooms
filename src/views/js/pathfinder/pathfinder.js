@@ -96,28 +96,19 @@ function findNode(id) {
 async function setupPathfinder() {
     // yoink node locations from svg
     var textElements = $("#svgNodes text");
-    //if ()
-    //var globalTransform = spliceTransform($("#svgNodes").attr('transform'));
 
     textElements.each(function () {
         var element = $(this);
         var id = element.text();
 
-        //var localTransform = spliceTransform(element.attr('transform'));
+        var xPos = parseFloat(element.attr('x'));
+        var yPos = parseFloat(element.attr('y'));
 
-        var xPos = parseFloat(element.attr('x'))/*  + globalTransform[0] + localTransform[0] */;
-        var yPos = parseFloat(element.attr('y'))/*  + globalTransform[1] + localTransform[1] */;
-
-        // console.log("Created Node " + id);
-        // console.log("Pos " + element.attr('x') + " " + element.attr('y'));
-        // console.log("Global " + globalTransform[0].toString() + " " + globalTransform[1].toString());
-        // console.log("Local " + localTransform[0].toString() + " " + localTransform[1].toString());
-        
-        //console.log(id + " " + xPos + " " + yPos);
         new PathNode(xPos, yPos, id.toString());
     });
 
-    console.log(schoolRedirect);
+
+    // create correct connections
     if (schoolRedirect == "fhs") {
         fhsConnections();
         lineWidth = 1;
@@ -128,16 +119,15 @@ async function setupPathfinder() {
     }
     else idaConnections();
 
-    var path = pathfindToNearestBathroom("SS012");
-    //var path = findPath("SS019", "BG3");
+    // pathfind to closest bathroom to current class
+    var currentClass = JSON.parse($('#accountData').html()).currentClass;
 
-    drawPath(path);
-    //drawAllConnections();
-    
-    //drawLine(200,100,200,200);
-    //chsConnections();
-    //drawAllConnections();
+    if (currentClass != -1) {
+        var path = pathfindToNearestBathroom(currentClass.toString());
+        drawPath(path);
+    }
 
+    drawAllConnections();
 }
 
 function idaConnections() { }
@@ -629,13 +619,11 @@ function pathfindToNearestBathroom(roomId, brPrefs) {
 
         var p = findPath(roomId, brNode.id); 
 
-        if (p == undefined) {
-            console.log("path not found");
+        if (p == undefined)
             return;
-        }
 
         paths.push(p);
-    })
+    });
 
     return selectShortestPath(paths);
 }
@@ -660,7 +648,6 @@ function selectShortestPath(paths) {
 
 // based off thing i made a long time ago in cs https://github.com/LucaHaverty/hexgrid-game/blob/main/Assets/Scrips/Static/Pathfinding.cs
 function findPath(startNodeId, endNodeId) {
-    console.log("Finding path between " + startNodeId + " and " + endNodeId);
     startNode = findNode(startNodeId);
     endNode = findNode(endNodeId);
 
@@ -774,9 +761,7 @@ function drawConnection(connection) {
 function drawPath(path) {
     console.log("Path between " + path.nodes[0].id + " and " + path.nodes[path.nodes.length-1].id + ":");
 
-    for (var i = 0; i < path.nodes.length; i++) {
-        // console.log(path.nodes[i].id);
-        
+    for (var i = 0; i < path.nodes.length; i++) {        
         if (i == 0) 
             continue;
 
@@ -792,12 +777,6 @@ function drawLineBetweenNodes(nodeA, nodeB) {
 // draws a line on the map connecting two points
 function drawLine(x1, y1, x2, y2) {
     const svgNS = "http://www.w3.org/2000/svg";
-
-    // offset to center
-    x1 += 4;
-    x2 += 4;
-    y1 -= 1;
-    y2 -= 1;
     
     // Calculate the SVG dimensions based on line coordinates
     const minX = Math.min(x1, x2);
