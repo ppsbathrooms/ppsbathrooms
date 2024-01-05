@@ -99,7 +99,7 @@ function verifyEmail(email, name, verificationKey) {
     const unescapedEmail = unescapeRegExp(email)
     const modifiedHtml = data
       .replace('{{username}}', name)
-      .replace('{{link}}', `http://localhost:42069/verify/${unescapedEmail}/${verificationKey}`)
+      .replace('{{link}}', `http://ppsbathrooms.org/verify/${unescapedEmail}/${verificationKey}`)
     const msg = {
       to: unescapedEmail,
       from: 'verify@ppsbathrooms.org',
