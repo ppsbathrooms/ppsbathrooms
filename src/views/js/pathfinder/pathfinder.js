@@ -115,7 +115,7 @@ async function setupPathfinder() {
     }
     else if (schoolRedirect == "chs") {
         chsConnections();
-        lineWidth = 12;
+        lineWidth = 8;
     }
     else idaConnections();
 
@@ -797,21 +797,31 @@ function drawLine(x1, y1, x2, y2) {
     const svgNS = "http://www.w3.org/2000/svg";
     const lineHolder = document.getElementById("lineHolder");
     
+    
     const newLine = document.createElementNS(svgNS, "svg");
     newLine.setAttribute("width", 10000); // Add some padding for visibility
     newLine.setAttribute("height", 10000);
     
+    // extend line by half of line width
+    const extensionAmount = lineWidth / 2
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const extendedX = x2 + (dx / length) * extensionAmount;
+    const extendedY = y2 + (dy / length) * extensionAmount;
+
     const line = document.createElementNS(svgNS, "line");
-    line.setAttribute("x1", x1.toString()); // Offset x coordinates
-    line.setAttribute("y1", y1.toString()); // Offset y coordinates
-    line.setAttribute("x2", x2.toString()); // Offset x coordinates
-    line.setAttribute("y2", y2.toString()); // Offset y coordinates
+    line.setAttribute("x1", x1.toString());
+    line.setAttribute("y1", y1.toString());
+    line.setAttribute("x2", extendedX.toString());
+    line.setAttribute("y2", extendedY.toString());
     line.setAttribute("stroke", "red");
     line.setAttribute("stroke-width", lineWidth.toString());
     
     newLine.appendChild(line);
     lineHolder.appendChild(newLine);
 }
+
 
 function drawCircle(x, y) {
     const svgNS = "http://www.w3.org/2000/svg";
@@ -820,7 +830,7 @@ function drawCircle(x, y) {
     var circle = document.createElementNS(svgNS, 'circle');
     circle.setAttributeNS(null, 'cx', x);
     circle.setAttributeNS(null, 'cy', y);
-    circle.setAttributeNS(null, 'r', 20);
+    circle.setAttributeNS(null, 'r', 10);
     circle.setAttributeNS(null, 'style', 'fill: red; stroke: none; stroke-width: 2px;' );
     lineHolder.appendChild(circle);
 }
