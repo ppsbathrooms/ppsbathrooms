@@ -591,8 +591,8 @@ function chsConnections() {
     new Connection("311", "313");
     new Connection("311", "309");
     new Connection("307", "309");
-    new Connection("307", "B");
-    new Connection("300", "B");
+    new Connection("307", "Y");
+    new Connection("300", "Y");
     new Connection("300", "308");
     new Connection("306", "308");
     new Connection("306", "310");
