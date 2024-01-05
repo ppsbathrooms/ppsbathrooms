@@ -123,7 +123,7 @@ function setupPathfinder() {
     
     //drawLine(200,100,200,200);
     //chsConnections();
-    //fhsConnections();
+    fhsConnections();
     drawAllConnections();
 }
 
@@ -277,6 +277,154 @@ function fhsConnections() {
     new Connection("T103", "BG2");
     new Connection("T103", "S105");
     new Connection("S112A", "S105");
+
+    //floor 2
+    new Connection("T200","S245");
+    new Connection("S245","S244");
+    new Connection("S244","CS201");
+    new Connection("CS201","S243");
+    new Connection("S243","S242");
+    new Connection("S242","S241");
+    new Connection("S240","BT3");
+    new Connection("BT3","S239");
+    new Connection("S239","S238");
+    new Connection("S238","S237");
+    new Connection("S237","S236");
+    new Connection("S236","S235");
+    new Connection("S235","S234");
+    new Connection("S234","CS206");
+    new Connection("CS206","T201");
+    new Connection("CS206","CS200");
+    new Connection("CS200","S230");
+    new Connection("S230","S226");
+    new Connection("S226","CS202");
+    new Connection("CS202","S226A");
+    new Connection("S226A","CS203");
+    new Connection("CS203","S224");
+    new Connection("CS203","S222");
+    new Connection("S222","S221");
+    new Connection("S221","S220");
+    new Connection("S220","S219");
+    new Connection("S219","CS204");
+    new Connection("CS204","S218");
+    new Connection("S218","S217");
+    new Connection("S217","BN8");
+    new Connection("BN8","CS205");
+    new Connection("CS205","S215");
+    new Connection("S215","S214");
+    new Connection("CS204","S213");
+    new Connection("S213","T202");
+    new Connection("CS200","BG5");
+    new Connection("BG5","BB5");
+    new Connection("BB5","M218");
+    new Connection("M218","CM20");
+    new Connection("CM20","M210");
+    new Connection("M210","M209");
+    new Connection("M209","M208");
+    new Connection("M208","M207");
+    new Connection("M207","M206");
+    new Connection("M206","M204");
+    new Connection("M204","CM21");
+    new Connection("CM21","T204");
+    new Connection("CM20","M219");
+    new Connection("M219","T211");
+    new Connection("T211","M221");
+    new Connection("M221","M222");
+    new Connection("M222","T212");
+    new Connection("T212","M223");
+    new Connection("M223","CM22");
+    new Connection("CM22","M233");
+    new Connection("M233","M232");
+    new Connection("M232","M234");
+    new Connection("M234","M235");
+    new Connection("M235","M236");
+    new Connection("M236","M237");
+    new Connection("M237","M238");
+    new Connection("M238","CM23");
+    new Connection("CM23","M239");
+    new Connection("M239","T205");
+    new Connection("CM22","M224");
+    new Connection("M224","BB6");
+    new Connection("BB6","BG6");
+    new Connection("BG6","SS221");
+    new Connection("SS221","CSS20");
+    new Connection("CSS20","SS220");
+    new Connection("SS220","T207");
+    new Connection("CSS20","T210");
+
+    //counseling center
+    new Connection("T206","SS219");
+    new Connection("SS219","CSS21");
+    new Connection("CSS21","SS218");
+    new Connection("CSS21","SS216");
+    new Connection("SS216","CSS22");
+    new Connection("CSS22","SS212");
+    new Connection("SS212","CSS23");
+    new Connection("CSS23","SS202");
+    new Connection("CSS23","SS203");
+    new Connection("SS203","SS204");
+    new Connection("SS204","SS205");
+    new Connection("SS205","SS206");
+    new Connection("SS206","CSS24");
+    new Connection("CSS24","SS207");
+    new Connection("SS207","SS208");
+    new Connection("SS208","CSS25");
+    new Connection("SS209","CSS25");
+    new Connection("SS209","SS210");
+    new Connection("CSS25","SS211");
+    new Connection("SS211","CSS22");
+
+    //gym ground floor    
+    new Connection("TG2","G002");
+    new Connection("G002","EG1");
+    new Connection("EG1","G003");
+    new Connection("G003","G009");
+    new Connection("G009","G004");
+    new Connection("G004","CG00");
+    new Connection("CG00","G005");
+    new Connection("CG00","CG01");
+    new Connection("CG01","BN10");
+    new Connection("G006","BN10");
+    new Connection("G006","G008");
+    new Connection("CG01","G010");
+    new Connection("G010","BB8");
+    new Connection("BB8","G012");
+    new Connection("G012","G013");
+    new Connection("G013","BG8");
+    new Connection("BB9","BG8");
+    new Connection("BB9","G015");
+    new Connection("G015","TG3");
+    new Connection("TG3","G016");
+    new Connection("G016","BB9A");
+    new Connection("BB9A","G015A");
+    new Connection("G015A","G017");
+    new Connection("G017","G018");
+    new Connection("G018","G019");
+    new Connection("G019","G020");
+    new Connection("G020","BG9A");
+    new Connection("G021","BG9");
+    new Connection("G021","BG9A");
+    new Connection("BG9","G023");
+
+    //gym 1st floor
+    new Connection("CG11","BN9");
+    new Connection("BN9","G114");
+    new Connection("G113","G114");
+    new Connection("G113","G111");
+    new Connection("G111","CG12");
+    new Connection("CG12","CG13");
+    new Connection("TG1","G106");
+    new Connection("G106","CG13");
+    new Connection("CG13","BG7");
+    new Connection("BG7","BB7");
+    new Connection("CG10","BB7");
+    new Connection("CG10","EG0");
+    new Connection("EG0","CG11");
+    new Connection("CG11","TG0");
+
+    //gym 2nd floor
+    new Connection("G203","EG2");
+    new Connection("EG2","TG4");
 }
 
 function chsConnections() {
