@@ -123,7 +123,7 @@ function setupPathfinder() {
     
     //drawLine(200,100,200,200);
     //chsConnections();
-    fhsConnections();
+    //fhsConnections();
     drawAllConnections();
 }
 
