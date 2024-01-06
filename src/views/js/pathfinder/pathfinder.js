@@ -33,7 +33,7 @@ class PathNode {
         if (id.startsWith("B")) {
             bathroomNodes.push(this);
         }
-        else if (id.startsWith("c-")){
+        else if (id.startsWith("c-") || id.startsWith("C")){
             cornerNodes.push(this);
         }
         else {
@@ -691,7 +691,8 @@ function findPath(startNodeId, endNodeId) {
         bestIndex = 0;
 
         for (var i = 1; i < openSet.length; i++) {
-            if (openSet[i].hCost+openSet[i].gCost < currentNode.hCost+currentNode.gCost || openSet[i].hCost+openSet[i].gCost == currentNode.hCost+currentNode.gCost && openSet[i].hCost < currentNode.hCost) {
+            console.log(openSet[i].gCost);
+            if (openSet[i].hCost + openSet[i].gCost < currentNode.hCost + currentNode.gCost || openSet[i].hCost + openSet[i].gCost == currentNode.hCost + currentNode.gCost && openSet[i].hCost < currentNode.hCost) {
                 currentNode = openSet[i];
                 bestIndex = i;
             }
@@ -734,7 +735,7 @@ function findPath(startNodeId, endNodeId) {
             }
         }
     }
-
+    
     // reaches here if no path found
 }
 
