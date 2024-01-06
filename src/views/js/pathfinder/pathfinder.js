@@ -149,8 +149,9 @@ function fhsConnections() {
     new Connection("S017", "BB4");  
     new Connection("S017", "S016");  
     new Connection("S017", "S016");  
-    new Connection("S016", "CS02");  
-    new Connection("CS02", "T001");
+    new Connection("S016", "CS02");
+    new Connection("S012", "CS02");  
+    new Connection("S012", "T001");
 
 
     // SS basement
@@ -691,7 +692,6 @@ function findPath(startNodeId, endNodeId) {
         bestIndex = 0;
 
         for (var i = 1; i < openSet.length; i++) {
-            console.log(openSet[i].gCost);
             if (openSet[i].hCost + openSet[i].gCost < currentNode.hCost + currentNode.gCost || openSet[i].hCost + openSet[i].gCost == currentNode.hCost + currentNode.gCost && openSet[i].hCost < currentNode.hCost) {
                 currentNode = openSet[i];
                 bestIndex = i;
@@ -735,7 +735,7 @@ function findPath(startNodeId, endNodeId) {
             }
         }
     }
-    
+
     // reaches here if no path found
 }
 
