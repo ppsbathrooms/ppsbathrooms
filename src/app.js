@@ -367,14 +367,10 @@ app.get('/login', (req, res) => {
 app.get('/verify/:email/:key', async (req,res) => {
   const email = req.params.email;
   const key = escapeRegExp(req.params.key);
-  console.log('')
 
-  userColl.findOne({ emailVerificationKey: key }, function(err, user) {
-    if (err) {
-      console.log('Error finding user:', err);
-      return;
-    }
-    
+  try {
+    const user = await userColl.findOne({ emailVerificationKey: key });
+
     if (user) {
       if((user.email = email) && (user.emailVerificationKey = key)) {
         userColl.updateOne(
@@ -388,15 +384,21 @@ app.get('/verify/:email/:key', async (req,res) => {
               console.log('Error updating user verification:', err);
               return;
             }
+            else {
+              console.log(`${user.username} verified`)
+            }
           }
           );
-          bot.botSendMessage(discordChannels.bot_testing, `${user.username} created an account`, true, false);
+          // bot.botSendMessage(discordChannels.bot_testing, `${user.username} created an account`, true, false);
         res.redirect('/login?verified=true');
       }
     } else {
       res.redirect('/');
     }
-  });
+
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 function getCurrentPeriod(periodData) {
