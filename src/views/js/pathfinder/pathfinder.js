@@ -134,11 +134,10 @@ async function setupPathfinder() {
     // pathfind to closest bathroom to current class
     accountData = $('#accountData').html()
     var currentClass = JSON.parse(accountData).currentClass;
+    var currentClass = currentClass.toString().replace(/-/g, "").toUpperCase();
     console.log("Current Class: " + currentClass);
 
     if (currentClass != -1) {
-        var currentClass = currentClass.toString().replace(/-/g, "");
-        currentClass = currentClass.toString().toUpperCase();
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
