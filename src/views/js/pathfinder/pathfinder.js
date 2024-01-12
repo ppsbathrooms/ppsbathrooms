@@ -10,7 +10,7 @@ var allConnections = [];
 
 var lineWidth = 3;
 
-const drawSpeed = 1.75;
+var drawSpeed;
 const loopTimeMS = 5;
 var intervalId = setInterval(function() {
     drawPathPeriodic();
@@ -117,13 +117,19 @@ async function setupPathfinder() {
     // create correct connections
     if (schoolRedirect == "fhs") {
         lineWidth = 2;
+        drawSpeed = 0.4;
         fhsConnections();
     }
     else if (schoolRedirect == "chs") {
         chsConnections();
+        drawSpeed = 1.9;
         lineWidth = 8;
     }
-    else idaConnections();
+    else {
+        idaConnections();
+        drawSpeed = 1.9;
+        lineWidth = 8;
+    }
 
     // pathfind to closest bathroom to current class
     accountData = $('#accountData').html()
@@ -135,6 +141,8 @@ async function setupPathfinder() {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
+
+    drawPathAnimated(pathfindToNearestBathroom("130"));
 }
 
 function idaConnections() { }
