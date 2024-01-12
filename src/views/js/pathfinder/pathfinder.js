@@ -10,6 +10,12 @@ var allConnections = [];
 
 var lineWidth = 3;
 
+const drawSpeed = 1;
+const loopTimeMS = 5;
+var intervalId = setInterval(function() {
+    drawPathPeriodic();
+}, loopTimeMS);
+
 // #region Structs
 
 class PathNode {
@@ -127,10 +133,10 @@ async function setupPathfinder() {
     if (currentClass != -1) {
         var currentClass = currentClass.toString().replace(/-/g, "")
         var path = pathfindToNearestBathroom(currentClass.toString());
-        drawPath(path);
+        drawPathAnimated(path);
     }
 
-    // drawAllConnections();
+    drawPathAnimated(pathfindToNearestBathroom("132"));
 }
 
 function idaConnections() { }
@@ -776,16 +782,75 @@ function drawConnection(connection) {
     drawLineBetweenNodes(connection.nodeA, connection.nodeB);
 }
 
+var pathToDraw;
+var currentPathIndex;
+var currentLinePercent;
+var currentLineLength;
+
+var currentNodeA;
+var currentNodeB;
+
+var currentLineID;
+
+function drawPathPeriodic() {
+    if (pathToDraw == null)
+        return;
+
+    currentLinePercent += (drawSpeed / currentLineLength) * loopTimeMS;
+    currentLinePercent = Math.min(currentLinePercent, 1);
+
+    modifyLine(currentLineID, currentNodeA.xPos, currentNodeA.yPos, 
+            lerp(currentNodeA.xPos, currentNodeB.xPos, currentLinePercent),
+            lerp(currentNodeA.yPos, currentNodeB.yPos, currentLinePercent));
+    
+    if (currentLinePercent >= 1) {
+        currentPathIndex++;
+
+        if (currentPathIndex >= pathToDraw.nodes.length) {
+            bathroom = pathToDraw.nodes[pathToDraw.nodes.length - 1];
+            drawCircle(bathroom.xPos, bathroom.yPos)
+            pathToDraw = null;
+            return;
+        }
+
+        currentLinePercent = 0;
+
+        currentNodeA = pathToDraw.nodes[currentPathIndex-1];
+        currentNodeB = pathToDraw.nodes[currentPathIndex];
+        currentLineLength = getDirectDistance(currentNodeA, currentNodeB);
+
+        currentLineID = drawLine(0,0,0,0, );
+    }
+}
+
+function drawPathAnimated(path) {
+    console.log("Path between " + path.nodes[0].id + " and " + path.nodes[path.nodes.length-1].id + ":");
+
+    pathToDraw = path;
+
+    currentPathIndex = 1;
+    currentLinePercent = 0;
+
+    currentNodeA = path.nodes[0];
+    currentNodeB = path.nodes[1];
+    currentLineLength = getDirectDistance(currentNodeA, currentNodeB);
+
+    currentLineID = drawLine(0,0,0,0);
+}
+
 function drawPath(path) {
     bathroom = path.nodes[path.nodes.length - 1];
     drawCircle(bathroom.xPos, bathroom.yPos)
+
+    console.log("CONSIDER USING drawPathAnimated() INSTEAD");
     console.log("Path between " + path.nodes[0].id + " and " + path.nodes[path.nodes.length-1].id + ":");
 
     for (var i = 0; i < path.nodes.length; i++) {        
         if (i == 0) 
             continue;
 
-        drawLineBetweenNodes(path.nodes[i-1], path.nodes[i]);
+            drawLine(currentNodeA.xPos, currentNodeA.yPos, currentNodeA.xPos, currentNodeA.yPos);
+            drawLineBetweenNodes(nodeA, nodeB);
     }
 }
 
@@ -796,9 +861,10 @@ function drawLineBetweenNodes(nodeA, nodeB) {
 
 // draws a line on the map connecting two points
 function drawLine(x1, y1, x2, y2) {
+    const lineID = uuidv4();
+
     const svgNS = "http://www.w3.org/2000/svg";
     const lineHolder = document.getElementById("lineHolder");
-    
     
     const newLine = document.createElementNS(svgNS, "svg");
     newLine.setAttribute("width", 10000); // Add some padding for visibility
@@ -808,11 +874,13 @@ function drawLine(x1, y1, x2, y2) {
     const extensionAmount = lineWidth / 2
     const dx = x2 - x1;
     const dy = y2 - y1;
-    const length = Math.sqrt(dx * dx + dy * dy);
+    const length = Math.sqrt(dx * dx + dy * dy) + 0.0001; // add small to avoid div by zero
     const extendedX = x2 + (dx / length) * extensionAmount;
     const extendedY = y2 + (dy / length) * extensionAmount;
 
     const line = document.createElementNS(svgNS, "line");
+
+    line.setAttribute("id", lineID);
     line.setAttribute("x1", x1.toString());
     line.setAttribute("y1", y1.toString());
     line.setAttribute("x2", extendedX.toString());
@@ -822,6 +890,24 @@ function drawLine(x1, y1, x2, y2) {
     
     newLine.appendChild(line);
     lineHolder.appendChild(newLine);
+
+    return lineID;
+}
+
+function modifyLine(lineID, x1, y1, x2, y2) {
+    const line = document.getElementById(lineID);
+
+    const extensionAmount = lineWidth / 2
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const length = Math.sqrt(dx * dx + dy * dy) + 0.0001; // add small to avoid div by zero
+    const extendedX = x2 + (dx / length) * extensionAmount;
+    const extendedY = y2 + (dy / length) * extensionAmount;
+
+    line.setAttribute("x1", x1.toString());
+    line.setAttribute("y1", y1.toString());
+    line.setAttribute("x2", extendedX.toString());
+    line.setAttribute("y2", extendedY.toString());
 }
 
 
@@ -836,5 +922,15 @@ function drawCircle(x, y) {
     circle.setAttributeNS(null, 'style', 'fill: red; stroke: none; stroke-width: 2px;' );
     lineHolder.appendChild(circle);
 }
+
+function lerp(start, end, amt){
+    return (1-amt)*start+amt*end
+}
+
+  function uuidv4() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
 
 // #endregion
