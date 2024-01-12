@@ -137,7 +137,7 @@ async function setupPathfinder() {
     var currentClass = currentClass.toString().replace(/-/g, "").toUpperCase();
     console.log("Current Class: " + currentClass);
 
-    if (currentClass != 1) {
+    if (currentClass != -1) {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
@@ -271,8 +271,8 @@ function fhsConnections() {
     new Connection("CM14", "M102");
     new Connection("M105", "M102");
     new Connection("CM14", "M101");
-    new Connection("CS12", "S145A");
-    new Connection("S142", "S145A");
+    new Connection("CS12", "S145");
+    new Connection("S142", "S145");
     new Connection("S142", "S140");
     new Connection("S138", "S140");
     new Connection("S138", "BN5");
@@ -289,15 +289,14 @@ function fhsConnections() {
     new Connection("S132", "S133");
     new Connection("S132", "S131");
     new Connection("CS16", "S131");
-    new Connection("CS16", "S131A");
-    new Connection("CS17", "S131A");
-    new Connection("CS17", "S131B");
-    new Connection("S130", "S131B");
+    new Connection("CS16", "S131");
+    new Connection("CS17", "S131");
+    new Connection("CS17", "S130");
     new Connection("S130", "S128");
     new Connection("S129", "S128");
     new Connection("BN4", "S128");
-    new Connection("BN4", "S122A");
-    new Connection("S120", "S122A");
+    new Connection("BN4", "S122");
+    new Connection("S120", "S122");
     new Connection("CS17", "CS18");
     new Connection("CS19", "CS18");
     new Connection("CS19", "S108");
@@ -309,7 +308,7 @@ function fhsConnections() {
     new Connection("BB2", "BG2");
     new Connection("T103", "BG2");
     new Connection("T103", "S105");
-    new Connection("S112A", "S105");
+    new Connection("S112", "S105");
 
     //floor 2
     new Connection("T200","S245");
@@ -331,8 +330,8 @@ function fhsConnections() {
     new Connection("CS200","S230");
     new Connection("S230","S226");
     new Connection("S226","CS202");
-    new Connection("CS202","S226A");
-    new Connection("S226A","CS203");
+    new Connection("CS202","S226");
+    new Connection("S226","CS203");
     new Connection("CS203","S224");
     new Connection("CS203","S222");
     new Connection("S222","S221");
@@ -428,15 +427,15 @@ function fhsConnections() {
     new Connection("BB9","G015");
     new Connection("G015","TG3");
     new Connection("TG3","G016");
-    new Connection("G016","BB9A");
-    new Connection("BB9A","G015A");
-    new Connection("G015A","G017");
+    new Connection("G016","BB9");
+    new Connection("BB9","G015");
+    new Connection("G015","G017");
     new Connection("G017","G018");
     new Connection("G018","G019");
     new Connection("G019","G020");
-    new Connection("G020","BG9A");
+    new Connection("G020","BG9");
     new Connection("G021","BG9");
-    new Connection("G021","BG9A");
+    new Connection("G021","BG9");
     new Connection("BG9","G023");
 
     //gym 1st floor
