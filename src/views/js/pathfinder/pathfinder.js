@@ -137,7 +137,7 @@ async function setupPathfinder() {
     var currentClass = currentClass.toString().replace(/-/g, "").toUpperCase();
     console.log("Current Class: " + currentClass);
 
-    if (currentClass != -1) {
+    if (currentClass != 1) {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
