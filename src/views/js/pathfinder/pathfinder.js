@@ -110,8 +110,8 @@ async function setupPathfinder() {
 
     // create correct connections
     if (schoolRedirect == "fhs") {
+        lineWidth = 2;
         fhsConnections();
-        lineWidth = 12;
     }
     else if (schoolRedirect == "chs") {
         chsConnections();
@@ -122,9 +122,10 @@ async function setupPathfinder() {
     // pathfind to closest bathroom to current class
     accountData = $('#accountData').html()
     var currentClass = JSON.parse(accountData).currentClass;
-    console.log(currentClass)
+    console.log("Current Class: " + currentClass);
 
     if (currentClass != -1) {
+        var currentClass = currentClass.toString().replace(/-/g, "")
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPath(path);
     }
@@ -831,7 +832,7 @@ function drawCircle(x, y) {
     var circle = document.createElementNS(svgNS, 'circle');
     circle.setAttributeNS(null, 'cx', x);
     circle.setAttributeNS(null, 'cy', y);
-    circle.setAttributeNS(null, 'r', 10);
+    circle.setAttributeNS(null, 'r', lineWidth*1.2);
     circle.setAttributeNS(null, 'style', 'fill: red; stroke: none; stroke-width: 2px;' );
     lineHolder.appendChild(circle);
 }
