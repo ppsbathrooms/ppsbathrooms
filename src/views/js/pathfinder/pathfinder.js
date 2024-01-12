@@ -10,7 +10,7 @@ var allConnections = [];
 
 var lineWidth = 3;
 
-const drawSpeed = 1;
+const drawSpeed = 1.75;
 const loopTimeMS = 5;
 var intervalId = setInterval(function() {
     drawPathPeriodic();
@@ -135,8 +135,6 @@ async function setupPathfinder() {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
-
-    drawPathAnimated(pathfindToNearestBathroom("132"));
 }
 
 function idaConnections() { }
