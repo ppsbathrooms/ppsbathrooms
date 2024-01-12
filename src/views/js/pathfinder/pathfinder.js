@@ -141,8 +141,6 @@ async function setupPathfinder() {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
-
-    drawPathAnimated(pathfindToNearestBathroom("130"));
 }
 
 function idaConnections() { }
