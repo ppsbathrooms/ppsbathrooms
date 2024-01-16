@@ -118,6 +118,15 @@ client.on('messageCreate', message => {
     });
 });
 
+client.on('messageCreate', (message) => {
+  if (nerds.includes(message.author.id)) {
+    message.react('🤓')
+      .catch((error) => console.error('error reacting with nerd emoji:', error));
+  }
+});
+
+nerds = ['614729600672727040', '795707189288501258']
+
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   const member = interaction.guild.members.cache.get(interaction.user.id);
@@ -191,6 +200,7 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(config.DISCORD_TOKEN);
+
 
 async function botSendMessage(channelId, message, embed, ephemeral) {
   try {
