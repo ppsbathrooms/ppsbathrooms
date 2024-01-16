@@ -86,9 +86,25 @@
 
     <div style="height: 50px"></div>
 
-    <div class="map"></div>
+    <div id="floorSelector">
+        <div class="floorSelection selectedFloor">
+            <p>1</p>
+        </div>
+        <div class="floorSelection">
+            <p>2</p>
+        </div>
+        <div class="floorSelection">
+            <p>3</p>
+        </div>
+    </div>
 
-    <div id="buttons"></div>
+    <div class="map">
+        <div id="mapHolder">
+
+        </div>
+    </div>
+
+    <div id=" buttons"></div>
 
     <div id="popup">
         <p id="popupId"></p>
@@ -122,5 +138,40 @@
 <script type="text/javascript" src="../js/selectSchool.js"></script>
 
 <script type="text/javascript" src="../js/pathfinder/pathfinder.js"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('.floorSelection').click(function () {
+            school = $('#pageID').html();
+            floor = $(this).find('p').html();
+
+            selectSchool(school, floor, false)
+
+            $('.floorSelection').removeClass('selectedFloor');
+            $(this).addClass('selectedFloor');
+        });
+    });
+</script>
+
+
+<!-- <script>
+    $(document).ready(function () {
+        let scale = 1;
+
+        $(".map").on("mousewheel DOMMouseScroll", function (e) {
+            e.preventDefault();
+            const delta = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+
+            scale += delta > 0 ? 0.1 : -0.1;
+            scale = Math.min(Math.max(1, scale), 2.5);
+
+            console.log(scale)
+
+            $(".map").css("transform", "scale(" + scale + ")");
+        });
+    });
+</script> -->
 
 </html>

@@ -10,7 +10,7 @@ isSchoolPage = isSchoolPage > 0 ? true : false;
 
 if(isSchoolPage) {
     if(schoolRedirect.replace(/\s/g, '').length) {
-        selectSchool(schoolRedirect.replace(/\s/g, ""), false)
+        selectSchool(schoolRedirect.replace(/\s/g, ""), 1, false)
         $('#buttons').show(100)
     } else {
         $('.schoolChoice').css('display', 'flex');
@@ -20,7 +20,7 @@ if(isSchoolPage) {
 
 //go to school page
 
-function selectSchool(school, redirect) {
+function selectSchool(school, floor, redirect) {
     document.title = "ppsbathrooms | " + schoolNameConvert(school, false) 
 
     $('#px').click();
@@ -40,7 +40,7 @@ function selectSchool(school, redirect) {
 
     $('#footer').css('position', 'static');
 
-    fetch('html/maps/' + school + 'Map.html')
+    fetch(`html/maps/${school}/floor${floor}.html`)
     .then(response => {
       if (!response.ok) {
         throw new Error('network response was not ok');
@@ -48,7 +48,7 @@ function selectSchool(school, redirect) {
       return response.text();
     })
     .then(data => {
-        $('.map').html(data);
+        $('#mapHolder').html(data);
         getData();
         getDataForUpdate();
         setupButtons();
@@ -87,7 +87,7 @@ window.onpopstate = function()
     }
     else if(newPage != currentPage) {
             justPage = window.location.href.toString().split(window.location.host)[1].replace(/\//g,'')
-            selectSchool(schoolNameConvert(justPage, true), false)
+            selectSchool(schoolNameConvert(justPage, true), 1, false)
         currentPage = newPage;
     }
 }

@@ -140,17 +140,23 @@ html::-webkit-scrollbar {
 }
 
 #mapHolder {
+    z-index: -1;
     position: absolute;
     left: 0px;
-    top: 100px;
     display: flex;
     justify-content: center;
-    width: 100%;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 .mapSvg {
-    width: 45vw;
-    margin-bottom: 50px;
+    /* border: 1px solid white; */
+    /* width: 45vw; */
+    /* margin-bottom: 50px; */
 }
 
 #navbarBackground {
@@ -774,6 +780,40 @@ svg#logo {
 #popupError#popupError {
     font-size: 12px;
     color: #ff0000;
+    display: none;
+}
+
+#floorSelector {
+    width: 25px;
+    height: 300px;
+    position: fixed;
+    top: 30vh;
+    left: 40px;
+    border: 1px solid white;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.floorSelection {
+    user-select: none;
+    width: 25px;
+    height: 100px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+}
+
+.selectedFloor {
+    /* border: 1px solid white; */
+    background: rgba(255, 255, 255, 0.35);
+}
+
+#svgNodes {
     display: none;
 }
 
