@@ -53,22 +53,49 @@
     }
 
     #verifyEmail {
-        width: 400px;
+        width: 350px;
         text-align: center;
-        margin-top: 20vh;
+        margin-top: 18vh;
         color: #fff;
-        font-size: 24px;
+        font-size: 18px;
         border: 1px solid white;
         border-radius: 10px;
         padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
+        text-wrap: pretty;
         display: none;
     }
 
+    #verifyEmail button {
+        display: none;
+    }
+
+    .clearDropdown {
+        color: #fff;
+        margin: 0;
+        margin-right: 5px;
+        padding: 3px 5px;
+        border-radius: 5px;
+        background: none;
+        border: none;
+        border: 1px solid white;
+        font-family: monospace;
+        outline: none;
+    }
+
+    .clearDropdown option:focus {
+        outline: none;
+        border: none;
+    }
+
+    .clearDropdown option {
+        color: #000;
+    }
+
     #createAccount {
-        margin-top: 20vh;
+        margin-top: 15vh;
         width: 400px;
         height: fit-content;
         border-radius: 10px;
@@ -83,7 +110,8 @@
         text-transform: uppercase;
     }
 
-    input {
+    input[type=text],
+    input[type=password] {
         all: unset;
         padding: 3px;
         margin-left: 3px;
@@ -154,8 +182,45 @@
         margin-bottom: 10px;
     }
 
+    #questions {
+        position: fixed;
+        right: 0px;
+        bottom: 0px;
+        cursor: pointer;
+        transition: 0.2s;
+        padding: 20px;
+    }
+
+    #questions:hover {
+        filter: brightness(80%);
+        transition: 0.2s;
+    }
+
+    #questionsInfo {
+        background: #0a0c15;
+        position: fixed;
+        right: 20px;
+        bottom: 50px;
+        width: 300px;
+        border: 1px solid white;
+        padding: 0px 10px;
+        text-wrap: pretty;
+        border-radius: 10px;
+        display: none;
+    }
+
+    .flex_horizontal {
+        display: flex;
+        align-content: center;
+    }
+
+    #br_prefs label {
+        margin-left: 10px;
+    }
+
     @media (max-width: 800px) {
         #createAccount {
+            margin-top: 10vh;
             border: none;
             display: flex;
             flex-direction: column;
@@ -164,12 +229,21 @@
 
         #verifyEmail {
             border: none;
+            width: 80vw;
+            font-size: 12px;
+            text-wrap: pretty;
         }
 
         #inputBg {
             width: 80vw;
         }
 
+    }
+
+    @media (max-width: 800px) {
+        #createAccount {
+            margin-top: 5vh;
+        }
     }
 </style>
 
@@ -196,14 +270,46 @@
                 <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="confirm password"
                     autocomplete="off" spellcheck="false">
                 <img id="passwordConfirmIcon" class="createAccountIcon" src="../../style/icons/x.svg" alt="">
+            </div><br>
+            <div style="width: 80vw">
+                <div id="schoolDropdown">
+                    <p>your school</p>
+                    <select name="school" class="clearDropdown">
+                        <option value="cleveland">cleveland</option>
+                        <option value="franklin">franklin</option>
+                        <option value="ibw">wells</option>
+                    </select>
+                </div><br>
+
+                <div id="br_prefs">
+                    <p>your prefered bathroom type/s</p>
+                    <div class="flex_horizontal">
+                        <input type="checkbox" name="male" value="male">
+                        <label for="male">male</label><br>
+                    </div>
+                    <div class="flex_horizontal">
+                        <input type="checkbox" name="female" value="female">
+                        <label for="female">female</label><br>
+                    </div>
+                    <div class="flex_horizontal">
+                        <input type="checkbox" name="all" value="all">
+                        <label for="all">all gender</label><br>
+                    </div><br>
+                </div>
             </div>
             <div id="bottomBar">
                 <button class="clearButton" id="createAccountButton" type="submit">create account</button>
             </div>
+            <img id="questions" src="/style/icons/questionmark.svg">
+            <div id="questionsInfo">
+                <p>your password is encrypted and all personal information is private and secure</p>
+                <p>your school and prefered bathroom type is used to show a route on the map from your current class to
+                    the closest bathroom.</p>
+            </div>
         </div>
         <p id="errorText">error</p>
         <div id="verifyEmail">
-            <p>please check your email to verify your account. after doing so you can log in. </p>
+            <p>an email has been sent to you. please click the link that it contains to verify your account.</p>
             <button class="clearButton" onclick="window.location.href='/login'">login</button>
         </div>
     </div>

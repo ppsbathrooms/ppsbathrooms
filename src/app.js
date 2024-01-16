@@ -34,6 +34,7 @@ updateSchedulesJob.start();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const sgMail = require('@sendgrid/mail');
+const e = require('express');
 
 emailApi = undefined;
 
@@ -687,10 +688,9 @@ app.get('*', (req, res) => {
 // #region Posts
 
 app.post('/createAccount', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, school, brPrefs } = req.body;
   escapedUsername = escapeRegExp(username)
   escapedEmail = escapeRegExp(email)
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const existingUser = await userColl.findOne({ username: { $regex: new RegExp(`^${escapedUsername}$`, 'i') } })
   const existingEmail = await userColl.findOne({ email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } })
   const highestKeyUser = await userColl.findOne({}, { sort: { key: -1 } });
@@ -703,49 +703,41 @@ app.post('/createAccount', async (req, res) => {
 
   verificationKey = crypto.randomBytes(64).toString('hex');
 
-  const dt = dateTime();
 
-  const joinTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
 
-  const newUserInfo = {
-    username: username,
-    password: await hashPassword(password),
-    access: '2',
-    key: nextKey,
-    email: email,
-    emailVerified: false,
-    emailVerificationKey: verificationKey,
-    schedule: ['','','','','','','',''],
-    joined: joinTime,
-    school: "cleveland",
-    br_prefs: {'male':"false", 'female':"false", 'all':"true"}
-  };
-  
-  usernameHasText = (username != '') 
-  passwordHasText = (password != '') 
-  
-  if((username == '') || (password == '') || (email == '')) {
-    res.json({ status: -1, error: 'all input fields must be filled'});
-  }
-  else if (usernameHasText && username.includes(' ')) {
-    res.json({ status: -1, error: 'username can\'t have spaces'});
-  }
-  else if (username.replace(/\s/g, '').length < 5 || username.replace(/\s/g, '').length > 24) {
-    res.json({ status: -1, error: 'username is too short'});
-  }
-  else if (!emailRegex.test(email)) {
-    res.json({ status: -1, error: 'enter a valid email address'});
-  }
-  else if (password.length < 6) {
-    res.json({ status: -1, error: 'password is too short'});
-  }
-  else if(existingUser) {
+  if(existingUser) {
     res.json({ status: 0, error: `username '${username.toLowerCase()}' is taken`});
+    return;
   }
   else if(existingEmail) {
     res.json({ status: 0, error: `email is taken`});
+    return;
   }
-  else {
+
+  const _usernameValid = usernameValid(username);
+  const _emailValid = emailValid(email);
+  const _passwordValid = passwordValid(password);
+  const _schoolValid = checkSchoolsValid(school);
+  const _brPrefsValid = checkBrPrefsValid(JSON.stringify(brPrefs));
+
+  if((_usernameValid.status === true) && (_passwordValid.status === true) && (_emailValid.status === true) && (_schoolValid) && (_brPrefsValid)) {
+    const dt = dateTime();
+    const joinTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
+
+    const newUserInfo = {
+      username: username,
+      password: await hashPassword(password),
+      access: '2',
+      key: nextKey,
+      email: email,
+      emailVerified: false,
+      emailVerificationKey: verificationKey,
+      schedule: ['','','','','','','',''],
+      joined: joinTime,
+      school: school,
+      br_prefs: brPrefs
+    };
+
     try {
       await userColl.insertOne(newUserInfo);
       verifyEmail(escapedEmail, escapedUsername, verificationKey)
@@ -756,7 +748,82 @@ app.post('/createAccount', async (req, res) => {
       console.error('Error creating new user:', error);
     }
   }
+  else {
+    if(_usernameValid.status != true) {
+      res.json(_usernameValid)
+    }
+    else if(_emailValid.status != true) {
+      res.json(_emailValid)
+    }
+    else if(_passwordValid.status != true) {
+      res.json(_passwordValid)
+    }
+    else if(_schoolValid != true) {
+      res.json({ status: 0, error: 'school is not valid'});
+    }
+    else if(_brPrefsValid != true) {
+      res.json({ status: 0, error: 'br prefs are not valid'});
+    }
+    else {
+      res.json({status: 0, error: 'an error has occured, please try again'})
+    }
+  }
 });
+
+function usernameValid(username) {
+  usernameHasText = (username != '')
+  if(!usernameHasText) {
+    return { status: 0, error: 'all input fields must be filled'};
+  }
+
+  else if (username.includes(' ')) {
+    return {status: 0, error: 'username can\'t contain spaces'}
+  }
+
+  else if (username.replace(/\s/g, '').length < 5 || username.replace(/\s/g, '').length > 24) {
+    return {status: 0, error: 'username is too short'}
+  }
+
+  else {
+    return {status: true, error: ''};
+  } 
+}
+
+function passwordValid(password) {
+  passwordHasText = (password != '');
+  
+  if(!passwordHasText) {
+    return { status: 0, error: 'all input fields must be filled'};
+  }
+
+  else if (password.includes(' ')) {
+     return { status: 0, error: 'password can\'t contain spaces'};
+  }
+
+  if (password.length < 6) {
+    return { status: 0, error: 'password is too short'};
+  }
+
+  else {
+    return {status: true, error: ''};
+  }
+}
+
+function emailValid(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  emailHasText = (email != '');
+
+  if(!emailHasText) {
+    res.json({ status: 0, error: 'all input fields must be filled'});
+  }
+
+  else if (!emailRegex.test(email)) {
+    res.json({ status: 0, error: 'enter a valid email address'});
+  }
+  else {
+    return {status: true, error: ''};
+  }
+}
 
 async function hashPassword(password) {
   try {
@@ -863,16 +930,37 @@ app.post('/updatePassword', async function(req, res) {
   }
 });
 
+function checkBrPrefsValid(prefs) {
+  const value = JSON.parse(prefs)
+  const validKeys = ["male", "female", "all"];
+  const validValues = ["true", "false"];
+  const keys = Object.keys(value);
+
+  const keysValid = keys.length === 3 && keys.every(key => validKeys.includes(key));
+  const valuesValid = keys.every(key => validValues.includes(value[key]));
+
+  return keysValid && valuesValid;
+}
+
+function checkSchoolsValid(school) {
+  const schools = ['cleveland', 'franklin', 'ibw'];
+  return schools.includes(school);
+}
+
 app.post('/updateSelf', async function(req, res) {
   if(req.session.authenticated && hasAccess('updateSelf', req.session)) {
 
-    schools = ['cleveland', 'franklin', 'ibw'];
     canUpdate = ['school', 'schedule', 'br_prefs'];
     toUpdate = req.body.toUpdate;
     newValue = req.body.newValue;
 
-    if(toUpdate == 'school' && !schools.includes(newValue)) {
+    if(toUpdate == 'school' && !checkSchoolsValid(newValue)) {
       console.log(chalk.red(req.session.username + ' attempted to change their school to ' + newValue))
+      return;
+    }
+
+    if(toUpdate == 'br_prefs' && !checkBrPrefsValid(JSON.stringify(newValue))) {
+      console.log(chalk.red(req.session.username + ' attempted to change their br prefs to ' + JSON.stringify(newValue)))
       return;
     }
 

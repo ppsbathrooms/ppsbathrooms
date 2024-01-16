@@ -204,6 +204,7 @@
                     url: '/login',
                     data: formData,
                     success: function (response) {
+                        console.log(response)
                         if (response.status < 1) {
                             failedAuth(response);
                         } else {

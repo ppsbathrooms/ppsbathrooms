@@ -1,10 +1,11 @@
 let errors = [];
 const errorText = $('#errorText');
 const errorMessages = {
-    usernameSpaces: 'username can\'t have spaces',
+    usernameSpaces: 'username can\'t contain spaces',
     usernameLength: 'username is too short',
     emailFormat: 'enter a valid email address',
     passwordLength: 'password is too short',
+    passwordSpaces: 'password can\'t contain spaces',
     passwordMismatch: 'passwords do not match',
     allInputs: 'all input fields must be filled'
 };
@@ -42,6 +43,10 @@ $(document).ready(function () {
             errors.push(errorMessages.passwordLength);
         }
 
+        if (passwordHasText && password.includes(' ')) {
+            errors.push(errorMessages.passwordSpaces);
+        }
+
         if (password !== confirmPassword) {
             errors.push(errorMessages.passwordMismatch);
         }
@@ -75,6 +80,15 @@ $(document).on('keypress',function(e) {
 });
 
 $('#createAccountButton').click(e => {
+    const maleChecked = $('input[name="male"]').is(':checked');
+    const femaleChecked = $('input[name="female"]').is(':checked');
+    const allChecked = $('input[name="all"]').is(':checked');
+    const brPrefs = {
+        male: maleChecked,
+        female: femaleChecked,
+        all: allChecked
+    };
+
     if(checkInputs() && errors.length == 0) {
         $.ajax({
             type: 'POST',
@@ -83,14 +97,17 @@ $('#createAccountButton').click(e => {
                 username: $('#username').val()?.trim(),
                 email: $('#email').val()?.trim(),
                 password: $('#password').val()?.trim(),
+                school: $('#schoolDropdown select').val(),
+                brPrefs: brPrefs
             },
             success: function (response) {
                 switch (response.status) {
-                    case 0: 
+                    case 0:
                         showError(response.error); 
                         break;
                     case 1:
                         $('#createAccount').hide();
+                        $('#errorText').hide();
                         $('#verifyEmail').fadeIn();
                         break;
                 }
@@ -121,3 +138,8 @@ function createAccountError() {
         button.removeClass('redBorder');
     }, 500);
 }
+
+
+$('#questions').on('click', e=> {
+    $('#questionsInfo').slideToggle(150);
+})
