@@ -52,8 +52,8 @@ Start the server in
 
 ## Authors
 
--   [@finnmprice](https://www.github.com/finnmprice)
 -   [@lucahaverty](https://www.github.com/lucahaverty)
+-   [@finnmprice](https://www.github.com/finnmprice)
 -   [@AidanMoellering](https://www.github.com/AidanMoellering)
 
 ## Feedback
