@@ -110,9 +110,9 @@ async function setupPathfinder() {
         var xPos = parseFloat(element.attr('x'));
         var yPos = parseFloat(element.attr('y'));
 
+        //console.log("Making node " + id.toString());
         new PathNode(xPos, yPos, id.toString());
     });
-
 
     // create correct connections
     if (schoolRedirect == "fhs") {
@@ -120,12 +120,14 @@ async function setupPathfinder() {
         drawSpeed = 0.4;
         fhsConnections();
     }
-    else if (schoolRedirect == "chs") {
+    else if (schoolRedirect === "chs") {
+        console.log("CHS connections");
         chsConnections();
         drawSpeed = 1.9;
         lineWidth = 8;
     }
     else {
+        console.log("IDA connections");
         idaConnections();
         drawSpeed = 1.9;
         lineWidth = 8;
@@ -134,6 +136,8 @@ async function setupPathfinder() {
     // pathfind to closest bathroom to current class
     accountData = $('#accountData').html()
     var currentClass = JSON.parse(accountData).currentClass;
+    // TODO
+    //currentClass = "132";
     console.log("Current Class: " + currentClass);
 
     if (currentClass != -1) {
@@ -141,6 +145,8 @@ async function setupPathfinder() {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
+
+    drawPathAnimated(findPath("132", "125"));
 }
 
 function idaConnections() { }

@@ -1,4 +1,4 @@
-schoolRedirect = $('#school').html()
+schoolRedirect = $('#school').html().trimStart().trimEnd();
 pageId = $('#pageID').html()
 
 schoolPages = ['chs', 'fhs', 'ihs', 'schools']
