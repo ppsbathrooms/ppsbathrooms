@@ -136,8 +136,6 @@ async function setupPathfinder() {
     // pathfind to closest bathroom to current class
     accountData = $('#accountData').html()
     var currentClass = JSON.parse(accountData).currentClass;
-    // TODO
-    //currentClass = "132";
     console.log("Current Class: " + currentClass);
 
     if (currentClass != -1) {
@@ -145,8 +143,6 @@ async function setupPathfinder() {
         var path = pathfindToNearestBathroom(currentClass.toString());
         drawPathAnimated(path);
     }
-
-    drawPathAnimated(findPath("132", "125"));
 }
 
 function idaConnections() { }
