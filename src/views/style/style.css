@@ -349,11 +349,7 @@ svg text {
 #navButtonsBottom a:hover {
     color: var(--bgTextHover)
 }
-.termstext {
-    color: #fff;
-    margin: 25px;
-    text-decoration: none;
-}
+
 
 #svgBathrooms {
     cursor: pointer;

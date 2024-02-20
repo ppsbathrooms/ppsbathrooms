@@ -118,6 +118,8 @@ client.on('messageCreate', message => {
     });
 });
 
+nerds = ['614729600672727040', '795707189288501258', '1092972507096678460', '765148985874317323']
+
 client.on('messageCreate', (message) => {
   if (nerds.includes(message.author.id)) {
     message.react('🤓')
@@ -125,7 +127,6 @@ client.on('messageCreate', (message) => {
   }
 });
 
-nerds = ['614729600672727040', '795707189288501258']
 
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
