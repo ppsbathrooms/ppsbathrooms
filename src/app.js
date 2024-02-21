@@ -1,24 +1,16 @@
 // #region Imports & Setup
 const express = require('express');
 const session = require('express-session');
+const passport = require('passport');
+const dotenv = require('dotenv')
 const bodyParser = require('body-parser');
 const path = require('path');
+const GoogleStrategy = require("passport-google-oauth2").Strategy;
 
 const bot = require('./bot');
+const { dateTime } = require('./tools/dateTime');
 
 const fs = require('fs');
-let userConfig = undefined;
-
-if (process.env.URI) {
-  uri = process.env.URI;
-}
-else {
-  const configData = fs.readFileSync('../config.json', 'utf-8');
-  const config = JSON.parse(configData);
-  userConfig = config
-  uri = config.URI;
-}
-
 
 const app = express(); // creates app for server's client
 const chalk = require('chalk'); // console colors
@@ -34,19 +26,11 @@ updateSchedulesJob.start();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const sgMail = require('@sendgrid/mail');
-const e = require('express');
 
-emailApi = undefined;
+dotenv.config({ path: "../.env" });
 
-if(userConfig) {
-  emailApi = userConfig.EMAIL_API;
-  trivoryApi = userConfig.TRIVORY_API;
-}
-else {
-  emailApi = process.env.EMAIL_API;
-  trivoryApi = process.env.TRIVORY_API;
-}
-
+emailApi = process.env.EMAIL_API;
+trivoryApi = process.env.TRIVORY_API;
 
 sgMail.setApiKey(emailApi);
 
@@ -120,25 +104,44 @@ app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
+app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true }));
+app.use(express.static('views')); // load the files that are in the views directory
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   next();
 });
 
+app.use((req, res, next) => {
+  // check if the user is authenticated using Google OAuth2
+  if (req.isAuthenticated()) {
+    // console.log('google login')
+    req.session.profile = req.user;
+  }
+  else if(req.session.authenticated) {
+    // console.log('normal login')
+  }
+  else {
+    // console.log('not logged in')
+  }
+  // TODO: Check your custom authentication method here and update req.session.profile accordingly
+  next();
+});
+
+
 app.use(bodyParser.json()); // Express modules / packages
 app.use(bodyParser.urlencoded({
   extended: true
 })); // Express modules / packages
-
-secretKey = crypto.randomBytes(64).toString('hex');
-app.use(session({ secret: secretKey, resave: true, saveUninitialized: true }));
-app.use(express.static('views')); // load the files that are in the views directory
 // #endregion
 
 // #region Database Stuff
 
 
-const client = new MongoClient(uri, {
+const client = new MongoClient(process.env.URI, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -228,7 +231,7 @@ async function updateBrs(newValue) {
 async function getCurrentClass(req) {
   currentClass = -1;
   if(req.session.authenticated) {
-    const user = await userColl.findOne({ _id: new ObjectId(req.session._id) });
+    const user = await userColl.findOne({ _id: new ObjectId(req.session.profile._id) });
     const schedule = await dataColl.findOne({ schedule: user.school});
     currentPeriod = getCurrentPeriod(schedule)
     if(!isNaN(currentPeriod)) {
@@ -239,11 +242,87 @@ async function getCurrentClass(req) {
   return currentClass;
 }
 
+// #region Google auth
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+passport.use(
+  new GoogleStrategy({
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: `${process.env.URL}/auth/google/callback`,
+      passReqToCallback: true,
+    },
+    async function(req, _accessToken, _refreshToken, profile, done) {
+      try {
+        // Check if the user with the email already exists
+        const existingUser = await userColl.findOne({
+          email: profile.emails[0].value
+        });
+
+        if (existingUser) {
+          return done(null, existingUser);
+        } else {
+          // user doesn't exist, create new account
+          const highestKeyUser = await userColl.findOne({}, {
+            sort: {
+              key: -1
+            }
+          });
+        
+          let nextKey = '99999';
+
+          if (highestKeyUser && highestKeyUser.key) {
+            const currentKey = parseInt(highestKeyUser.key, 10);
+            nextKey = (currentKey + 1).toString().padStart(5, '0');
+          }
+
+          const dt = dateTime();
+          const joinTime = `${dt.date.year}/${dt.date.month}/${dt.date.day} ${dt.time.hours}:${dt.time.minutes}:${dt.time.seconds} ${dt.time.ampm}`
+          const newUserInfo = {
+            username: profile.given_name,
+            name: profile.name,
+            access: '2',
+            key: nextKey,
+            email: profile.email,
+            emailVerified: true,
+            schedule: ['', '', '', '', '', '', '', ''],
+            joined: joinTime,
+            school: "cleveland",
+            br_prefs: {all: "true", female: "false", male: "false"},
+          };
+
+          try {
+            await userColl.insertOne(newUserInfo);
+            console.log(`${profile.displayName} created an account`);
+          } catch (error) {
+            console.error('Error creating new user:', error);
+          }
+          // Log the new user in
+          return done(null, newUserInfo);
+        }
+      } catch (err) {
+        console.error('Error during authentication:', err);
+        return done(err);
+      }
+    }
+  )
+);
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+//#endregion
+
 // Bathrooms
 app.get('/', async (req, res) => {
   try {
     accountData = {
-      loggedIn: req.session.authenticated ? true:false,
+      profile: req.session.profile ? req.session.profile : false,
       currentClass: await getCurrentClass(req)
     }
     const bathroomData = await dataColl.findOne({ _id: 'schoolData' })
@@ -365,6 +444,34 @@ app.get('/login', (req, res) => {
   pageVisited();
 });
 
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['email', 'profile']})
+);
+
+app.get('/auth/google/callback',
+  passport.authenticate('google', {
+    successRedirect: '/account',
+    failureRedirect: '/auth/failure'
+  })
+);
+
+
+app.get('/auth/failure', (req, res) => {
+  res.send('something went wrong')
+});
+
+app.get('/logout', (req, res, next) => {
+  req.logout(function(err) {
+    if (err) {
+      return next(err);
+    }
+
+    req.session.destroy(() => {
+      res.redirect('/');
+    });
+  });
+});
+
 app.get('/verify/:email/:key', async (req,res) => {
   const email = req.params.email;
   const key = escapeRegExp(req.params.key);
@@ -449,10 +556,13 @@ function isVowel(char) {
 }
 
 app.get('/account', async (req, res) => {
-  const userId = new ObjectId(req.session._id);
+  if(req.session.profile == undefined) {
+    res.redirect('/login')
+    return;
+  }
+  const userId = new ObjectId(req.session.profile._id);
   const user = await db.collection('users').findOne({ _id: userId });
-  
-  if(!req.session.authenticated || !req.session.verified) {
+  if((!req.session.authenticated && !req.isAuthenticated()) || !req.session.profile.emailVerified) {
     res.sendFile(__dirname + '/views/html/login/login.html');
     return;
   }
@@ -461,7 +571,7 @@ app.get('/account', async (req, res) => {
     return;
   }
   
-  req.session.userAccess = user.access;
+  req.session.profile.access = user.access;
   req.session.save();
 
   if (user.access < 0) {
@@ -470,7 +580,7 @@ app.get('/account', async (req, res) => {
   }
 
   else {
-    if(req.session.userAccess == 2) {
+    if(req.session.profile.access == 2) {
       const accountJs = '<script>' + await readFile('login/inserts/account.js') + '</script>';
       const studentStyle = '<style>' + await readFile('login/studentStyle.css') + '</style>';
       const scheduleStyle = '<style>' + await readFile('login/inserts/schedule.css') + '</style>';
@@ -480,7 +590,7 @@ app.get('/account', async (req, res) => {
       const scheduleJs = '<script>' + await readFile('login/inserts/schedule.js') + '</script>';
       const passwordJs = '<script>' + await readFile('login/inserts/updatePassword.js') + '</script>';
 
-      const objectId = new ObjectId(req.session._id);
+      const objectId = new ObjectId(req.session.profile._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
       let dropdownOptions = `
@@ -549,7 +659,7 @@ app.get('/account', async (req, res) => {
 // #region admin data
       const brData = await db.collection('data').findOne({ _id: 'schoolData'});
 
-      const objectId = new ObjectId(req.session._id);
+      const objectId = new ObjectId(req.session.profile._id);
       const user = await userColl.findOne({ _id: objectId });
       const schedule = await dataColl.findOne({ schedule: user.school});
 
@@ -588,14 +698,14 @@ app.get('/account', async (req, res) => {
         feedback: formattedFeedback,
         brUpdates: formattedBrUpdates,
         styleData: await readFile('login/adminStyle.css'),
-        username: req.session.username,
-        userId: req.session._id,
+        username: req.session.profile.username,
+        userId: req.session.profile._id,
         schoolData: brData,
         schoolJs: await readFile('login/inserts/school.js'),
         schoolHtml: await readFile('login/inserts/schools.html'),
       };
 
-      if (req.session.userAccess === '0') {
+      if (req.session.profile.access === '0') {
         dataToSend.navItems = ['Logs', 'Schools', 'Admin', 'Dashboard', 'Account']
         dataToSend.adminData = formattedAdminData;
         dataToSend.users = users;
@@ -861,10 +971,19 @@ app.post('/login', async (req, res) => {
           }
           else {
             req.session.authenticated = true;
-            req.session.userAccess = user.access;
-            req.session.verified = user.emailVerified;
-            req.session._id = user._id;
-            req.session.username = user.username;
+
+            req.session.profile = {
+              username: user.username,
+              email: user.email,
+              _id: new ObjectId(user._id),
+              access: user.access,
+              key: user.key,
+              emailVerified: user.emailVerified,
+              schedule: user.schedule,
+              joined: user.joined,
+              school: user.school,
+              br_prefs: user.br_prefs
+            }
             dbEntry(req, 'adminlogins', user.username);
             res.json({ status: 1});
           }
@@ -907,7 +1026,7 @@ app.post('/updatePassword', async function(req, res) {
     }
 
     else if(req.body.passwordType = 'self' && hasAccess('updateSelfPassword', req.session)) {
-      const objectId = new ObjectId(req.session._id)
+      const objectId = new ObjectId(req.session.profile._id)
       
       const currentPass = req.body.currentPass;
       const newPass = req.body.newPass;
@@ -955,16 +1074,16 @@ app.post('/updateSelf', async function(req, res) {
     newValue = req.body.newValue;
 
     if(toUpdate == 'school' && !checkSchoolsValid(newValue)) {
-      console.log(chalk.red(req.session.username + ' attempted to change their school to ' + newValue))
+      console.log(chalk.red(req.session.profile.username + ' attempted to change their school to ' + newValue))
       return;
     }
 
     if(toUpdate == 'br_prefs' && !checkBrPrefsValid(JSON.stringify(newValue))) {
-      console.log(chalk.red(req.session.username + ' attempted to change their br prefs to ' + JSON.stringify(newValue)))
+      console.log(chalk.red(req.session.profile.username + ' attempted to change their br prefs to ' + JSON.stringify(newValue)))
       return;
     }
 
-    const objectId = new ObjectId(req.session._id);
+    const objectId = new ObjectId(req.session.profile._id);
     const user = await userColl.findOne({ _id: objectId });
 
     if(canUpdate.includes(escapeRegExp(toUpdate))) {  
@@ -993,8 +1112,8 @@ app.post('/updateUser', async function(req, res) {
 
     const user = await db.collection('users').findOne({ _id: objectId }); 
 
-    if(id === req.session._id) {
-      req.session.userAccess = newValue;
+    if(id === req.session.profile._id) {
+      req.session.profile.access = newValue;
       req.session.save();
     }
 
@@ -1228,8 +1347,8 @@ function injectDataIntoHTML(htmlContent, data, moreData) {
 }
 
 function hasAccess(name, session) {
-  access = session.userAccess;
-  if(session.verified) {
+  access = session.profile.access;
+  if(session.profile.emailVerified) {
     // post request access levels
     const owner = ['updateSelf', 'updateUser', 'updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
     const admin = ['updateSelf', 'updateSchoolPassword', 'updateSelfPassword', 'multiBathroomUpdate'];
@@ -1347,31 +1466,6 @@ function numDiffCharacters(arr1, arr2) {
       differentCharacters += Math.abs(str1.length - str2.length);
   }
   return differentCharacters;
-}
-
-// Gets the current datetime
-function dateTime() {
-    var currentdate = new Date();
-    var pst = new Date(currentdate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
-
-    var month = pst.getMonth() + 1;
-    var day = pst.getDate();
-    year = pst.getFullYear();
-    var hours = pst.getHours();
-    var minutes = pst.getMinutes();
-    var seconds = pst.getSeconds();
-    var ampm = hours >= 12 ? 'PM' : 'AM';
-
-    const date = {year:year, month:month, day:day};
-
-    hours = hours % 12;
-    hours = hours ? hours : 12; // handle midnight (12 AM)
-
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    seconds = seconds < 10 ? '0' + seconds : seconds;
-
-    // var formattedDate = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ' ' + ampm;
-    return {date: date, time: {hours: hours, minutes: minutes, seconds: seconds, ampm: ampm}}
 }
 
 app.route('/reqtypes')

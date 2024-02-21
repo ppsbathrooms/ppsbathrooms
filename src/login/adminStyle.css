@@ -388,9 +388,19 @@ body img {
     margin-left: 20px;
 }
 
+#logout-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 20px;
+    z-index: 3;
+    background: var(--background)
+}
+
 .correctPass {
     animation: correctPass 1.5s ease forwards;
 }
+
 .wrongPass {
     animation: wrongPass .5s ease forwards;
 }
@@ -506,6 +516,7 @@ body img {
         font-size: 10px;
         width: fit-content;
     }
+    
     #idFull {
         display: none;
     }

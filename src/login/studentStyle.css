@@ -142,6 +142,15 @@ body {
     z-index: 2;
 }
 
+#logout-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 20px;
+    z-index: 3;
+    background: var(--background)
+}
+
 #top p {
     margin-right: 20px;
 }

@@ -19,7 +19,7 @@
     body {
         background: #0a0c15;
         font-family: monospace;
-        overflow: hidden;
+        overflow-x: hidden;
     }
 
     .redBorder {
@@ -218,6 +218,34 @@
         margin-left: 10px;
     }
 
+    #google-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border: 1px solid white;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    #google-login img {
+        width: 25px;
+        height: 25px;
+        margin-right: 15px;
+        user-select: none;
+    }
+
+    #or {
+        display: flex;
+        align-items: center;
+        margin: 10px;
+        color: #bbb;
+    }
+
+    #or hr {
+        width: 40%;
+    }
+
     @media (max-width: 800px) {
         #createAccount {
             margin-top: 10vh;
@@ -252,6 +280,15 @@
     <div id="createAccountWindow">
         <div id="createAccount">
             <h2>CREATE ACCOUNT</h2>
+            <div id="google-login">
+                <img src="/style/icons/google.svg" alt="">
+                <p>Create an account with google</p>
+            </div>
+            <div id="or">
+                <hr>
+                <p>or</p>
+                <hr>
+            </div>
             <div id="inputBg">
                 <input type="text" id="username" name="username" placeholder="username" minlength="6" maxlength="24"
                     autocomplete="off" spellcheck="false" autofocus>

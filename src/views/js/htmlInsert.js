@@ -40,27 +40,13 @@ $('.header').html(
             <div>
                 <p id="aboutRedirect">about</> 
             </div>
-            <div ${accountData.loggedIn ? 'style="display:none";' : ''}id="ihsNavbar"> 
+            <div ${accountData.profile ? 'style="display:none";' : ''}id="ihsNavbar"> 
                 <p id="navbarSignIn">login</p> <br>
             </div> 
-            <div ${!accountData.loggedIn ? 'style="display:none";' : ''} id="ihsNavbar"> 
+            <div ${!accountData.profile ? 'style="display:none";' : ''} id="ihsNavbar"> 
                 <p id="navbarAccount">account</p> <br>
             </div> 
         </div> 
-        <div id="navbarLogin"> 
-          <form id="navLoginForm"> 
-            <div id="navLoginInputBg"> 
-                <input type="text" placeholder="username" id="username" name="username" autocomplete="off"> 
-            </div> 
-            <div id="navLoginInputBg"> 
-                <input type="password" placeholder="password" id="password" name="password" autocomplete="off"> 
-            </div> 
-            <div id="navLoginContainer"> 
-                <button id="navbarLoginButton" type="submit">login</button> 
-            </div>
-          </form>
-        </div> 
-        <a href="/createaccount" id="navbarNewAccount">create account</a>
         <div id="navButtonsBottom"> 
           <a href="/help">help</a> 
           <a href="/contact">contact</a> 
@@ -96,23 +82,9 @@ $('#footer').html(
 $('#navbarAccount').click(function() {
   window.location.href = '/account'; 
 });
+
 $('#navbarSignIn').click(function() {
-  $(this).fadeOut(100)
-
-  $('#navbarLogin').fadeIn(400)
-  $("#navbarLogin").animate({
-      top: '273px'
-  }, { duration: 300, queue: false });
-  $("#navbarScroll")[0].scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-  });
-
-  $("#navbarNewAccount").animate({opacity: 1}, 400);
-
-  if($(window).width() > 800) {
-    $('#username').focus();
-  }
+  window.location = '/login'
 });
 
 $("#navbarButton").click(function(){
@@ -221,6 +193,4 @@ function hideNavbar() {
 
 function resetSignIn() {
     $('#navbarSignIn').fadeIn(0)
-    $('#navbarLogin').fadeOut(0)
-    $("#navbarLogin").css('top','290px')
 }

@@ -57,6 +57,10 @@ $(document).ready(function () {
             hideError();
         }
     });
+
+    $('#google-login').click(e => {
+        window.location = '/auth/google';
+    })
 });
 
 function showError(message) {
