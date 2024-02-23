@@ -120,6 +120,7 @@ app.use((req, res, next) => {
   if (req.isAuthenticated()) {
     // console.log('google login')
     req.session.profile = req.user;
+    req.session.authenticated = true;
   }
   else if(req.session.authenticated) {
     // console.log('normal login')
@@ -467,6 +468,7 @@ app.get('/logout', (req, res, next) => {
     }
 
     req.session.destroy(() => {
+      req.session.authenticated = false;
       res.redirect('/');
     });
   });
@@ -1105,6 +1107,7 @@ app.post('/updateSelf', async function(req, res) {
 
 app.post('/updateUser', async function(req, res) {
   if (req.session.authenticated && hasAccess('updateUser', req.session)) {
+    console.log('gwe')
     const id = req.body.id;
     const objectId = new ObjectId(id);
     const valueName = req.body.valueName;
