@@ -466,9 +466,10 @@ app.get('/logout', (req, res, next) => {
     if (err) {
       return next(err);
     }
+    
+    req.session.authenticated = false;
 
     req.session.destroy(() => {
-      req.session.authenticated = false;
       res.redirect('/');
     });
   });
