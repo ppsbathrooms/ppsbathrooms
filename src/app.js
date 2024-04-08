@@ -39,23 +39,29 @@ function updateAllPeriods() {
     getPeriodData(school)
   })  
 }
+
 async function getPeriodData(school) {
   try {
     const response = await axios.get("https://trivory.com/api/today_schedule?schoolid=" + school + "&language=en&api_key=" + trivoryApi);
     const json = response.data;
     const schedule = {};
-    // if(json.bellSchedule[0] != undefined) {
-    const bellSchedule = json.bell_schedule[0].sched;      
-    bellSchedule.forEach((period) => {
-      const periodInfo = {
-        start: new Date(period[0].start),
-        startTime: period[0].start_time,
-        end: new Date(period[0].end),
-        endTime: period[0].end_time,
-      };
-      schedule[period[0].period] = periodInfo;
-    });
-    // }
+
+    if (json.bell_schedule && json.bell_schedule.length > 0) {
+        const bellSchedule = json.bell_schedule[0].sched;
+
+      bellSchedule.forEach((period) => {
+        const periodInfo = {
+          start: new Date(period[0].start),
+          startTime: period[0].start_time,
+          end: new Date(period[0].end),
+          endTime: period[0].end_time,
+        };
+        schedule[period[0].period] = periodInfo;
+      });
+
+    } else {
+      // weekend or no school. no available bell schedule. 
+    }
 
     schedule['day_subtitle'] = json.day_subtitle_short;
     dt = dateTime();
@@ -73,7 +79,7 @@ async function getPeriodData(school) {
       console.error('Error updating document:', error);
     }
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error(chalk.red('Error fetching data:', error));
   }
 }
 
@@ -703,6 +709,7 @@ app.get('/account', async (req, res) => {
         styleData: await readFile('login/adminStyle.css'),
         username: req.session.profile.username,
         userId: req.session.profile._id,
+        joined: req.session.profile.joined,
         schoolData: brData,
         schoolJs: await readFile('login/inserts/school.js'),
         schoolHtml: await readFile('login/inserts/schools.html'),
@@ -1261,7 +1268,8 @@ function injectDataIntoHTML(htmlContent, data, moreData) {
                         </div>
                         <p>school : ${user.school}</p>
                         <p>schedule : ${(user.schedule == ",,,,,,,") ? 'no schedule' : user.schedule}</p>   
-                        <p id="idFull">id : ${user._id}</p>                     
+                        <p>joined : ${user.joined}</p>   
+                        <p id="idFull">id : ${user._id}</p>
                       </div>
                     </div>
                 </div>
