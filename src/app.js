@@ -1231,6 +1231,8 @@ function injectDataIntoHTML(htmlContent, data, moreData) {
     navbarJs += navbarJsInsert;
   });
 
+  navbar += `<div id="navbar-info"><h3>users: ${data.users.length}</h3><h3>latest: ${data.users[data.users.length - 1].username}</h3></div>`;
+
   if (data.users) {
     data.users.forEach((user) => {
       userInsert = `

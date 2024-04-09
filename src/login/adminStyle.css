@@ -412,6 +412,12 @@ body img {
     cursor: pointer;
 }
 
+#navbar-info {
+    margin: 0px 30px;
+    color: #aaa;
+    font-size: 10px;
+}
+
 @keyframes correctPass {
     0% {
         border-color: green;
