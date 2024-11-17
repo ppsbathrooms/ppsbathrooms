@@ -1,61 +1,103 @@
-# [ppsbathrooms](https://ppsbathrooms.org)
+# PPS Bathrooms
 
-PPS Bathrooms allows students at PPS schools find open bathrooms. PPS Bathrooms currently covers Cleveland, Franklin, and Ida B Wells High Schools.
+[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fppsbathrooms.org)](https://ppsbathrooms.org)
+[![GitHub Contributors](https://img.shields.io/github/contributors/pps-bathrooms/ppsbathrooms)](https://github.com/pps-bathrooms/ppsbathrooms/graphs/contributors)
 
-Bathrooms are labeled with green or red boxes, coorisponding to if the bathrooms are open or closed. you can click a bathroom or it's coorisponding box to change the status. after updating bathrooms, you can click the button in the bottom right of the screen and enter a confirmation password to confirm your changes. We require a password to ensure the validity of the data that is submitted, to be added to the team that updates bathrooms, contact us [here](https://ppsbathrooms.org/contact).
+A real-time bathroom availability tracking system for Portland Public Schools (PPS). Currently serving Cleveland, Franklin, and Ida B Wells High Schools.
 
-You can create an account [here](https://ppsbathrooms.org/createaccount). With an account you can enter your class schedule and school and on the main map a line will be drawn to the closest bathrooms.
+## 🚀 Features
 
-## Environment Variables
+-   **Real-time Status Updates**: Bathrooms are marked with color-coded indicators (green for open, red for closed)
+-   **Interactive Map Interface**: Click on bathrooms or status boxes to update availability
+-   **Account System**: Create an account to access personalized features
+-   **Class Schedule Integration**: View optimal bathroom routes based on your class schedule
+-   **Data Validation**: Secure confirmation system to maintain data accuracy
+-   **Multi-School Support**: Currently available for three PPS high schools
 
-To run this project, you will need to add the following environment variables to a config.json file in the root directory
+## 🎯 Quick Start
 
-`URI`
+Visit [ppsbathrooms.org](https://ppsbathrooms.org) to:
 
-Connection string for connection to mongodb database
+1. View real-time bathroom availability
+2. [Create an account](https://ppsbathrooms.org/createaccount)
+3. Set up your class schedule
+4. Start contributing to the community
 
-`EMAIL_API`
+## 💻 Development Setup
 
-API key to send emails
+### Prerequisites
 
-`TRIVORY_API`
+-   Node.js (Latest LTS version recommended)
+-   npm or yarn
+-   MongoDB instance
+-   API keys for required services
 
-API key to support the Trivory API, allowing access to school schedules
+### Environment Configuration
 
-`DISCORD_TOKEN`
+Create a `config.json` file in the root directory with the following variables:
 
-Token for Discord bot
-
-`DISOCRD_ID`
-
-ID of Discord bot
-
-## Run Locally
-
-Clone the project
-
-```bash
-  git clone https://github.com/pps-bathrooms/ppsbathrooms
+```json
+{
+    "URI": "mongodb-connection-string",
+    "EMAIL_API": "your-email-api-key",
+    "TRIVORY_API": "your-trivory-api-key",
+    "DISCORD_TOKEN": "your-discord-bot-token",
+    "DISCORD_ID": "your-discord-bot-id"
+}
 ```
 
-Install dependencies
+### Installation
+
+1. Clone the repository
 
 ```bash
-  npm install
+git clone https://github.com/ppsbathrooms/ppsbathrooms
 ```
 
-Start the server in
+2. Install dependencies
 
 ```bash
-  cd src; node app.js
+npm install
 ```
 
-## Authors
+3. Start the server
 
--   [@finnmprice](https://www.github.com/finnmprice)
--   [@lucahaverty](https://www.github.com/lucahaverty)
--   [@AidanMoellering](https://www.github.com/AidanMoellering)
+```bash
+cd src
+node app.js
+```
 
-## Feedback
+## 🤝 Contributing
 
-If you have any feedback, please reach out to us at contact@ppsbathrooms.org
+### Becoming a Contributor
+
+To join the team of bathroom status updaters:
+
+1. Contact us through our [contact form](https://ppsbathrooms.org/contact)
+2. Complete the verification process
+3. Receive your confirmation password
+
+### Development Contributions
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 👥 Team
+
+-   Finn Price ([@finnmprice](https://www.github.com/finnmprice))
+-   Luca Haverty ([@lucahaverty](https://www.github.com/lucahaverty))
+-   Aidan Moellering ([@AidanMoellering](https://www.github.com/AidanMoellering))
+
+## 📝 Feedback & Support
+
+-   Email: contact@ppsbathrooms.org
+-   Contact: [ppsbathrooms.org/contact](https://ppsbathrooms.org/contact)
+
+---
+
+<div align="center">
+Made with ❤️ by PPS students for PPS students
+</div>
