@@ -19,7 +19,7 @@ body {
   scroll-behavior: smooth;
   background: var(--background);
   font-family: monospace;
-  /* text-transform: lowercase; */
+  /* text-transform: uppercase; */
 }
 
 html {
