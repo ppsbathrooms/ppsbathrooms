@@ -177,6 +177,42 @@ app.get("/", async (req, res) => {
   }
 });
 
+app.get("/m/franklin", async (req, res) => {
+  try {
+    const dataToClient = {
+      school: "franklin",
+    };
+    res.render("html/maps", { data: dataToClient });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+app.get("/m/cleveland", async (req, res) => {
+  try {
+    const dataToClient = {
+      school: "cleveland",
+    };
+    res.render("html/maps", { data: dataToClient });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+app.get("/m/ida", async (req, res) => {
+  try {
+    const dataToClient = {
+      school: "ida",
+    };
+    res.render("html/maps", { data: dataToClient });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
 app.get("/cleveland", async (req, res) => {
   try {
     const bathroomData = await dataColl.findOne({ _id: "schoolData" });
