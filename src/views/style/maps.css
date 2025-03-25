@@ -2,6 +2,10 @@ body {
   background: #121211;
 }
 
+#schoolTitle {
+  padding-top: 50px;
+}
+
 #schoolTitle h1 {
   color: #fff;
   font-size: 3em;

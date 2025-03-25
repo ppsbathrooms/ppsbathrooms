@@ -3,6 +3,11 @@
   src: url(../style/fonts/Inter.ttf);
 }
 
+@font-face {
+  font-family: futura;
+  src: url(../style/fonts/futura.ttf);
+}
+
 #background-image {
   width: 100%;
   transform: rotate(180deg);
