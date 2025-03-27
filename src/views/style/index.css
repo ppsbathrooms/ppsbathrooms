@@ -4,11 +4,12 @@
 }
 
 @font-face {
-  font-family: futura;
+  font-family: "Futura";
   src: url(../style/fonts/futura.ttf);
 }
 
 #background-image {
+  margin-top: 25px;
   width: 100%;
   transform: rotate(180deg);
   user-select: none;
@@ -23,6 +24,8 @@
 #main-content #title {
   position: absolute;
   left: 50%;
+  width: 100%;
+  top: 80px;
   transform: translateX(-50%);
   color: #fff;
   text-align: center;
@@ -40,7 +43,8 @@
 
 #main-content #title p {
   font-size: 2em;
-  opacity: 0.5;
+  color: #aaa;
+  filter: drop-shadow(0 0 0.75rem #000);
   margin: 0;
   font-weight: 300;
 }
@@ -53,6 +57,11 @@
   height: 40px;
   bottom: 20px;
   z-index: 1;
+}
+
+#sub-content {
+  position: absolute;
+  top: 100%;
 }
 
 #our-schools {

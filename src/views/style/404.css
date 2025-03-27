@@ -5,16 +5,15 @@
 }
 
 @font-face {
-  font-family: inter;
-  src: url(../style/fonts/Inter.ttf);
+  font-family: "Futura";
+  src: url(../style/fonts/futura.ttf);
 }
 
 body {
-  background-color: #0f141a;
+  background-color: #121211;
   text-align: center;
-  font-family: monospace;
+  font-family: "Futura";
   overflow: none;
-  user-select: none;
 }
 
 .text404 {
@@ -42,6 +41,11 @@ body {
   font-size: 12px;
 }
 
+.bottom p a {
+  text-decoration: underline;
+  color: #aaa;
+}
+
 #linkholder {
   display: flex;
   justify-content: center;
@@ -58,7 +62,7 @@ a.home-link {
   text-decoration: none;
   border-radius: 10px;
   transition: transform 0.2s;
-  font-family: inter;
+  font-family: "Futura";
   cursor: pointer;
   font-weight: 200;
 }

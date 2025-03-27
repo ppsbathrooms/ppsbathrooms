@@ -33,3 +33,7 @@ body {
   width: 50vw;
   margin-bottom: 50px;
 }
+
+footer {
+  opacity: 0;
+}

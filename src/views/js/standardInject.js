@@ -1,9 +1,9 @@
 const headerCode = `
   <a href="/"><img src="../style/images/logo.png" /></a>
   <div id="buttons">
-    <a id="franklin-header" href="/m/franklin">FHS</a>
-    <a id="cleveland-header" href="/m/cleveland">CHS</a>
-    <a id="ida-header" href="/m/ida">IHS</a>
+    <a id="franklin-header" href="/franklin">FHS</a>
+    <a id="cleveland-header" href="/cleveland">CHS</a>
+    <a id="ida-header" href="/ida">IHS</a>
   </div>
   `;
 
@@ -16,5 +16,5 @@ const footerCode = `
   </div>
 `;
 
-$("#header").append(headerCode);
-$(".footer").append(footerCode);
+$("header").append(headerCode);
+$("footer").append(footerCode);

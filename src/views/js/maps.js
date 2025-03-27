@@ -1,4 +1,8 @@
 const school = $("#school").html();
+const bathroomData = $("#bathroomData").html();
+
+const greenColor = "#036F3E";
+const redColor = "#D40028";
 
 const schoolData = {
   franklin: {
@@ -18,18 +22,30 @@ const schoolData = {
   },
 };
 
+function setBathroomStatus() {
+  const brDataArray = bathroomData.split(",");
+
+  brDataArray.forEach((status, index) => {
+    const icon = $(`#bathroom-icon-${index + 1}`);
+    if (icon.length === 0) return;
+
+    if (status === "1") {
+      icon.css("fill", greenColor);
+    } else {
+      icon.css("fill", redColor);
+    }
+  });
+}
+
 setSchoolData();
 function setSchoolData() {
   data = schoolData[school];
-  console.log(data);
-
   $("#schoolTitle h1").text(data.title);
   $(`#${data.school}-header`).addClass("header-selected");
   setMap(data.map);
 }
 
 function setMap(map) {
-  console.log("setting map");
   fetch("/html/maps/" + map + "Map.html")
     .then((response) => {
       if (!response.ok) {
@@ -39,7 +55,10 @@ function setMap(map) {
     })
     .then((data) => {
       $("#map").html(data);
-      console.log(map + " map set");
+
+      // fade in footer to ensure it doesn't show before map is loaded
+      $("footer").css("opacity", 0).animate({ opacity: 1 }, 250);
+      setBathroomStatus();
     })
     .catch((error) => {
       console.error("there was a problem fetching the document:", error);
