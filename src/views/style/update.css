@@ -1,0 +1,79 @@
+@font-face {
+  font-family: "Futura";
+  src: url(../style/fonts/futura.ttf);
+}
+
+body {
+  background: #121211;
+  margin: 0;
+  padding: 0;
+  font-family: "Futura";
+}
+
+#side-panel {
+  position: fixed;
+  top: 0;
+}
+
+#side-panel div {
+  margin-top: 100px;
+  border-right: 1px solid #fff;
+}
+
+#side-panel p {
+  color: #aaa;
+  font-size: 24px;
+  margin: 0;
+  margin-bottom: 10px;
+  padding: 0px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+#side-panel div p.selected {
+  color: #fff;
+}
+
+#map {
+  width: 100%;
+}
+
+#mapHolder {
+  margin: 100px 0px;
+  display: flex;
+  justify-content: center;
+}
+
+.mapSvg {
+  width: 50vw;
+  user-select: none;
+}
+
+#submit {
+  /* display: none; */
+  user-select: none;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 30px;
+  border-radius: 20px;
+  padding: 0;
+  margin: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+#submit p {
+  color: #eee;
+  transition: color 0.25s;
+  padding: 10px 40px;
+  margin: 0;
+  font-size: 16px;
+}
+
+#icon-holder rect {
+  cursor: pointer;
+}

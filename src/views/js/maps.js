@@ -25,19 +25,15 @@ const schoolData = {
 function setBathroomStatus() {
   const brDataArray = bathroomData.split(",");
 
-  brDataArray.forEach((status, index) => {
-    const icon = $(`#bathroom-icon-${index + 1}`);
-    if (icon.length === 0) return;
-
-    if (status === "1") {
-      icon.css("fill", greenColor);
-    } else {
-      icon.css("fill", redColor);
-    }
+  $("#icon-holder rect[data-number]").each(function () {
+    const number = +$(this).data("number");
+    const color = brDataArray[number] === "1" ? greenColor : redColor;
+    $(this).css("fill", color);
   });
 }
 
 setSchoolData();
+
 function setSchoolData() {
   data = schoolData[school];
   $("#schoolTitle h1").text(data.title);

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../thirdParty/jquery.min.js"></script>
+    <title>PPSBathrooms Admin</title>
+    <link rel="stylesheet" href="../style/update.css" />
+    <link rel="stylesheet" href="../style/standard.css" />
+  </head>
+  <body>
+    <header></header>
+    <div class="schoolData">
+      { "franklin":
+      "0,1,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,1,1,0,0,1,0,1,0,1,1,0,0,1,0,0,1,1",
+      "cleveland": "0,1,0,1,1,0,0,1,1,0,1,0,1,0", "ida": "1,0,0,1,1,0,1,0,1,0" }
+    </div>
+    <div id="side-panel">
+      <div>
+        <p id="franklin-select" class="selected">Franklin</p>
+        <p id="cleveland-select">Cleveland</p>
+        <p id="ida-select">Ida</p>
+      </div>
+    </div>
+    <div id="main-content">
+      <div id="map"></div>
+      <div id="submit">
+        <p>Submit Changes</p>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../js/standardInject.js"></script>
+  <script type="text/javascript" src="../js/update.js"></script>
+</html>

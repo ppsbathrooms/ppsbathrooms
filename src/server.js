@@ -61,7 +61,7 @@ app.get("/", (req, res) => {
   res.render("html/index");
 });
 
-const staticPages = ["contact", "privacy", "terms", "help"];
+const staticPages = ["contact", "privacy", "terms", "help", "update"];
 staticPages.forEach((page) => {
   app.get(`/${page}`, (req, res) => {
     res.render(`html/${page}`);
