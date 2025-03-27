@@ -1,4 +1,4 @@
-const data = JSON.parse($(".schoolData").html());
+const schoolData = JSON.parse($("#school-data").attr("data-schools"));
 
 const greenColor = "#036F3E";
 const redColor = "#D40028";
@@ -12,14 +12,63 @@ const schools = {
 // change stroke width per school
 // for different svg sizes
 const strokeWidths = {
-  franklin: "1px",
-  cleveland: "5px",
-  ida: "1px",
+  franklin: "2px",
+  cleveland: "6px",
+  ida: "2px",
 };
 
-// save modified data across school switches
-const modifiedData = { ...data };
-var currentSchool;
+const data = {};
+const modifiedData = {};
+
+// process school data
+Object.keys(schoolData.schools).forEach((school) => {
+  data[school] = schoolData.schools[school].bathrooms.join(",");
+  modifiedData[school] = schoolData.schools[school].bathrooms.join(",");
+});
+
+var currentSchool = "franklin";
+
+function hasChanges() {
+  for (const school in modifiedData) {
+    const originalData = data[school].split(",");
+    const modifiedSchoolData = modifiedData[school].split(",");
+
+    for (let i = 0; i < originalData.length; i++) {
+      if (originalData[i] !== modifiedSchoolData[i]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function updateSubmitButtonVisibility() {
+  if (hasChanges()) {
+    $("#submit").show();
+  } else {
+    $("#submit").hide();
+  }
+}
+
+function resetBathroomStatus() {
+  $("#icon-holder rect[data-number]").each(function () {
+    const number = +$(this).data("number");
+    const currentStatus = modifiedData[currentSchool].split(",")[number];
+
+    const color = currentStatus === "1" ? greenColor : redColor;
+    $(this)
+      .css({
+        fill: color,
+        stroke: "none",
+      })
+      .attr("data-original-status", currentStatus)
+      .attr("data-current-status", currentStatus);
+  });
+
+  $("#submit").hide();
+}
+
+$("#submit").hide();
 
 setMap("franklin");
 
@@ -60,13 +109,21 @@ function setBathroomStatus(brData) {
       $(this).css("stroke", "none");
     }
   });
+
+  updateSubmitButtonVisibility();
 }
 
 function getCurrentData() {
-  return { ...modifiedData };
+  // format data to match server-side expected format
+  const updatedData = {};
+  for (const school in modifiedData) {
+    updatedData[school] = modifiedData[school]
+      .split(",")
+      .map((status) => parseInt(status));
+  }
+  return updatedData;
 }
 
-// Click toggle logic
 function setMap(school) {
   currentSchool = school;
   fetch("/html/maps/" + schools[school] + "Map.html")
@@ -89,14 +146,11 @@ function setMap(school) {
           const currentStatus = $icon.attr("data-current-status");
           const originalStatus = $icon.attr("data-original-status");
 
-          // Toggle status
           const newStatus = currentStatus === "1" ? "0" : "1";
           $icon.attr("data-current-status", newStatus);
 
-          // Update color
           $icon.css("fill", newStatus === "1" ? greenColor : redColor);
 
-          // border
           if (newStatus !== originalStatus) {
             $icon.css({
               stroke: "white",
@@ -106,7 +160,6 @@ function setMap(school) {
             $icon.css("stroke", "none");
           }
 
-          // Update modifiedData
           const brDataArray = modifiedData[currentSchool]
             ? modifiedData[currentSchool].split(",")
             : data[currentSchool].split(",");
@@ -114,6 +167,8 @@ function setMap(school) {
           const number = +$icon.data("number");
           brDataArray[number] = newStatus;
           modifiedData[currentSchool] = brDataArray.join(",");
+
+          updateSubmitButtonVisibility();
         });
     })
     .catch((error) => {
@@ -123,5 +178,35 @@ function setMap(school) {
 }
 
 $("#submit").on("click", function () {
-  console.log("Current Data:", JSON.stringify(getCurrentData()));
+  const dataToSubmit = getCurrentData();
+
+  const $submitButton = $("#submit");
+  $submitButton.prop("disabled", true).css("opacity", "0.5");
+
+  // send data to server
+  $.ajax({
+    url: "/update-bathrooms",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(dataToSubmit),
+    success: function (response) {
+      // update original data to match modified data
+      for (const school in modifiedData) {
+        data[school] = modifiedData[school];
+      }
+
+      // reset the current school's view
+      resetBathroomStatus();
+
+      $submitButton.prop("disabled", false).css("opacity", "1");
+
+      alert("Bathroom status updated successfully!");
+    },
+    error: function (xhr, status, error) {
+      $submitButton.prop("disabled", false).css("opacity", "1");
+
+      alert("Failed to update bathroom status. Please try again.");
+      console.error("Submission error:", error);
+    },
+  });
 });
