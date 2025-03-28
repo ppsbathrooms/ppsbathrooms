@@ -1,0 +1,147 @@
+@font-face {
+  font-family: inter;
+  src: url(../style/fonts/Inter.ttf);
+}
+
+@font-face {
+  font-family: "Futura";
+  src: url(../style/fonts/futura.ttf);
+}
+
+#background-image {
+  margin-top: 25px;
+  width: 100%;
+  transform: rotate(180deg);
+  user-select: none;
+  z-index: -1;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#main-content #title {
+  position: absolute;
+  left: 50%;
+  width: 100%;
+  top: 80px;
+  transform: translateX(-50%);
+  color: #fff;
+  text-align: center;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#main-content #title h1 {
+  margin: 0;
+  font-size: 6em;
+  font-weight: 700;
+}
+
+#main-content #title p {
+  font-size: 2em;
+  color: #aaa;
+  filter: drop-shadow(0 0 0.75rem #000);
+  margin: 0;
+  font-weight: 300;
+}
+
+#scroll-icon {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  bottom: 20px;
+  z-index: 1;
+}
+
+#sub-content {
+  position: absolute;
+  top: 100%;
+}
+
+#our-schools {
+  margin: 20px 100px;
+}
+
+#our-schools p {
+  text-align: center;
+  color: #fff;
+  font-size: 1.5em;
+  margin: 0;
+  font-weight: 600;
+}
+
+#our-schools span {
+  text-align: center;
+  color: #aaa;
+  font-size: 1em;
+  margin: 0;
+  margin-top: 5px;
+  font-weight: 100;
+}
+
+#our-schools div {
+  display: flex;
+  justify-content: center;
+  align-self: center;
+}
+
+#our-schools div div,
+#our-schools div div a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#our-schools div a img {
+  width: 50%;
+  cursor: pointer;
+  transition: transform 0.25s;
+}
+
+#our-schools div a img:hover {
+  transform: scale(1.05);
+  transition: transform 0.5s;
+}
+
+#secondary-section {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+}
+
+.secondary-section {
+  width: 80%;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.secondary-section.reverse {
+  flex-direction: row;
+}
+
+.secondary-section img {
+  width: 50%;
+}
+
+.secondary-section div {
+  width: 50%;
+}
+
+.secondary-section div h3 {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.secondary-section div p {
+  font-weight: 200;
+}

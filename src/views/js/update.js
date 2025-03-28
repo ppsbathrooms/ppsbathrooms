@@ -1,377 +1,249 @@
-//get bathroom data
-function getDataForUpdate() {
-    pageID = $('#pageID').html();
+const schoolData = JSON.parse($("#school-data").attr("data-schools"));
+const userEmail = schoolData.userEmail;
 
-    brData = $('#' + pageID + 'Data').html();
-    brData = brData.toString().split(',');
-    numDiff = 0;
-    originalData = [...brData];
+const greenColor = "#036F3E";
+const redColor = "#D40028";
+
+const schools = {
+  franklin: "fhs",
+  cleveland: "chs",
+  ida: "ihs",
+};
+
+// change stroke width per school
+// for different svg sizes
+const strokeWidths = {
+  franklin: "2px",
+  cleveland: "6px",
+  ida: "2px",
+};
+
+const data = {};
+const modifiedData = {};
+
+// process school data
+Object.keys(schoolData.schools).forEach((school) => {
+  data[school] = schoolData.schools[school].bathrooms.join(",");
+  modifiedData[school] = schoolData.schools[school].bathrooms.join(",");
+});
+
+var currentSchool = "franklin";
+
+function hasChanges() {
+  for (const school in modifiedData) {
+    const originalData = data[school].split(",");
+    const modifiedSchoolData = modifiedData[school].split(",");
+
+    for (let i = 0; i < originalData.length; i++) {
+      if (originalData[i] !== modifiedSchoolData[i]) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
-//bathroom update button pressed
-function buttonPressed(brNumber) {
-    brData[brNumber] = 1 - brData[brNumber];
-    originalData[brNumber] = Number(originalData[brNumber]);
+function updateSubmitButtonVisibility() {
+  if (hasChanges()) {
+    $("#submit").show();
+  } else {
+    $("#submit").hide();
+  }
+}
 
-    setStatus(brNumber, brData[brNumber]);
-    
-    if (brData[brNumber] !== originalData[brNumber]) {
-        numDiff += 1;
+function resetBathroomStatus() {
+  $("#icon-holder rect[data-number]").each(function () {
+    const number = +$(this).data("number");
+    const currentStatus = modifiedData[currentSchool].split(",")[number];
+
+    const color = currentStatus === "1" ? greenColor : redColor;
+    $(this)
+      .css({
+        fill: color,
+        stroke: "none",
+      })
+      .attr("data-original-status", currentStatus)
+      .attr("data-current-status", currentStatus);
+  });
+
+  $("#submit").hide();
+}
+
+$("#submit").hide();
+
+setMap("franklin");
+$("#user-email").html(userEmail);
+
+// school switching
+$("#side-panel p.school").on("click", function () {
+  $("#side-panel p").removeClass("selected");
+  $(this).addClass("selected");
+  $("#account-info").hide();
+  const id = $(this).attr("id");
+  const school = id.replace("-select", "");
+  setMap(school);
+});
+
+$("#side-panel p.account").on("click", function () {
+  $("#side-panel p").removeClass("selected");
+  $(this).addClass("selected");
+  $("#map").html("");
+  $("#account-info").show();
+});
+
+function setBathroomStatus(brData) {
+  const brDataArray = brData.split(",");
+
+  $("#icon-holder rect[data-number]").each(function () {
+    const number = +$(this).data("number");
+    const originalStatus = brDataArray[number];
+    const currentStatus = modifiedData[currentSchool]
+      ? modifiedData[currentSchool].split(",")[number]
+      : originalStatus;
+
+    if (!currentStatus) return;
+
+    const color = currentStatus === "1" ? greenColor : redColor;
+    $(this)
+      .css("fill", color)
+      .attr("data-original-status", originalStatus)
+      .attr("data-current-status", currentStatus);
+
+    if (currentStatus !== originalStatus) {
+      $(this).css({
+        stroke: "white",
+        "stroke-width": strokeWidths[currentSchool],
+      });
     } else {
-        numDiff -= 1;
+      $(this).css("stroke", "none");
     }
+  });
 
-    if ((numDiff > 0) && !$('#submitButton').is(":visible")) {
-        $("#submitButton")
-            .css("display", "flex")
-            .fadeIn(100);
-
-        } else if (numDiff === 0) {
-        $("#submitButton").fadeOut(100);
-    }
-    document.getElementById("submitButton").innerHTML = '<img id="icon16" src="/style/icons/check.svg"></img> <p> ('+numDiff+')</p>';
+  updateSubmitButtonVisibility();
 }
 
-$("#highlight").hide();
-$("#triHighlight").hide();
-
-// highlight specific room
-function highlightRoom(roomNum) {
-    var roomData = roomNumToIndex(roomNum);
-    if (roomData === -1)
-        return false;
-
-    // {...} makes roomData value type not reference
-    var roomData = { ...roomData };
-
-    // Apply transform
-    if (roomData.r - 199 < 0) // floor 1
-    {
-        roomData.x = roomData.x * 3.69 - 35.42;
-        roomData.y = roomData.y * 4.676 - 70.56;
-    }
-    else if (roomData.r - 299 < 0) // floor 2
-    {
-        roomData.x = roomData.x * 4.027 - 385;
-        roomData.y = roomData.y * 4.06 + 65;
-    }
-    else if (roomData.r - 399 < 0) // floor 3
-    {
-        roomData.x = roomData.x * 4.08 - 385;
-        roomData.y = roomData.y * 4 - 20;
-    }
-    roomData.w = roomData.w * 4;
-    roomData.h = roomData.h * 4;
-    $("#highlight").css(
-        { x: roomData.x, y: roomData.y, width: roomData.w, height: roomData.h }
-    );
-
-    //if the room is a triangle
-    if (roomData.hasOwnProperty("x1")) {
-        document.getElementById("triHighlight")
-            .setAttribute("points",
-                roomData.x1.toString() + "," + roomData.y1.toString() + "," + roomData.x2.toString() + "," + roomData.y2.toString() + "," + roomData.x3.toString() + "," + roomData.y3.toString());
-
-        $("#highlight").fadeOut(250);
-        $("#triHighlight").fadeIn(250);
-    }
-    else {
-        $("#highlight").fadeIn(250);
-        $("#triHighlight").fadeOut(250);
-    }
-    return true;
+function getCurrentData() {
+  // format data to match server-side expected format
+  const updatedData = {};
+  for (const school in modifiedData) {
+    updatedData[school] = modifiedData[school]
+      .split(",")
+      .map((status) => parseInt(status));
+  }
+  return updatedData;
 }
 
-//toggle visibility of bathrooms
-function toggleBathrooms(shown) {
-    if (shown) { $('#svgBathrooms, #svgButtons').fadeIn(250); }
-    else { $('#svgBathrooms, #svgButtons').fadeOut(250); }
-}
+function setMap(school) {
+  currentSchool = school;
+  fetch("/html/maps/" + schools[school] + "Map.html")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("network response was not ok");
+      }
+      return response.text();
+    })
+    .then((map) => {
+      $("#map").html(map);
 
-//shows bathroom update buttons
-function setupButtons() {
-    pageID = $('#pageID').html();
+      $("footer").css("opacity", 0).animate({ opacity: 1 }, 250);
+      setBathroomStatus(data[school]);
 
-    switch(pageID) {
-        case 'chs':
-            numBathrooms = 14;
-            break;
-        case 'fhs':
-            numBathrooms = 35;
-            break;
-        case 'ihs':
-            numBathrooms = 10;
-            break;
-    }
+      $("#icon-holder")
+        .off("click")
+        .on("click", "rect", function () {
+          const $icon = $(this);
+          const currentStatus = $icon.attr("data-current-status");
+          const originalStatus = $icon.attr("data-original-status");
 
-    //detect bathroom button click event
-    for (let i = 0; i < numBathrooms + 1; i++) {
-        $("#button" + i).click(function() {buttonPressed(i-1);});
-        $("#square" + i).click(function() {buttonPressed(i-1);});
-    }
+          const newStatus = currentStatus === "1" ? "0" : "1";
+          $icon.attr("data-current-status", newStatus);
 
+          $icon.css("fill", newStatus === "1" ? greenColor : redColor);
 
-    //detect bottom button click event, different detection for appended elements
-    $(document).on('click','#feedbackButton',function(e) {
-        createPopup('feedback', 'submit feedback');
-    });
+          if (newStatus !== originalStatus) {
+            $icon.css({
+              stroke: "white",
+              "stroke-width": strokeWidths[currentSchool],
+            });
+          } else {
+            $icon.css("stroke", "none");
+          }
 
-    $(document).on('click','#highlightRoomButton',function(e) {
-        if (notHighlighted) {
-            createPopup('highlight', 'enter room number');
-        }
-        else {
-            notHighlighted = true;
-            document.getElementById("highlightRoomButton").innerHTML = "<img id='icon16' src='style/icons/find.svg'>";
-            $("#cancelHighlightButton").fadeOut(100);
-            $("#highlight").fadeOut(250);
-            $("#triHighlight").fadeOut(250);
-            toggleBathrooms(true);
-        }
-    });
+          const brDataArray = modifiedData[currentSchool]
+            ? modifiedData[currentSchool].split(",")
+            : data[currentSchool].split(",");
 
-    $(document).on('click','#submitButton',function(e) {
-        createPopup('brData', 'enter password', '#passwordInfo', '#submitButton');
-    });
-}
+          const number = +$icon.data("number");
+          brDataArray[number] = newStatus;
+          modifiedData[currentSchool] = brDataArray.join(",");
 
-function createPopup(id, title, helpDestination, buttonsToHide) {
-    $("#navbarBackground").animate({right: '-200px'}, 100);
-    $("#bottomButtonNavbarShift").animate({width: 'hide'}, 100);
-
-    $('#popupTitle').html(title);
-    $('#popupId').html(id);
-    $('#popupButtons').html(buttonsToHide);
-    helpDestination = helpDestination ? helpDestination : '';
-    $('#popupHelp').attr('href', '/help' + helpDestination)
-    $('#pInput').val('')
-    $("#popupError").html('');
-
-    if(id == 'highlight') {
-        $('#pInput').attr('oninput', "this.value = this.value.replace(/[^0-9]/g, '')");
-        $('#pInput').attr('type', "text");
-    }
-    else if (id == 'brData') {
-        $('#pInput').attr('type', "password");
-        $('#pInput').attr('oninput', '');
-    }
-    else {
-        $('#pInput').attr('oninput', '');
-        $('#pInput').attr('type', "text");
-    }
-
-    $("#popup").css('display', 'flex');
-    $(buttonsToHide).fadeOut(50);
-    $("#pBackdrop").fadeIn(100);
-    $('#pInput').focus();
-}
-
-$('#px').click(function (e) {
-    $('#pInput').val('')
-    $("#popup").fadeOut(100)
-    $("#pBackdrop").fadeOut(100);
-    fadeButtons = $('#popupButtons').html()
-    if(fadeButtons != '') {
-        $('#popupButtons').html('')
-        $(fadeButtons).fadeIn(100);
-    }
-});
-
-numWrong = 0;
-var notHighlighted = true;
-
-$('#popupSubmit').click(function (e) {
-    const userInput = $('#pInput').val();
-    if (userInput !== '') {
-        switch ($('#popupId').html()) {
-            case 'brData':
-                $(this).attr("disabled", "disabled");
-
-                $.post("/bathroomUpdate", {
-                    values: brData,
-                    school: pageID,
-                    confirmation: userInput
-                }, function (data, status) { // server response
-                    if (data.isCorrect) {
-                        $('#ppInput').val('');
-                        confettiBurst(numDiff);
-                        numDiff = 0;
-                        originalData = [...brData];
-
-                        numWrong = 0;
-
-                        $("#popup").fadeOut(100);
-                        $("#pBackdrop").fadeOut(100);
-                        $("#popupError").html('');
-                        $("#popupError").fadeOut(100);
-                    } else {
-                        if(!(numWrong > 4)) {
-                            $('#pInput').val('');
-                            $("#popupError").html('incorrect password');
-                            $("#popupError").fadeIn(100);
-                            numWrong ++
-                        }
-                        else {
-                            $("#pInputBg").hide();
-                            numWrong = 0;
-                        }
-                    }
-                });
-                $(this).removeAttr("disabled");
-                break;
-            
-            case 'feedback': 
-                $(this).attr("disabled", "disabled");
-                $(document).ready(function () {
-                    $.post("/sendfeedback",
-                        {
-                            feedback: userInput,
-                        },
-                        function (data, status) {
-                        });
-                });
-                $("#popup").fadeOut(100);
-                $("#pBackdrop").fadeOut(100);
-                $(this).removeAttr("disabled");
-            break;
-
-            case 'highlight':
-                let result = /^\d+$/.test(userInput);
-                if (!result) { 
-                    $("#popupError").html('enter a number');
-                    $("#popupError").fadeIn(100);
-                }
-                else if (userInput == null) { alert("no room entered"); }
-                else if (!highlightRoom(userInput)) {
-                    $("#popupError").html('cound not find room ' + userInput);
-                    $("#popupError").fadeIn(100);
-                    return;
-                }
-                else {
-                    $("#popupError").fadeOut(100);
-                    $("#popup").fadeOut(100);
-                    $("#pBackdrop").fadeOut(100);
-                    notHighlighted = false;
-                    removeHighlight = document.getElementById("highlightRoomButton");
-                    removeHighlight.innerHTML = "<img id='icon16' src='style/icons/x.svg'>";
-                    toggleBathrooms(false);
-                }
-                break;
-        }
-    }
-});
-
-$('#pInput').on('keypress', function (e) {
-    if(e.which === 13){
-        $('#popupSubmit').click();
-    }
-});
-
-$("#pInput").on("input", function() {
-    if($(this).val() != '') {
-        $('#popupSubmit').animate({opacity:1},25);
-        $('#popupSubmit').css('cursor', 'pointer')
-    }
-    else {
-        $('#popupSubmit').animate({opacity:0},50);
-        $('#popupSubmit').css('cursor', 'default');
-    }
-});
-
-
-//menu animation stuffs
-$(window).ready(function() {
-    $('#mainTitle').animate({top:'0px'}, {duration: 500, easing: 'swing', queue: false});
-
-    setTimeout(function() {
-        $('#mainTitle').animate({opacity:'1'}, {duration: 750, easing: 'swing', queue: false});
-    }, 50);
-
-    setTimeout(function() {
-        $('#menuSchoolButtons').animate({top:'30%'}, {duration: 650, easing: 'swing', queue: false});
-    }, 150);
-
-    setTimeout(function() {
-        $('#menuSchoolButtons').animate({opacity:'1'}, {duration: 500, easing: 'swing', queue: false});
-        $('#menuLabels').animate({top:'30%'}, {duration: 650, easing: 'swing', queue: false});
-    }, 200);
-
-    setTimeout(function() {
-        $('#menuLabels').animate({opacity:'1'}, {duration: 750, easing: 'swing', queue: false});
-    }, 250);
-});
-
-
-$(document).ready(function() {
-  $('#navLoginForm').submit(function(event) {
-    event.preventDefault();
-    
-    allInputsHaveText = ($('#username').val() != '') && ($('#password').val() != '');
-
-    if(allInputsHaveText) {
-        var formData = $(this).serialize();
-        $.ajax({
-        type: 'POST',
-        url: '/login',
-        data: formData,
-        success: function(response) {
-            if(response.status < 1) {
-                failedAuth()
-            } else {
-                location.href = '/account'
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX request error:', status, error);
-        }
+          updateSubmitButtonVisibility();
         });
-    }
+    })
+    .catch((error) => {
+      console.error("there was a problem fetching the document:", error);
+      return null;
+    });
+}
+
+$("#submit").on("click", function () {
+  const dataToSubmit = getCurrentData();
+
+  const $submitButton = $("#submit");
+  $submitButton.prop("disabled", true).css("opacity", "0.5");
+
+  // send data to server
+  $.ajax({
+    url: "/update-bathrooms",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(dataToSubmit),
+    success: function (response) {
+      // update original data to match modified data
+      for (const school in modifiedData) {
+        data[school] = modifiedData[school];
+      }
+
+      // reset the current school's view
+      resetBathroomStatus();
+
+      $submitButton.prop("disabled", false).css("opacity", "1");
+
+      alert("Bathroom status updated successfully!");
+    },
+    error: function (xhr, status, error) {
+      $submitButton.prop("disabled", false).css("opacity", "1");
+
+      alert("Failed to update bathroom status. Please try again.");
+      console.error("Submission error:", error);
+    },
   });
 });
 
-function failedAuth(status) {
-    $('#navLoginForm')[0].reset();
-    $('#username').focus();
+const logoutButton = document.getElementById("logout-button");
+if (logoutButton) {
+  logoutButton.addEventListener("click", async (e) => {
+    console.log("gwe");
+    e.preventDefault();
 
-    $('#navbarLoginButton').addClass('redBorder');
+    try {
+      const response = await fetch("/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    setTimeout(function() {
-        $('#navbarLoginButton').removeClass('redBorder');
-    }, 500);
-}
+      const result = await response.json();
 
-function confettiBurst(multiplier) {
-  var duration = 10 * 100 + 500 * multiplier;
-  var animationEnd = Date.now() + duration;
-  var defaults = {
-    startVelocity: randomInRange(20, 40),
-    spread: 360,
-    ticks: 60,
-    zIndex: 0
-  };
-
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  var interval = setInterval(function () {
-    var timeLeft = animationEnd - Date.now();
-
-    if (timeLeft <= 0) {
-      return clearInterval(interval);
+      if (response.ok) {
+        window.location.href = result.redirectTo || "/";
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("An error occurred during logout");
     }
-
-    var particleCount = 50 * (timeLeft / duration);
-
-    confetti({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-    });
-    confetti({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-    });
-  }, 250);
+  });
 }

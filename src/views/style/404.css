@@ -1,72 +1,78 @@
 @font-face {
-    font-family: 'Catamaran';
-    font-weight: 800;
-    src: url(./fonts/404font.woff2) format('woff2');
+  font-family: "Catamaran";
+  font-weight: 800;
+  src: url(./fonts/404font.woff2) format("woff2");
 }
 
 @font-face {
-    font-family: barlowBold;
-    src: url(../style/fonts/Barlow-Bold.ttf);
+  font-family: "Futura";
+  src: url(../style/fonts/futura.ttf);
 }
 
 body {
-    background-color: #0f141a;
-    text-align: center;
-    font-family: monospace;
-    overflow: none;
-    user-select: none;
-    text-transform: lowercase;
+  background-color: #121211;
+  text-align: center;
+  font-family: "Futura";
+  overflow: none;
 }
-
 
 .text404 {
-    font-family: 'Catamaran', sans-serif;
-    line-height: 1px;
-    font-weight: bold;
-    color: #fff;
-    font-size: 150px;
-    margin-top: 100px;
+  font-family: "Catamaran", sans-serif;
+  line-height: 1px;
+  font-weight: bold;
+  color: #fff;
+  font-size: 150px;
+  margin-top: 100px;
 }
 
-
 .text {
-    position: absolute;
-    font-size: 24px;
-    color: #888;
-    top: 200px;
-    width: 100%;
+  position: absolute;
+  font-size: 24px;
+  color: #888;
+  top: 200px;
+  width: 100%;
 }
 
 .bottom {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    color: #999;
-    font-size: 12px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.bottom p a {
+  text-decoration: underline;
+  color: #aaa;
 }
 
 #linkholder {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 a.home-link {
-    position: absolute;
-    color: #fff;
-    padding: 5px 10px;
-    border: 1px solid white;
-    font-size: 18px;
-    top: 50vh;
-    background: transparent;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: transform 0.2s;
-    font-family: barlowBold;
-    cursor: pointer;
+  position: absolute;
+  color: #aaa;
+  padding: 10px 15px;
+  border: 1px solid #aaa;
+  top: 50vh;
+  background: transparent;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: transform 0.2s;
+  font-family: "Futura";
+  cursor: pointer;
+  font-weight: 200;
+}
+
+a.home-link:hover {
+  color: #eee;
+  transition: transform 0.2s;
 }
 
 .home-link:hover {
-    color: #bbb;
-    transition: color .25s;
+  color: #bbb;
+  transition: color 0.25s;
 }

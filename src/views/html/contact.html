@@ -1,53 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+    />
     <link rel="icon" href="../style/images/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="../style/style.css">
-
+    <link rel="stylesheet" href="../style/standard.css" />
     <script src="../thirdParty/jquery.min.js"></script>
-    <title>ppsbathrooms | contact</title>
-</head>
+    <title>PPS Bathrooms | Contact</title>
+    <style>
+      @font-face {
+        font-family: "Futura";
+        src: url(../style/fonts/int.ttf);
+      }
 
-<body>
-    <div class="header"></div>
-
-    <p id="pageID">contact</p>
-
-    <div id="contactHolder">
-        <h1>contact us</h1>
-        <div id="contactIconHolder">
-            <a id="contactEmail" target="_blank" href="mailto:ppsbathrooms@gmail.com">ppsbathrooms@gmail.com</a><br><br>
-            <a target="_blank" href="https://www.instagram.com/ppsbathrooms/"><img id="icon24"
-                    src="../style/icons/instagram.svg"></a>
-            <a target="_blank" href="https://discord.gg/qwY9258CNA"><img id="icon24"
-                    src="../style/icons/discord.svg"></a><br><br>
-        </div>
-    </div>
-
-    <div id="footer"></div>
-
-</body>
-<script src="../js/htmlInsert.js"></script>
-<script src="../js/selectSchool.js"></script>
-<script src="../js/update.js"></script>
-<style>
-    #contactEmail {
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #121212;
         color: #fff;
-        font-family: monospace;
+        font-family: "Futura", sans-serif;
+        text-align: center;
+      }
+
+      #contactHolder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 10vh;
+      }
+
+      #contactEmail {
+        color: #fff;
         font-size: 20px;
         text-decoration: none;
-    }
+        transition: color 0.3s ease-in-out;
+      }
 
-    #contactHolder {
-        font-family: barlowBold;
-    }
+      #contactEmail:hover {
+        color: #aaa;
+      }
 
-    #contactHolder a {
-        margin: 10px;
-    }
-</style>
+      .iconLink img {
+        width: 32px;
+        height: 32px;
+        transition: transform 0.2s ease-in-out;
+      }
 
+      .iconLink img:hover {
+        transform: scale(1.2);
+      }
+
+      #contactIcons {
+        display: flex;
+        gap: 15px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 20px;
+        }
+
+        #contactEmail {
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header></header>
+
+    <main id="contactHolder">
+      <h1>Contact Us</h1>
+      <a id="contactEmail" href="mailto:ppsbathrooms@gmail.com">
+        ppsbathrooms@gmail.com
+      </a>
+      <div id="contactIcons">
+        <a
+          class="iconLink"
+          href="https://www.instagram.com/ppsbathrooms/"
+          target="_blank"
+        >
+          <img src="../style/icons/instagram.svg" alt="Instagram" />
+        </a>
+        <a
+          class="iconLink"
+          href="https://discord.gg/qwY9258CNA"
+          target="_blank"
+        >
+          <img src="../style/icons/discord.svg" alt="Discord" />
+        </a>
+      </div>
+    </main>
+
+    <script src="../js/standardInject.js"></script>
+  </body>
 </html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PPSBathrooms - Login</title>
+    <script src="../thirdParty/jquery.min.js"></script>
+    <link rel="stylesheet" href="../style/login.css" />
+    <link rel="stylesheet" href="../style/standard.css" />
+  </head>
+  <body>
+    <header></header>
+    <div class="login-wrapper">
+      <div class="login-container">
+        <form id="login-form">
+          <input type="hidden" id="returnTo" name="returnTo" value="/update" />
+          <div class="form-header">
+            <h1>Log In</h1>
+          </div>
+
+          <div class="input-group">
+            <div class="input-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                ></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <input
+              type="email"
+              id="emailEntry"
+              placeholder="Email address"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <div class="input-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <input
+              type="password"
+              id="passEntry"
+              placeholder="Password"
+              required
+            />
+          </div>
+
+          <div class="form-utils">
+            <label class="checkbox-container">
+              <input type="checkbox" id="remember-me" />
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="login-button">
+            Sign In
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 18l6-6-6-6"></path>
+            </svg>
+          </button>
+
+          <p class="signup-text">
+            Don't have an account?
+            <a href="/account-info">More Info</a>
+          </p>
+        </form>
+      </div>
+    </div>
+    <script src="../js/login.js"></script>
+    <script src="../js/standardInject.js"></script>
+  </body>
+</html>
