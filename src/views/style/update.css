@@ -77,3 +77,14 @@ body {
 #icon-holder rect {
   cursor: pointer;
 }
+
+#logout-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 5px 10px;
+  border: 1px solid #fff;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}

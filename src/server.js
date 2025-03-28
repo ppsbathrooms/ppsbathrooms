@@ -2,6 +2,9 @@ const express = require("express");
 const path = require("path");
 const { MongoClient } = require("mongodb");
 const chalk = require("chalk");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 // .env file must be in src folder
 require("dotenv").config();
@@ -31,24 +34,50 @@ async function connectToDatabase() {
   }
 }
 
-let mongoClient;
-connectToDatabase()
-  .then((client) => {
-    mongoClient = client;
+// Initialize session middleware with MemoryStore first
+// This ensures session is available even if MongoDB connection fails initially
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "fallback_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: MONGODB_URI,
+      dbName: DB_NAME,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+    },
   })
-  .catch((error) => {
-    console.error("Failed to connect to database", error);
-    process.exit(1);
-  });
+);
 
-app.use((req, res, next) => {
-  if (mongoClient) {
-    req.db = mongoClient.db(DB_NAME);
-  } else {
-    console.error(chalk.red("Database connection not established"));
+// Database middleware
+app.use(async (req, res, next) => {
+  try {
+    if (mongoClient) {
+      req.db = mongoClient.db(DB_NAME);
+    } else {
+      console.error(chalk.red("Database connection not established"));
+      return res.status(500).send("Database connection error");
+    }
+    next();
+  } catch (error) {
+    console.error(chalk.red("Database middleware error:"), error);
+    res.status(500).send("Internal server error");
   }
-  next();
 });
+
+// Authentication middleware
+function requireAuth(req, res, next) {
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    res.redirect(`/login?returnTo=${encodeURIComponent(req.originalUrl)}`);
+  }
+}
 
 app.set("views", path.join(__dirname, "views"));
 app.engine("html", require("ejs").renderFile);
@@ -68,7 +97,99 @@ staticPages.forEach((page) => {
   });
 });
 
-app.get("/update", async (req, res) => {
+let mongoClient;
+connectToDatabase()
+  .then((client) => {
+    mongoClient = client;
+    console.log("MongoDB connected and session store initialized");
+
+    // start server after database is connected
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database", error);
+    process.exit(1);
+  });
+
+app.get("/login", (req, res) => {
+  // if already logged in, redirect to update page
+  if (req.session.user) {
+    return res.redirect("/update");
+  }
+
+  const returnTo = req.query.returnTo || "/update";
+  res.render("html/login", { returnTo });
+});
+
+// login
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    // Ensure db is available
+    if (!req.db) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
+
+    const accountsCollection = req.db.collection("accounts");
+
+    // Find user by email
+    const user = await accountsCollection.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Create session
+    req.session.user = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
+    // Redirect to either the returnTo URL or /update
+    const returnTo = req.body.returnTo || "/update";
+    res.status(200).json({
+      message: "Login successful",
+      redirectTo: returnTo,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res
+      .status(500)
+      .json({ message: "Error during login", details: error.message });
+  }
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Could not log out" });
+    }
+    res.clearCookie("connect.sid");
+    res.status(200).json({
+      message: "Logged out successfully",
+      redirectTo: "/",
+    });
+  });
+});
+
+app.get("/update", requireAuth, async (req, res) => {
   try {
     if (!mongoClient)
       return res
@@ -93,13 +214,12 @@ app.get("/update", async (req, res) => {
   }
 });
 
-// update bathrooms post
-app.post("/update-bathrooms", async (req, res) => {
+app.post("/update-bathrooms", requireAuth, async (req, res) => {
   try {
     const bathroomUpdates = req.body;
     const bathroomCollection = req.db.collection("bathroomStatus");
 
-    // Update each school's bathroom status
+    // update each school's bathroom status
     for (const school in bathroomUpdates) {
       await bathroomCollection.updateOne(
         { school: school },
@@ -114,7 +234,6 @@ app.post("/update-bathrooms", async (req, res) => {
   }
 });
 
-// schools
 app.get("/:school", async (req, res) => {
   try {
     if (!mongoClient) {
@@ -155,11 +274,6 @@ app.get("/:school", async (req, res) => {
 // 404 handler - this should be the last route
 app.use((req, res) => {
   res.status(404).render("html/404");
-});
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 // Graceful shutdown

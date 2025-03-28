@@ -210,3 +210,31 @@ $("#submit").on("click", function () {
     },
   });
 });
+
+const logoutButton = document.getElementById("logout-button");
+if (logoutButton) {
+  logoutButton.addEventListener("click", async (e) => {
+    console.log("gwe");
+    e.preventDefault();
+
+    try {
+      const response = await fetch("/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        window.location.href = result.redirectTo || "/";
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("An error occurred during logout");
+    }
+  });
+}
