@@ -1,4 +1,5 @@
 const schoolData = JSON.parse($("#school-data").attr("data-schools"));
+const userEmail = schoolData.userEmail;
 
 const greenColor = "#036F3E";
 const redColor = "#D40028";
@@ -71,15 +72,23 @@ function resetBathroomStatus() {
 $("#submit").hide();
 
 setMap("franklin");
+$("#user-email").html(userEmail);
 
 // school switching
-$("#side-panel p").on("click", function () {
+$("#side-panel p.school").on("click", function () {
   $("#side-panel p").removeClass("selected");
   $(this).addClass("selected");
-
+  $("#account-info").hide();
   const id = $(this).attr("id");
   const school = id.replace("-select", "");
   setMap(school);
+});
+
+$("#side-panel p.account").on("click", function () {
+  $("#side-panel p").removeClass("selected");
+  $(this).addClass("selected");
+  $("#map").html("");
+  $("#account-info").show();
 });
 
 function setBathroomStatus(brData) {

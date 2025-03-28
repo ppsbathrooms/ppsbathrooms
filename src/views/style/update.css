@@ -88,3 +88,10 @@ body {
   border-radius: 5px;
   cursor: pointer;
 }
+
+#account-info {
+  display: none;
+  margin-left: 200px;
+  color: #fff;
+  margin-top: 100px;
+}

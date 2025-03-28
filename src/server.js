@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const chalk = require("chalk");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
@@ -189,6 +189,76 @@ app.post("/logout", (req, res) => {
   });
 });
 
+app.post("/change-password", requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // validate input
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Current and new passwords are required" });
+    }
+
+    // ensure db is available
+    if (!req.db) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
+
+    const accountsCollection = req.db.collection("accounts");
+    const userId = new ObjectId(req.session.user.id);
+
+    // find current user
+    const user = await accountsCollection.findOne({
+      _id: userId,
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    // verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // validate new password requirements
+    if (
+      newPassword.length < 8 ||
+      !/[a-zA-Z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword) ||
+      !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "New password does not meet requirements" });
+    }
+
+    // hash new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+    // update password in database
+    await accountsCollection.updateOne(
+      { _id: userId },
+      { $set: { password: hashedNewPassword } }
+    );
+
+    res.status(200).json({
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.error("Password change error:", error);
+    res.status(500).json({
+      message: "Error changing password",
+      details: error.message,
+    });
+  }
+});
+
 app.get("/update", requireAuth, async (req, res) => {
   try {
     if (!mongoClient)
@@ -207,7 +277,10 @@ app.get("/update", requireAuth, async (req, res) => {
     const schools = Object.fromEntries(
       results.map((r, i) => [validSchools[i], { bathrooms: r.data }])
     );
-    res.render("html/update", { data: { schools } });
+
+    const userEmail = req.session.user.email;
+
+    res.render("html/update", { data: { schools, userEmail } });
   } catch (e) {
     console.error("An error occurred:", e);
     res.status(500).render("html/error");
